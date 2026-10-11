@@ -2,8 +2,8 @@ import XCTest
 @testable import PhoneMirrorCore
 
 final class ReconnectionTests: XCTestCase {
-    let target = DeviceIdentity(platform: .android, id: "A")
-    let other = DeviceIdentity(platform: .android, id: "B")
+    let target = ConnectionTarget(identity: DeviceIdentity(platform: .android, id: "A"), transport: .usb)
+    let other = ConnectionTarget(identity: DeviceIdentity(platform: .android, id: "B"), transport: .usb)
     func armedPolicy() -> ReconnectionPolicy {
         var policy = ReconnectionPolicy(); policy.userStarted(target); policy.streamBecameLive(); policy.streamEnded(at: 100)
         return policy
@@ -79,9 +79,16 @@ final class ReconnectionTests: XCTestCase {
         }
     }
     func testChangingTargetRequiresNewUserStart() {
-        var policy = armedPolicy(); let ios = DeviceIdentity(platform: .iOS, id: "A")
+        var policy = armedPolicy(); let ios = ConnectionTarget(identity: DeviceIdentity(platform: .iOS, id: "A"), transport: .usb)
         policy.userStopped(); policy.userStarted(ios); policy.streamEnded(at: 0)
         XCTAssertNil(policy.nextAttempt(devices: [target: .ready], at: 1))
         XCTAssertEqual(policy.nextAttempt(devices: [target: .ready, ios: .ready], at: 1), ios)
     }
+    func testInvalidTargetsCannotArmAutomaticReconnect() {
+        for target in [ConnectionTarget(identity: DeviceIdentity(platform: .android, id: ""), transport: .wifi), ConnectionTarget(identity: DeviceIdentity(platform: .iOS, id: "A"), transport: .wifi)] {
+            var policy = ReconnectionPolicy(); policy.userStarted(target); policy.streamEnded(at: 100)
+            XCTAssertNil(policy.target); XCTAssertNil(policy.nextAttempt(devices: [target: .ready], at: 101))
+        }
+    }
+
 }

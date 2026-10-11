@@ -17,10 +17,12 @@ cat > "$APP/Contents/Info.plist" <<'PLIST'
 <key>CFBundleName</key><string>Phone Mirror</string>
 <key>CFBundleDisplayName</key><string>Phone Mirror</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>0.3.0</string>
-<key>CFBundleVersion</key><string>3</string>
+<key>CFBundleShortVersionString</key><string>0.4.0</string>
+<key>CFBundleVersion</key><string>4</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
+<key>NSLocalNetworkUsageDescription</key><string>같은 Wi-Fi에 있는 Android 폰을 검색하고 화면을 연결하기 위해 로컬 네트워크를 사용합니다.</string>
+<key>NSBonjourServices</key><array><string>_adb-tls-pairing._tcp</string><string>_adb-tls-connect._tcp</string></array>
 <key>NSCameraUsageDescription</key><string>USB로 연결된 아이폰과 아이패드 화면을 표시하기 위해 캡처 권한이 필요합니다.</string>
 </dict></plist>
 PLIST

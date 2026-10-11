@@ -50,10 +50,11 @@ final class FakeMirrorSession: MirrorSession {
 final class FakeMirrorSessionFactory: MirrorSessionFactory {
     var sessions: [FakeMirrorSession] = []
     var identities: [DeviceIdentity] = []
+    var devices: [PhoneDevice] = []
     var fails = false
-    func makeSession(for device: DeviceIdentity, settings: MirrorSettings) throws -> any MirrorSession {
+    func makeSession(for device: PhoneDevice, settings: MirrorSettings) throws -> any MirrorSession {
         if fails { throw CocoaError(.fileReadNoSuchFile) }
-        let session = FakeMirrorSession(); sessions.append(session); identities.append(device); return session
+        let session = FakeMirrorSession(); sessions.append(session); identities.append(device.identity); devices.append(device); return session
     }
 }
 
@@ -254,6 +255,48 @@ final class ViewModelBehaviorTests: XCTestCase {
         XCTAssertNil(model.lastSavedURL); XCTAssertFalse(model.mediaStatusMessage.isEmpty); XCTAssertEqual(model.connectionState, .live)
         model.stopMirroring(); model.captureScreenshot(to: directory.appendingPathComponent("stopped.png"))
         XCTAssertFalse(FileManager.default.fileExists(atPath: directory.appendingPathComponent("stopped.png").path))
+    }
+
+    func wirelessDevice(_ address: String, id: String = "A") -> PhoneDevice {
+        PhoneDevice(identity: DeviceIdentity(platform: .android, id: id), name: "Galaxy", availability: .ready, endpoint: DeviceEndpoint(transport: .wifi, address: address))
+    }
+    func testWirelessReconnectUsesLatestAddressWithStableSelection() async {
+        let (model, discovery, factory, time, store) = fixture()
+        let first = wirelessDevice("192.168.0.44:40001"), moved = wirelessDevice("192.168.0.99:65535")
+        discovery.devices = [deviceA, first]; await model.refreshDevices(); model.selectDevice(first.id); model.startMirroring(); factory.sessions[0].emitFrame(); await settle()
+        XCTAssertEqual(model.connectionTransportLabel, "Wi-Fi"); XCTAssertEqual(store.settings.preferredDeviceID(for: .android), first.id)
+        factory.sessions[0].interruptForTest(); await settle(); discovery.devices = [deviceA, moved]; time.now += 1; await model.refreshDevices()
+        XCTAssertEqual(factory.devices.last?.endpoint.address, moved.endpoint.address); XCTAssertEqual(model.selectedDeviceID, first.id)
+        XCTAssertEqual(factory.devices.count, 2)
+    }
+    func testActiveWirelessAddressChangeEndsOldSessionBeforeRetry() async {
+        let (model, discovery, factory, time, _) = fixture()
+        discovery.devices = [wirelessDevice("1.2.3.4:1")]; await model.refreshDevices(); model.startMirroring(); factory.sessions[0].emitFrame(); await settle()
+        discovery.devices = [wirelessDevice("1.2.3.4:2")]; await model.refreshDevices()
+        XCTAssertEqual(model.connectionState, .reconnecting); XCTAssertEqual(factory.sessions[0].stopCount, 1)
+        time.now += 1; await model.refreshDevices(); XCTAssertEqual(factory.devices.last?.endpoint.address, "1.2.3.4:2")
+    }
+    func testWirelessTargetNeverSwitchesToUSBEvenForSamePhone() async {
+        let (model, discovery, factory, time, _) = fixture()
+        discovery.devices = [wirelessDevice("1.2.3.4:1")]; await model.refreshDevices(); model.startMirroring(); factory.sessions[0].emitFrame(); await settle()
+        factory.sessions[0].interruptForTest(); await settle(); discovery.devices = [deviceA, wirelessDevice("1.2.3.5:2", id: "B")]; time.now += 100; await model.refreshDevices()
+        XCTAssertEqual(factory.sessions.count, 1); XCTAssertEqual(model.connectionTransportLabel, "Wi-Fi")
+        model.stopMirroring(); model.selectDevice(deviceA.id); XCTAssertEqual(model.connectionTransportLabel, "USB"); model.startMirroring()
+        XCTAssertEqual(factory.devices.last?.endpoint.transport, .usb)
+    }
+    func testSavedWirelessSelectionRestoresAcrossAddressChangeWithoutAutostart() async {
+        var settings = MirrorSettings(); let first = wirelessDevice("1.2.3.4:1"); settings.rememberDevice(DeviceIdentity(platform: .android, id: first.id))
+        let (model, discovery, factory, _, store) = fixture(settings)
+        discovery.devices = [deviceA, wirelessDevice("1.2.3.5:2")]; await model.refreshDevices()
+        XCTAssertEqual(model.selectedDeviceID, first.id); XCTAssertTrue(factory.sessions.isEmpty); XCTAssertTrue(store.writes.isEmpty)
+    }
+
+    func testWirelessTimeoutKeepsTransportSpecificGuidanceAndCancelsControls() async {
+        let (model, discovery, factory, time, _) = fixture()
+        discovery.devices = [wirelessDevice("1.2.3.4:1")]; await model.refreshDevices(); model.startMirroring()
+        time.now += 15; model.tick(); model.sendKey(3)
+        XCTAssertEqual(model.connectionState, .reconnecting); XCTAssertTrue(factory.sessions[0].keys.isEmpty)
+        XCTAssertTrue(model.connectionMessage.contains("Wi-Fi")); XCTAssertFalse(model.connectionMessage.contains("USB 디버깅"))
     }
 
 }

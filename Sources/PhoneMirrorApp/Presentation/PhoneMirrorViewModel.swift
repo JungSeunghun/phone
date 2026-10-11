@@ -6,7 +6,7 @@ import UniformTypeIdentifiers
 import PhoneMirrorCore
 
 enum ConnectionState: String {
-    case idle = "기기 연결 대기", ready = "USB 연결됨 · 화면 보기 준비", unauthorized = "USB 디버깅 승인 대기"
+    case idle = "기기 연결 대기", ready = "기기 연결됨 · 화면 보기 준비", unauthorized = "디버깅 승인 대기"
     case connecting = "영상 연결 중", live = "화면 수신 중", stalled = "영상 수신 지연", reconnecting = "자동 재연결 대기"
     case disconnected = "연결 끊김", failed = "연결 실패", stopped = "화면 보기 종료"
     var active: Bool { self == .connecting || self == .live || self == .stalled }
@@ -19,7 +19,7 @@ final class PhoneMirrorViewModel: ObservableObject {
     @Published private(set) var availableDevices: [PhoneDevice] = []
     @Published private(set) var selectedDeviceID = ""
     @Published private(set) var connectionState: ConnectionState = .idle
-    @Published private(set) var connectionMessage = "USB 케이블로 폰을 연결하세요."
+    @Published private(set) var connectionMessage = "USB 또는 Wi-Fi로 폰을 연결하세요."
     @Published private(set) var settingsStatusMessage = ""
     @Published private(set) var connectionLog = ""
     @Published private(set) var currentFrame: CGImage?
@@ -40,6 +40,7 @@ final class PhoneMirrorViewModel: ObservableObject {
     private var phoneAudio: PhoneAudio?
     private var session: (any MirrorSession)?
     private var sessionGeneration: UUID?
+    private var sessionEndpoint: DeviceEndpoint?
     private var discoveryGeneration = UUID()
     private var refreshInProgress = false
     private var reconnect = ReconnectionPolicy()
@@ -59,8 +60,9 @@ final class PhoneMirrorViewModel: ObservableObject {
     var canStartMirroring: Bool {
         !hasShutdown && !isMirroring && !isSavingRecording && !reconnect.isWaiting && availableDevices.contains { $0.id == selectedDeviceID && $0.availability == .ready }
     }
+    var connectionTransportLabel: String { availableDevices.first(where: { $0.id == selectedDeviceID })?.endpoint.transport.displayName ?? (reconnect.target?.transport.displayName ?? "") }
     var canSaveFrame: Bool { currentFrame != nil && connectionState == .live }
-    init(settingsStore: any SettingsStore = UserDefaultsSettingsStore(), deviceDiscovery: any DeviceDiscovery = USBDeviceDiscovery(), sessionFactory: any MirrorSessionFactory = USBMirrorSessionFactory(), timeProvider: any TimeProvider = MonotonicTimeProvider(), automaticallyPoll: Bool = true) {
+    init(settingsStore: any SettingsStore = UserDefaultsSettingsStore(), deviceDiscovery: any DeviceDiscovery = PhoneDeviceDiscovery(), sessionFactory: any MirrorSessionFactory = PhoneMirrorSessionFactory(), timeProvider: any TimeProvider = MonotonicTimeProvider(), automaticallyPoll: Bool = true) {
         self.settingsStore = settingsStore; self.deviceDiscovery = deviceDiscovery; self.sessionFactory = sessionFactory; self.timeProvider = timeProvider; self.automaticallyPoll = automaticallyPoll
         let restoredSettings = settingsStore.load().validated()
         settings = restoredSettings; platform = restoredSettings.preferredPlatform
@@ -86,7 +88,7 @@ final class PhoneMirrorViewModel: ObservableObject {
     func selectDevice(_ id: String) {
         guard id != selectedDeviceID, !isMirroring, !isSavingRecording, availableDevices.contains(where: { $0.id == id && $0.identity.isValid }) else { return }
         stopMirroring(); selectedDeviceID = id
-        var updated = settings; updated.rememberDevice(DeviceIdentity(platform: platform, id: id)); updateSettings(updated); updateReadyState()
+        var updated = settings; if let device = availableDevices.first(where: { $0.id == id }) { updated.rememberDevice(device.target) }; updateSettings(updated); updateReadyState()
     }
     func selectPlatform(_ value: PhonePlatform) {
         guard value != platform, !isMirroring, !isSavingRecording else { return }
@@ -101,7 +103,7 @@ final class PhoneMirrorViewModel: ObservableObject {
         scanCounter += 1
         if automaticallyPoll && scanCounter % 2 == 0 { Task { await refreshDevices() } }
         if connectionState == .connecting && timeProvider.now - connectionStartedTime >= 15 {
-            sessionEnded("15초 동안 영상이 도착하지 않았습니다. 폰 잠금과 USB 디버깅 승인을 확인하세요.")
+            sessionEnded("15초 동안 영상이 도착하지 않았습니다. \(connectionTransportLabel) 연결과 폰 잠금·디버깅 승인을 확인하세요.")
         } else if connectionState == .live && timeProvider.now - lastFrameTime >= 4 {
             connectionState = .stalled; connectionMessage = "새 영상 프레임이 도착하지 않아 마지막 수신 화면을 표시합니다."
         }
@@ -119,7 +121,9 @@ final class PhoneMirrorViewModel: ObservableObject {
             var seen = Set<String>()
             availableDevices = devices.filter { $0.identity.platform == platform && $0.identity.isValid && seen.insert($0.id).inserted }
             if session != nil {
-                if !availableDevices.contains(where: { $0.id == selectedDeviceID && $0.availability == .ready }) { sessionEnded("USB 기기 연결이 끊겼습니다.") }
+                if let current = availableDevices.first(where: { $0.id == selectedDeviceID && $0.availability == .ready }) {
+                    if current.endpoint != sessionEndpoint { sessionEnded("기기 연결 주소가 변경됐습니다. 새 주소로 다시 연결합니다.") }
+                } else { sessionEnded("기기 연결이 끊겼습니다.") }
             } else if reconnect.target == nil {
                 if let preferred = settings.preferredDeviceID(for: platform), availableDevices.contains(where: { $0.id == preferred }) { selectedDeviceID = preferred }
                 else if !availableDevices.contains(where: { $0.id == selectedDeviceID }) { selectedDeviceID = availableDevices.first?.id ?? "" }
@@ -138,23 +142,23 @@ final class PhoneMirrorViewModel: ObservableObject {
         guard !isMirroring else { return }
         if let device = availableDevices.first(where: { $0.id == selectedDeviceID }) {
             switch device.availability { case .ready: connectionState = .ready; case .unauthorized: connectionState = .unauthorized; case .offline: connectionState = .disconnected }
-            connectionMessage = device.availability == .ready ? "USB 기기를 인식했습니다. 화면 보기를 시작하세요." : device.status
-        } else { connectionState = .idle; connectionMessage = platform == .android ? "Android 폰을 연결하고 USB 디버깅을 켜주세요." : "아이폰을 연결하고 잠금 해제 후 ‘이 컴퓨터를 신뢰’를 선택하세요." }
+            connectionMessage = device.availability == .ready ? "\(device.endpoint.transport.displayName) 기기를 인식했습니다. 화면 보기를 시작하세요." : device.status
+        } else { connectionState = .idle; connectionMessage = platform == .android ? "USB 연결 또는 Wi-Fi 페어링으로 Android 폰을 연결하세요." : "아이폰을 연결하고 잠금 해제 후 ‘이 컴퓨터를 신뢰’를 선택하세요." }
     }
     func startMirroring() {
         guard canStartMirroring else { return }
-        let device = DeviceIdentity(platform: platform, id: selectedDeviceID)
-        reconnect.userStarted(device)
-        var updated = settings; updated.rememberDevice(device); updated.preferredPlatform = platform; updateSettings(updated)
+        guard let device = availableDevices.first(where: { $0.id == selectedDeviceID }) else { return }
+        reconnect.userStarted(device.target)
+        var updated = settings; updated.rememberDevice(device.target); updated.preferredPlatform = platform; updateSettings(updated)
         beginSession(device)
     }
-    private func beginSession(_ device: DeviceIdentity) {
-        let token = UUID(); sessionGeneration = token; connectionState = .connecting; currentFrame = nil; lastPixelBuffer = nil; videoMetrics = ""
+    private func beginSession(_ device: PhoneDevice) {
+        let token = UUID(); sessionGeneration = token; sessionEndpoint = device.endpoint; connectionState = .connecting; currentFrame = nil; lastPixelBuffer = nil; videoMetrics = ""
         connectionStartedTime = timeProvider.now; frameCounter = 0; lastMetricsTime = timeProvider.now; isAudioAvailable = false
         connectionMessage = "폰 화면 전송을 시작합니다. 첫 영상 프레임을 기다리고 있어요."
         do {
             let newSession = try sessionFactory.makeSession(for: device, settings: settings); session = newSession
-            phoneAudio = device.platform == .android && settings.audioEnabled ? PhoneAudio() : nil
+            phoneAudio = device.identity.platform == .android && settings.audioEnabled ? PhoneAudio() : nil
             newSession.callbacks = MirrorSessionCallbacks(
                 onFrame: { [weak self] buffer in DispatchQueue.main.async { self?.receive(buffer, token: token) } },
                 onAudio: { [weak self] data in DispatchQueue.main.async {
@@ -178,7 +182,7 @@ final class PhoneMirrorViewModel: ObservableObject {
         if isRecording { recorder.appendVideo(buffer, time: CACurrentMediaTime()) }
     }
     private func releaseSession() {
-        sessionGeneration = nil; let previous = session; session = nil; previous?.stop()
+        sessionGeneration = nil; sessionEndpoint = nil; let previous = session; session = nil; previous?.stop()
         phoneAudio?.stop(); phoneAudio = nil; isAudioAvailable = false
         if isRecording { stopRecording() }
     }
@@ -188,14 +192,14 @@ final class PhoneMirrorViewModel: ObservableObject {
     }
     private func updateReconnectState(reason: String? = nil) {
         connectionState = reconnect.isWaiting ? .reconnecting : .disconnected
-        if reconnect.isExhausted { connectionMessage = "자동 재연결 5회 실패. USB 연결을 확인한 뒤 다시 시작하세요." }
-        else if reconnect.isWaiting { connectionMessage = "\(reason.map { $0 + " " } ?? "")같은 폰에 자동 재연결합니다. 재시도 \(reconnect.attemptCount + 1)/5 · 폰에서 USB 디버깅 승인이 필요하면 허용하세요." }
+        if reconnect.isExhausted { connectionMessage = "자동 재연결 5회 실패. USB 또는 Wi-Fi 연결을 확인한 뒤 다시 시작하세요." }
+        else if reconnect.isWaiting { connectionMessage = "\(reason.map { $0 + " " } ?? "")같은 폰에 자동 재연결합니다. 재시도 \(reconnect.attemptCount + 1)/5 · 폰에서 디버깅 승인이 필요하면 허용하세요." }
         else { connectionMessage = reason ?? "자동 재연결이 꺼져 있습니다. 직접 화면 보기를 시작할 수 있어요." }
     }
     private func tryReconnect() {
         guard !hasShutdown, session == nil else { return }
-        let devices = Dictionary(uniqueKeysWithValues: availableDevices.map { ($0.identity, $0.availability) })
-        if let device = reconnect.nextAttempt(devices: devices, at: timeProvider.now, recordingIsBusy: isRecording || isSavingRecording) { selectedDeviceID = device.id; beginSession(device) }
+        let devices = Dictionary(uniqueKeysWithValues: availableDevices.map { ($0.target, $0.availability) })
+        if let target = reconnect.nextAttempt(devices: devices, at: timeProvider.now, recordingIsBusy: isRecording || isSavingRecording), let device = availableDevices.first(where: { $0.target == target && $0.availability == .ready }) { selectedDeviceID = device.id; beginSession(device) }
     }
     func stopMirroring() { reconnect.userStopped(); releaseSession(); connectionState = .stopped; connectionMessage = "화면 보기를 종료했습니다." }
     func simulateStreamEndForTest() { session?.interruptForTest() }

@@ -4,4 +4,4 @@
 
 SHA-256: `26cbc9ad0aced6c2282455bef4fb43462605c1f8758c74b4ab1dbf818c229daa`
 
-The Swift client implements the 5.0 wire protocol. Update the protocol code and integration tests before changing this binary; server and client versions must match. The server runs as Android's ADB shell user, is copied to a unique `/data/local/tmp/phone-mirror-<id>.jar` at connection time, and uses the upstream cleanup behavior.
+The Swift client and independent Rust/Tauri client in `desktop` implement the 5.0 wire protocol. Update both clients' protocol code and integration tests before changing this binary; server and client versions must match. The server runs as Android's ADB shell user, is copied to a unique `/data/local/tmp/phone-mirror-<id>.jar` at connection time, and uses the upstream cleanup behavior. The Rust/Tauri app embeds the same server and packages this source record and the Apache 2.0 license in its `licenses` resources.

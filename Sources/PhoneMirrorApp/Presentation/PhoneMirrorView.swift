@@ -47,6 +47,7 @@ struct PhoneScreen: NSViewRepresentable {
 struct PhoneMirrorView: View {
     @ObservedObject var model: PhoneMirrorViewModel
     @State private var showLog = false
+    @State private var showWirelessPairing = false
     private func settingsBinding<Value>(_ keyPath: WritableKeyPath<MirrorSettings, Value>) -> Binding<Value> {
         Binding(get: { model.settings[keyPath: keyPath] }, set: { value in var settings = model.settings; settings[keyPath: keyPath] = value; model.updateSettings(settings) })
     }
@@ -55,12 +56,12 @@ struct PhoneMirrorView: View {
     }
     var body: some View {
         HStack(spacing: 0) {
-            VStack(alignment: .leading, spacing: 18) {
+            VStack(alignment: .leading, spacing: 14) {
                 HStack(spacing: 12) {
                     Image(systemName: "iphone.gen3.radiowaves.left.and.right").font(.system(size: 28)).foregroundStyle(.mint)
                     VStack(alignment: .leading, spacing: 3) {
                         Text("Phone Mirror").font(.system(size: 23, weight: .bold))
-                        Text("USB로 연결하는 내 폰 화면").foregroundStyle(.secondary).font(.caption)
+                        Text("USB · Wi-Fi로 연결하는 내 폰 화면").foregroundStyle(.secondary).font(.caption)
                     }
                 }
                 Picker("폰 종류", selection: Binding(get: { model.platform }, set: { model.selectPlatform($0) })) {
@@ -74,6 +75,10 @@ struct PhoneMirrorView: View {
                         ForEach(model.availableDevices) { Text("\($0.name) · \($0.status)").tag($0.id) }
                     }.labelsHidden() }
                 }.disabled(model.isMirroring || model.isSavingRecording)
+                if model.platform == .android {
+                    Button { showWirelessPairing = true } label: { Label("Wi-Fi 페어링 · 연결", systemImage: "wifi") }
+                        .disabled(model.isMirroring || model.isSavingRecording)
+                }
                 Divider()
                 if model.platform == .android {
                     VStack(alignment: .leading, spacing: 14) {
@@ -98,14 +103,15 @@ struct PhoneMirrorView: View {
                     Text(model.connectionMessage).font(.callout).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
                 }
                 Button { model.canStopMirroring ? model.stopMirroring() : model.startMirroring() } label: {
-                    HStack { Image(systemName: model.canStopMirroring ? "stop.fill" : "play.fill"); Text(model.canStopMirroring ? "화면 보기 종료" : "폰 화면 보기").fontWeight(.semibold); Spacer() }.padding(.vertical, 7)
+                    HStack { Image(systemName: model.canStopMirroring ? "stop.fill" : "play.fill"); Text(model.connectionState == .reconnecting ? "자동 재연결 취소" : model.canStopMirroring ? "화면 보기 종료" : "폰 화면 보기").fontWeight(.semibold); Spacer() }.padding(.vertical, 7)
                 }.buttonStyle(.borderedProminent).tint(.mint).disabled(!model.canStopMirroring && !model.canStartMirroring)
                 Button(showLog ? "연결 로그 닫기" : "연결 로그 보기") { showLog.toggle() }.buttonStyle(.plain).font(.caption).foregroundStyle(.secondary)
-            }.padding(26).frame(width: 360).frame(maxHeight: .infinity).background(Color(nsColor: .windowBackgroundColor))
+            }.padding(22).frame(width: 360).frame(maxHeight: .infinity).background(Color(nsColor: .windowBackgroundColor))
             Divider()
             VStack(spacing: 0) {
                 HStack(spacing: 12) {
                     Text(model.videoMetrics.isEmpty ? "내 폰 화면" : model.videoMetrics).font(.caption.monospaced()).foregroundStyle(.secondary)
+                    if !model.connectionTransportLabel.isEmpty { Text(model.connectionTransportLabel).font(.caption).padding(.horizontal, 8).padding(.vertical, 4).background(.mint.opacity(0.12), in: Capsule()) }
                     Spacer()
                     if model.isRecording { HStack(spacing: 5) { Circle().fill(.red).frame(width: 7, height: 7); Text(String(format: "%02d:%02d", model.recordingSeconds / 60, model.recordingSeconds % 60)).monospacedDigit() }.font(.caption).foregroundStyle(.red) }
                     Button { model.captureScreenshot() } label: { Label("스크린샷", systemImage: "camera") }.disabled(!model.canSaveFrame).keyboardShortcut("s", modifiers: [.command, .shift])
@@ -124,7 +130,7 @@ struct PhoneMirrorView: View {
                             Image(systemName: model.isConnecting ? "antenna.radiowaves.left.and.right" : "cable.connector").font(.system(size: 62, weight: .light)).foregroundStyle(.mint)
                             Text(model.isConnecting ? "첫 영상 프레임을 기다리고 있어요" : "작은 화면을, 더 넓게.").font(.system(size: 23, weight: .semibold))
                             if model.isConnecting { ProgressView() }
-                            else { Text(model.platform == .android ? "USB 연결 → 폰에서 디버깅 허용 → 폰 화면 보기" : "USB 연결 → 잠금 해제 → 컴퓨터 신뢰").font(.callout).foregroundStyle(.secondary) }
+                            else { Text(model.platform == .android ? "USB 연결 또는 Wi-Fi 페어링 → 폰 화면 보기" : "USB 연결 → 잠금 해제 → 컴퓨터 신뢰").font(.callout).foregroundStyle(.secondary) }
                         }.padding(30).frame(maxWidth: .infinity, maxHeight: .infinity)
                     }
                 }.frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -147,6 +153,7 @@ struct PhoneMirrorView: View {
                 }
             }.background(Color(red: 0.045, green: 0.065, blue: 0.085))
         }.frame(minWidth: 940, minHeight: 700).preferredColorScheme(.dark)
+        .sheet(isPresented: $showWirelessPairing) { WirelessPairingView { Task { await model.refreshDevices() } } }
     }
 }
 

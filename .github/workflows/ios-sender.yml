@@ -1,0 +1,15 @@
+name: Phone Mirror iPhone Sender
+on:
+  push:
+    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
+  pull_request:
+    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
+  workflow_dispatch:
+jobs:
+  simulated-build:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test --package-path ios
+      - run: xcodebuild -project ios/PhoneMirrorSender.xcodeproj -scheme PhoneMirrorSender -sdk iphonesimulator -derivedDataPath ios/.build/Simulator CODE_SIGNING_ALLOWED=NO build
+      - run: xcodebuild -project ios/PhoneMirrorSender.xcodeproj -scheme PhoneMirrorSender -sdk iphoneos -derivedDataPath ios/.build/Device CODE_SIGNING_ALLOWED=NO build

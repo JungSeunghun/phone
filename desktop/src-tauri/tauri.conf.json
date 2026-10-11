@@ -1,0 +1,66 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Phone Mirror Desktop",
+  "version": "0.1.0",
+  "identifier": "local.phone.desktop",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://127.0.0.1:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "Phone Mirror Desktop",
+        "width": 1120,
+        "height": 780,
+        "minWidth": 800,
+        "minHeight": 600
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src ipc: http://ipc.localhost; object-src 'none'; frame-src 'none'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["app", "dmg", "nsis"],
+    "category": "Utility",
+    "shortDescription": "Android USB/Wi-Fi and iPhone USB/Wi-Fi screen mirroring",
+    "resources": {
+      "../../Vendor/scrcpy-LICENSE": "licenses/scrcpy-LICENSE",
+      "../../Vendor/README.md": "licenses/scrcpy-server.md",
+      "licenses/mp4-LICENSE": "licenses/mp4-LICENSE",
+      "licenses/num-bigint-LICENSE-MIT": "licenses/num-bigint-LICENSE-MIT",
+      "licenses/num-integer-LICENSE-MIT": "licenses/num-integer-LICENSE-MIT",
+      "licenses/num-rational-LICENSE-MIT": "licenses/num-rational-LICENSE-MIT",
+      "licenses/ios-wifi/": "licenses/ios-wifi/",
+      "licenses/audio-recording/": "licenses/audio-recording/",
+      "licenses/ios-usb/": "licenses/ios-usb/",
+      "licenses/connection-qr/": "licenses/connection-qr/"
+    },
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "14.0",
+      "infoPlist": "Info.plist"
+    },
+    "windows": {
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+      "nsis": {
+        "installMode": "currentUser",
+        "displayLanguageSelector": false
+      }
+    }
+  }
+}

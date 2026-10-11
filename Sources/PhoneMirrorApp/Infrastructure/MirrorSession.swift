@@ -24,14 +24,13 @@ protocol MirrorSession: AnyObject {
     func sendTouch(action: UInt8, point: CGPoint, size: CGSize)
     func interruptForTest()
 }
-protocol MirrorSessionFactory { func makeSession(for device: DeviceIdentity, settings: MirrorSettings) throws -> any MirrorSession }
-struct USBDeviceDiscovery: DeviceDiscovery {
+protocol MirrorSessionFactory { func makeSession(for device: PhoneDevice, settings: MirrorSettings) throws -> any MirrorSession }
+struct PhoneDeviceDiscovery: DeviceDiscovery {
+    private let android: AndroidDeviceDiscovery
+    init(bookmarkStore: any WirelessDeviceStore = UserDefaultsWirelessDeviceStore()) { android = AndroidDeviceDiscovery(bookmarkStore: bookmarkStore) }
     func discoverDevices(for platform: PhonePlatform) async throws -> [PhoneDevice] {
         if platform == .android {
-            guard let adb = ProcessCommandRunner.locate("adb") else { throw MediaError.failed("Android 연결 도구 adb가 없습니다. README의 설치 안내를 확인하세요.") }
-            let (code, output) = await ProcessCommandRunner.run(adb, ["devices", "-l"])
-            guard code == 0 else { throw MediaError.failed("USB 기기 확인 실패: \(output)") }
-            return AndroidDeviceParser.parse(output)
+            return try await android.discoverDevices(for: platform)
         }
         var address = CMIOObjectPropertyAddress(mSelector: CMIOObjectPropertySelector(kCMIOHardwarePropertyAllowScreenCaptureDevices), mScope: CMIOObjectPropertyScope(kCMIOObjectPropertyScopeGlobal), mElement: CMIOObjectPropertyElement(kCMIOObjectPropertyElementMain))
         var value: UInt32 = 1
@@ -42,22 +41,22 @@ struct USBDeviceDiscovery: DeviceDiscovery {
         }
     }
 }
-struct USBMirrorSessionFactory: MirrorSessionFactory {
-    func makeSession(for device: DeviceIdentity, settings: MirrorSettings) throws -> any MirrorSession {
-        guard device.isValid else { throw MediaError.failed("유효하지 않은 기기 식별자입니다.") }
-        if device.platform == .android {
+struct PhoneMirrorSessionFactory: MirrorSessionFactory {
+    func makeSession(for device: PhoneDevice, settings: MirrorSettings) throws -> any MirrorSession {
+        guard device.target.isValid else { throw MediaError.failed("유효하지 않거나 지원하지 않는 기기 연결입니다.") }
+        if device.identity.platform == .android {
             guard ProcessCommandRunner.locate("adb") != nil, FileManager.default.fileExists(atPath: AndroidStream.serverURL.path) else { throw MediaError.failed("Android 화면 전송 도구를 찾을 수 없습니다.") }
             return AndroidMirrorSession(device: device, settings: settings.validated())
         }
-        return IOSMirrorSession(device: device)
+        return IOSMirrorSession(device: device.identity)
     }
 }
 final class AndroidMirrorSession: MirrorSession {
     var callbacks = MirrorSessionCallbacks()
     private let stream = AndroidStream()
     private let options: AndroidStreamOptions
-    init(device: DeviceIdentity, settings: MirrorSettings) {
-        options = AndroidStreamOptions(deviceID: device.id, videoMaxDimension: settings.videoMaxDimension, videoMaxFrameRate: settings.videoMaxFrameRate, audioEnabled: settings.audioEnabled, keepScreenAwake: settings.keepScreenAwake)
+    init(device: PhoneDevice, settings: MirrorSettings) {
+        options = AndroidStreamOptions(transportIdentifier: device.endpoint.identifier, videoMaxDimension: settings.videoMaxDimension, videoMaxFrameRate: settings.videoMaxFrameRate, audioEnabled: settings.audioEnabled, keepScreenAwake: settings.keepScreenAwake)
     }
     func start() {
         stream.onFrame = { [weak self] in self?.callbacks.onFrame?($0) }

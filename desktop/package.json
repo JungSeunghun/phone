@@ -1,0 +1,48 @@
+{
+  "name": "phone-mirror-desktop",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "test": "vitest run",
+    "test:browser": "playwright test",
+    "format": "prettier --write src tests scripts *.json *.ts",
+    "format:check": "prettier --check src tests scripts *.json *.ts",
+    "tauri": "tauri",
+    "test:backend": "cargo test --manifest-path src-tauri/Cargo.toml --no-default-features",
+    "pretest:browser": "node scripts/prepare-ios-fixture.mjs",
+    "test:recording-audio": "node scripts/verify-recording-audio.mjs",
+    "test:ios-usb-audio": "node scripts/verify-recording-audio.mjs --ios-usb",
+    "test:ios-windows-usb": "node scripts/verify-ios-windows-usb.mjs",
+    "test:release": "node --test scripts/release-tests/release-policy.test.mjs scripts/release-tests/draft-release.test.mjs",
+    "release:validate": "node scripts/release.mjs validate",
+    "package:mac": "node scripts/release.mjs package --target macos-arm64",
+    "package:windows": "node scripts/release.mjs package --target windows-x64"
+  },
+  "dependencies": {
+    "@tauri-apps/api": "^2.10.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.64.0",
+    "@tauri-apps/cli": "^2.10.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/dom-webcodecs": "^0.1.17",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "jsdom": "^26.1.0",
+    "jsqr": "^1.4.0",
+    "prettier": "^3.9.10",
+    "typescript": "^5.9.3",
+    "vite": "^7.2.0",
+    "vitest": "^3.2.4",
+    "yaml": "^2.9.1"
+  }
+}

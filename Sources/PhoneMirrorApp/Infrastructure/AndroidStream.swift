@@ -3,7 +3,7 @@ import Darwin
 import CoreVideo
 
 struct AndroidStreamOptions {
-    let deviceID: String
+    let transportIdentifier: String
     let videoMaxDimension: Int
     let videoMaxFrameRate: Int
     let audioEnabled: Bool
@@ -23,13 +23,13 @@ final class AndroidStream {
     private var controller: Int32 = -1
     private var process: Process?
     private var port: Int?
-    private var serial = ""
+    private var transportIdentifier = ""
     private let controls = DispatchQueue(label: "phone.controls")
     private let decoder = VideoDecoder()
     private var stopped: Bool { lock.lock(); defer { lock.unlock() }; return ended }
     static var serverURL: URL { Bundle.main.resourceURL!.appendingPathComponent("scrcpy-server-v5.0") }
     func start(_ options: AndroidStreamOptions) {
-        serial = options.deviceID
+        transportIdentifier = options.transportIdentifier
         decoder.onFrame = { [weak self] buffer in self?.onFrame?(buffer) }
         Task { [self] in
             guard let adb = ProcessCommandRunner.locate("adb"), FileManager.default.fileExists(atPath: Self.serverURL.path) else {
@@ -37,20 +37,20 @@ final class AndroidStream {
             }
             let id = UInt32.random(in: 1...0x7fffffff), scid = String(format: "%08x", id)
             let remote = "/data/local/tmp/phone-mirror-\(scid).jar"
-            let pushed = await ProcessCommandRunner.run(adb, ["-s", serial, "push", Self.serverURL.path, remote])
+            let pushed = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "push", Self.serverURL.path, remote])
             guard pushed.0 == 0 else { finish("전송 모듈 설치 실패: \(pushed.1)"); return }
-            guard !stopped else { _ = await ProcessCommandRunner.run(adb, ["-s", serial, "shell", "rm", "-f", remote]); return }
-            let forwarded = await ProcessCommandRunner.run(adb, ["-s", serial, "forward", "tcp:0", "localabstract:scrcpy_\(scid)"])
+            guard !stopped else { _ = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "shell", "rm", "-f", remote]); return }
+            let forwarded = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "forward", "tcp:0", "localabstract:scrcpy_\(scid)"])
             guard forwarded.0 == 0, let assigned = Int(forwarded.1.trimmingCharacters(in: .whitespacesAndNewlines)) else {
-                _ = await ProcessCommandRunner.run(adb, ["-s", serial, "shell", "rm", "-f", remote])
-                finish("USB 영상 채널 연결 실패: \(forwarded.1)"); return
+                _ = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "shell", "rm", "-f", remote])
+                finish("ADB 영상 채널 연결 실패: \(forwarded.1)"); return
             }
             let cancelled = lock.withLock { port = assigned; return ended }
-            if cancelled { cleanupForward(); _ = await ProcessCommandRunner.run(adb, ["-s", serial, "shell", "rm", "-f", remote]); return }
+            if cancelled { cleanupForward(); _ = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "shell", "rm", "-f", remote]); return }
             let server = Process(), pipe = Pipe()
             server.executableURL = URL(fileURLWithPath: adb)
             server.environment = ProcessCommandRunner.environment
-            server.arguments = ["-s", serial, "shell", "CLASSPATH=\(remote)", "app_process", "/", "com.genymobile.scrcpy.Server", "5.0",
+            server.arguments = ["-s", transportIdentifier, "shell", "CLASSPATH=\(remote)", "app_process", "/", "com.genymobile.scrcpy.Server", "5.0",
                 "scid=\(scid)", "tunnel_forward=true", "send_device_meta=false", "audio=\(options.audioEnabled)", "audio_codec=raw",
                 "video_codec=h264", "max_size=\(options.videoMaxDimension)", "max_fps=\(options.videoMaxFrameRate)", "video_bit_rate=8000000",
                 "stay_awake=\(options.keepScreenAwake)", "control=true", "clipboard_autosync=false", "log_level=info"]
@@ -60,7 +60,7 @@ final class AndroidStream {
                 if data.isEmpty { handle.readabilityHandler = nil; return }
                 self?.onLog?(String(decoding: data, as: UTF8.self))
             }
-            server.terminationHandler = { [weak self] _ in self?.finish("폰과의 영상 연결이 종료됐습니다. USB 연결과 폰 잠금을 확인하세요.") }
+            server.terminationHandler = { [weak self] _ in self?.finish("폰과의 영상 연결이 종료됐습니다. ADB 연결과 폰 잠금을 확인하세요.") }
             do {
                 let launched = try lock.withLock { () throws -> Bool in
                     if ended { return false }
@@ -88,7 +88,7 @@ final class AndroidStream {
                         }
                         handedToReader = true
                         try receiveVideo(video)
-                        finish("USB 영상 스트림이 끊겼습니다. 케이블을 다시 연결해 주세요.")
+                        finish("ADB 영상 스트림이 끊겼습니다. 폰의 USB 또는 Wi-Fi 연결을 확인하세요.")
                     } catch { if !stopped { finish(error.localizedDescription) } }
                 }
             } catch { pipe.fileHandleForReading.readabilityHandler = nil; finish("화면 전송 실행 실패: \(error.localizedDescription)") }
@@ -96,12 +96,12 @@ final class AndroidStream {
     }
     private func connectSocket(port: Int) throws -> Int32 {
         let fd = socket(AF_INET, SOCK_STREAM, 0)
-        guard fd >= 0 else { throw MediaError.failed("USB 영상 소켓 생성 실패") }
+        guard fd >= 0 else { throw MediaError.failed("ADB 영상 소켓 생성 실패") }
         var address = sockaddr_in()
         address.sin_len = UInt8(MemoryLayout<sockaddr_in>.size); address.sin_family = sa_family_t(AF_INET)
         address.sin_port = UInt16(port).bigEndian; address.sin_addr.s_addr = inet_addr("127.0.0.1")
         let result = withUnsafePointer(to: &address) { $0.withMemoryRebound(to: sockaddr.self, capacity: 1) { Darwin.connect(fd, $0, socklen_t(MemoryLayout<sockaddr_in>.size)) } }
-        if result != 0 { close(fd); throw MediaError.failed("USB 영상 채널에 연결할 수 없습니다.") }
+        if result != 0 { close(fd); throw MediaError.failed("ADB 영상 채널에 연결할 수 없습니다.") }
         var yes: Int32 = 1
         setsockopt(fd, SOL_SOCKET, SO_NOSIGPIPE, &yes, socklen_t(MemoryLayout.size(ofValue: yes)))
         var timeout = timeval(tv_sec: 2, tv_usec: 0)
@@ -124,7 +124,7 @@ final class AndroidStream {
             }
             releaseSocket(fd); Thread.sleep(forTimeInterval: 0.1)
         }
-        throw MediaError.failed("폰의 화면 전송이 응답하지 않습니다. USB 디버깅 승인을 확인해 주세요.")
+        throw MediaError.failed("폰의 화면 전송이 응답하지 않습니다. ADB 디버깅 승인을 확인해 주세요.")
     }
     private func readExactly(_ fd: Int32, count: Int) throws -> Data {
         guard count >= 0 && count <= 16 * 1024 * 1024 else { throw MediaError.failed("잘못된 영상 패킷 크기") }
@@ -213,6 +213,6 @@ final class AndroidStream {
     private func cleanupForward() {
         lock.lock(); let assigned = port; port = nil; lock.unlock()
         guard let assigned, let adb = ProcessCommandRunner.locate("adb") else { return }
-        Task { _ = await ProcessCommandRunner.run(adb, ["-s", serial, "forward", "--remove", "tcp:\(assigned)"]) }
+        Task { _ = await ProcessCommandRunner.run(adb, ["-s", transportIdentifier, "forward", "--remove", "tcp:\(assigned)"]) }
     }
 }

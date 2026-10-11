@@ -1,0 +1,172 @@
+name: Phone Mirror Desktop Release Draft
+on:
+  push:
+    tags: ["desktop-v*"]
+  workflow_dispatch: {}
+permissions:
+  contents: read
+concurrency:
+  group: desktop-release-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+      signing-mode: ${{ steps.version.outputs.signing-mode }}
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - run: npm ci
+      - run: npm run test:release
+      - id: version
+        run: npm run release:validate
+        env:
+          DESKTOP_RELEASE_SIGNING: ${{ vars.DESKTOP_RELEASE_SIGNING || 'unsigned' }}
+  package:
+    needs: [validate]
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            id: macos-arm64
+            target: aarch64-apple-darwin
+            bundle: dmg
+          - os: macos-latest
+            id: macos-x64
+            target: x86_64-apple-darwin
+            bundle: dmg
+          - os: windows-latest
+            id: windows-x64
+            target: x86_64-pc-windows-msvc
+            bundle: nsis
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        working-directory: desktop
+    env:
+      DESKTOP_RELEASE_SIGNING: ${{ needs.validate.outputs.signing-mode }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+          components: rustfmt, clippy
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop/src-tauri
+          key: release-${{ matrix.id }}
+      - run: npm ci
+      - run: npm run test:release
+      - run: npm test
+      - run: npx playwright install chromium
+      - run: npm run test:browser
+      - run: npm run format:check
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --locked -- -D warnings
+      - uses: actions/setup-dotnet@v4
+        if: matrix.id == 'windows-x64' && needs.validate.outputs.signing-mode == 'signed'
+        with:
+          dotnet-version: "8.0.x"
+      - name: Install Windows cloud signing tool
+        if: matrix.id == 'windows-x64' && needs.validate.outputs.signing-mode == 'signed'
+        run: cargo install artifact-signing-cli --version 0.11.0 --locked
+      - name: Build Mac installer
+        if: startsWith(matrix.id, 'macos-')
+        run: node scripts/release.mjs package --target ${{ matrix.id }}
+        env:
+          APPLE_CERTIFICATE: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_CERTIFICATE || '' }}
+          APPLE_CERTIFICATE_PASSWORD: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
+          APPLE_SIGNING_IDENTITY: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_SIGNING_IDENTITY || '' }}
+          APPLE_API_ISSUER: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_API_ISSUER || '' }}
+          APPLE_API_KEY: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_API_KEY || '' }}
+          APPLE_API_PRIVATE_KEY_BASE64: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_API_PRIVATE_KEY_BASE64 || '' }}
+      - name: Build Windows installer
+        if: matrix.id == 'windows-x64'
+        run: node scripts/release.mjs package --target ${{ matrix.id }}
+        env:
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          WINDOWS_SIGNING_ENDPOINT: ${{ vars.WINDOWS_SIGNING_ENDPOINT }}
+          WINDOWS_SIGNING_ACCOUNT: ${{ vars.WINDOWS_SIGNING_ACCOUNT }}
+          WINDOWS_SIGNING_PROFILE: ${{ vars.WINDOWS_SIGNING_PROFILE }}
+      - name: Verify Mac app signature and notarization
+        if: startsWith(matrix.id, 'macos-')
+        shell: bash
+        env:
+          RELEASE_TARGET: ${{ matrix.target }}
+        run: |
+          release_mount="$RUNNER_TEMP/phone-mirror-verify-$RELEASE_TARGET"
+          mkdir -p "$release_mount"
+          release_images=(src-tauri/target/"$RELEASE_TARGET"/release/bundle/dmg/*.dmg)
+          [ "${#release_images[@]}" -eq 1 ]
+          hdiutil attach -readonly -nobrowse -mountpoint "$release_mount" "${release_images[0]}"
+          trap 'hdiutil detach "$release_mount"' EXIT
+          release_app="$release_mount/Phone Mirror Desktop.app"
+          codesign --verify --deep --strict "$release_app"
+          if [ "$DESKTOP_RELEASE_SIGNING" = "signed" ]; then
+            xcrun stapler validate "$release_app"
+            spctl --assess --type execute "$release_app"
+          fi
+      - name: Verify Windows signatures
+        if: matrix.id == 'windows-x64' && needs.validate.outputs.signing-mode == 'signed'
+        shell: pwsh
+        run: |
+          $releaseFiles = @(Get-Item 'src-tauri/target/x86_64-pc-windows-msvc/release/phone-mirror-desktop.exe')
+          $releaseFiles += @(Get-ChildItem 'src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/*.exe')
+          if ($releaseFiles.Count -lt 2) { throw 'Installer missing' }
+          foreach ($releaseFile in $releaseFiles) {
+            if ((Get-AuthenticodeSignature $releaseFile.FullName).Status -ne 'Valid') { throw 'Invalid Windows signature' }
+          }
+      - name: Stage installer and checksum manifest
+        run: node scripts/release.mjs stage --target ${{ matrix.id }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: desktop-installer-${{ matrix.id }}
+          path: dist/Release/stages/${{ matrix.id }}/
+          if-no-files-found: error
+          retention-days: 14
+      - name: Remove temporary notarization keys
+        if: always() && startsWith(matrix.id, 'macos-')
+        shell: bash
+        run: find "$RUNNER_TEMP" -maxdepth 1 -name 'phone-mirror-notary-*.p8' -delete
+  release-draft:
+    needs: [validate, package]
+    if: github.event_name == 'push' && github.ref_type == 'tag'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: desktop-installer-*
+          path: dist/release-stages
+      - name: Prepare and upload only a release draft
+        run: node scripts/release.mjs upload-draft --source ../dist/release-stages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_COMMIT: ${{ github.sha }}
+          DESKTOP_RELEASE_SIGNING: ${{ needs.validate.outputs.signing-mode }}

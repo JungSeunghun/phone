@@ -3,7 +3,7 @@ import XCTest
 
 final class DeviceParserTests: XCTestCase {
     func testUSBStatesAndWirelessExclusion() {
-        let devices = AndroidDeviceParser.parse("""
+        let devices = AndroidDeviceParser.parseUSBDevices("""
         List of devices attached
         A device usb:1 model:Galaxy_S24 transport_id:1
         B unauthorized usb:2
@@ -18,10 +18,10 @@ final class DeviceParserTests: XCTestCase {
     }
     func testEmptyMalformedDuplicateAndOversizedIdentifiers() {
         for text in ["", "\n\n", "List of devices attached\n", "A\nA nonsense\n* daemon started successfully *\n"] {
-            XCTAssertTrue(AndroidDeviceParser.parse(text).isEmpty)
+            XCTAssertTrue(AndroidDeviceParser.parseUSBDevices(text).isEmpty)
         }
-        XCTAssertEqual(AndroidDeviceParser.parse("A device\nA device\n").count, 1)
-        XCTAssertTrue(AndroidDeviceParser.parse(String(repeating: "A", count: 257) + " device").isEmpty)
-        XCTAssertEqual(AndroidDeviceParser.parse("A\tdevice\r\n").first?.name, "Android")
+        XCTAssertEqual(AndroidDeviceParser.parseUSBDevices("A device\nA device\n").count, 1)
+        XCTAssertTrue(AndroidDeviceParser.parseUSBDevices(String(repeating: "A", count: 257) + " device").isEmpty)
+        XCTAssertEqual(AndroidDeviceParser.parseUSBDevices("A\tdevice\r\n").first?.name, "Android")
     }
 }

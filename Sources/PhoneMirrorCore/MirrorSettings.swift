@@ -29,6 +29,9 @@ public struct MirrorSettings: Codable, Equatable, Sendable {
     public mutating func rememberDevice(_ device: DeviceIdentity) {
         preferredDeviceIDs[device.platform.rawValue] = device.isValid ? device.id : nil
     }
+    public mutating func rememberDevice(_ target: ConnectionTarget) {
+        guard target.isValid else { return }; preferredDeviceIDs[target.identity.platform.rawValue] = target.selectionID
+    }
     public func validated() -> Self {
         var copy = self
         if !Self.allowedVideoDimensions.contains(copy.videoMaxDimension) { copy.videoMaxDimension = 1920 }
@@ -36,7 +39,7 @@ public struct MirrorSettings: Codable, Equatable, Sendable {
         copy.windowPlacement = windowPlacement?.validated()
         copy.preferredDeviceIDs = preferredDeviceIDs.filter { key, value in
             guard let platform = PhonePlatform(rawValue: key) else { return false }
-            return DeviceIdentity(platform: platform, id: value).isValid
+            return ConnectionTarget.isValidSelectionID(value, platform: platform)
         }
         return copy
     }

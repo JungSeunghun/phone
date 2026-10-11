@@ -2,3 +2,10 @@ dist/
 .DS_Store
 .build/
 .swiftpm/
+node_modules/
+target/
+test-results/
+playwright-report/
+
+# Short native iOS encoder verification assets, never bundled or committed
+desktop/tests/generated/

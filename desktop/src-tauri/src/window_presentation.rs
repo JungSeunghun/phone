@@ -1,0 +1,156 @@
+//! Window policy is independent of Tauri, the stream and operating system APIs.
+use serde::{Deserialize, Serialize};
+#[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub enum WindowViewMode {
+    #[default]
+    Normal,
+    Fullscreen,
+    Pip,
+}
+#[derive(Clone, Copy, Debug)]
+pub struct WindowRectangle {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+}
+#[derive(Clone, Copy, Debug)]
+pub struct WindowSnapshot {
+    pub x: f64,
+    pub y: f64,
+    pub width: f64,
+    pub height: f64,
+    pub maximized: bool,
+    pub always_on_top: bool,
+}
+pub trait WindowPresentationPort {
+    fn snapshot(&self) -> Result<WindowSnapshot, String>;
+    fn work_area(&self) -> Result<WindowRectangle, String>;
+    fn apply(
+        &self,
+        mode: WindowViewMode,
+        rectangle: Option<WindowRectangle>,
+        snapshot: &WindowSnapshot,
+    ) -> Result<(), String>;
+}
+/// Reserve native title bar/borders before calculating content size. Coordinates
+/// remain outer-window coordinates; size is the usable content capacity.
+pub fn window_content_area(
+    area: WindowRectangle,
+    frame: (f64, f64),
+) -> Result<WindowRectangle, String> {
+    if ![area.x, area.y, area.width, area.height, frame.0, frame.1]
+        .iter()
+        .all(|v| v.is_finite())
+        || frame.0 < 0.0
+        || frame.1 < 0.0
+    {
+        return Err("창 테두리와 모니터 영역을 확인할 수 없습니다.".into());
+    }
+    let content = WindowRectangle {
+        width: area.width - frame.0,
+        height: area.height - frame.1,
+        ..area
+    };
+    if content.width < 240.0 || content.height < 180.0 {
+        return Err("PiP 창을 표시할 모니터 공간이 부족합니다.".into());
+    }
+    Ok(content)
+}
+pub fn pip_rectangle(
+    area: WindowRectangle,
+    dimensions: (u32, u32),
+) -> Result<WindowRectangle, String> {
+    let (width, height) = dimensions;
+    if !(1..=8192).contains(&width)
+        || !(1..=8192).contains(&height)
+        || ![area.x, area.y, area.width, area.height]
+            .iter()
+            .all(|v| v.is_finite())
+        || area.width < 240.0
+        || area.height < 180.0
+    {
+        return Err("PiP 화면 크기와 모니터 영역을 확인할 수 없습니다.".into());
+    }
+    let margin = 24.0_f64
+        .min((area.width - 240.0) / 2.0)
+        .min((area.height - 180.0) / 2.0);
+    let available_width = area.width - margin * 2.0;
+    let available_height = area.height - margin * 2.0;
+    let ratio = f64::from(width) / f64::from(height);
+    let mut w = if ratio > 1.0 { 520.0_f64 } else { 320.0_f64 };
+    let mut h = ((w / ratio) + 60.0)
+        .clamp(180.0, 620.0)
+        .min(available_height);
+    w = ((h - 60.0) * ratio)
+        .clamp(240.0, 520.0)
+        .min(available_width);
+    h = h.max(180.0);
+    Ok(WindowRectangle {
+        x: area.x + area.width - w - margin,
+        y: area.y + margin,
+        width: w,
+        height: h,
+    })
+}
+#[derive(Default)]
+pub struct WindowPresentation {
+    mode: WindowViewMode,
+    original: Option<WindowSnapshot>,
+}
+impl WindowPresentation {
+    pub fn mode(&self) -> WindowViewMode {
+        self.mode
+    }
+    pub fn set_mode(
+        &mut self,
+        port: &impl WindowPresentationPort,
+        mode: WindowViewMode,
+        dimensions: Option<(u32, u32)>,
+    ) -> Result<WindowViewMode, String> {
+        if self.mode == mode {
+            return Ok(mode);
+        }
+        let original = match self.original {
+            Some(snapshot) => snapshot,
+            None => port.snapshot()?,
+        };
+        let rectangle = if mode == WindowViewMode::Pip {
+            Some(pip_rectangle(
+                port.work_area()?,
+                dimensions.ok_or("PiP를 시작하려면 폰 영상이 필요합니다.")?,
+            )?)
+        } else {
+            None
+        };
+        // Retain the original geometry across PiP -> fullscreen -> normal.
+        if self.mode != WindowViewMode::Normal && mode != WindowViewMode::Normal {
+            port.apply(WindowViewMode::Normal, None, &original)?;
+            self.mode = WindowViewMode::Normal;
+        }
+        if let Err(error) = port.apply(mode, rectangle, &original) {
+            if mode != WindowViewMode::Normal {
+                match port.apply(WindowViewMode::Normal, None, &original) {
+                    Ok(()) => {
+                        self.mode = WindowViewMode::Normal;
+                        self.original = None;
+                    }
+                    Err(rollback) => {
+                        self.original = Some(original);
+                        self.mode = mode;
+                        return Err(format!("{error} (창 복원 실패: {rollback})"));
+                    }
+                }
+            }
+            return Err(error);
+        }
+        self.mode = mode;
+        self.original = if mode == WindowViewMode::Normal {
+            None
+        } else {
+            Some(original)
+        };
+        Ok(mode)
+    }
+}

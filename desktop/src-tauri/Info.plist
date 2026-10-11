@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0"><dict>
+<key>NSLocalNetworkUsageDescription</key><string>같은 Wi-Fi에 있는 Android 폰을 연결해 화면을 표시합니다.</string>
+<key>NSCameraUsageDescription</key><string>USB로 연결한 iPhone의 화면을 앱 안에 표시합니다.</string>
+<key>NSMicrophoneUsageDescription</key><string>USB로 연결한 iPhone의 오디오를 받아 재생하고 화면과 함께 녹화합니다. 컴퓨터 마이크는 입력으로 사용하지 않습니다.</string>
+</dict></plist>
