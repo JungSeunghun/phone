@@ -8,3 +8,4 @@
 - Include valid inputs, invalid inputs, minimum/maximum boundaries, time boundaries, missing/corrupt persisted data, repeated actions, asynchronous cancellation, and late callbacks where applicable.
 - Run automated unit/behavior tests and relevant real-device integration tests. Keep simulated failures distinct from physically unplugging a cable. Never claim iPhone hardware validation without an actual iPhone.
 - Do not share real-device screenshots or recordings externally. Keep verification media under ignored build output.
+- Use Conventional Commits with an English imperative summary for commit messages. Follow the types, scopes, and examples in `CONTRIBUTING.md` under "Commit messages". Keep each commit focused and exclude unrelated worktree changes.

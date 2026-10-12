@@ -1,0 +1,12 @@
+# <type>[optional scope][optional !]: <English imperative summary>
+# Keep the subject within 72 characters; no trailing period.
+# Start the summary with a lowercase verb; preserve proper names.
+# Types: feat, fix, docs, refactor, perf, test, build, ci, chore, revert
+# Optional scopes: desktop, swift, ios, localization
+# Example: feat: add Korean and English UI language settings
+#
+# Optional body after a blank line:
+# Explain the problem, resulting behavior, and actual verification.
+#
+# Optional issue footer: Closes #123
+# Breaking changes require ! and a BREAKING CHANGE: impact/migration footer.
