@@ -1,29 +1,52 @@
+<div align="center">
+
+<img src="desktop/src-tauri/icons/128x128.png" width="72" height="72" alt="Phone Mirror icon" />
+
 # Phone Mirror
 
-[한국어](README.ko.md) · [Contributing](CONTRIBUTING.md) · [Support matrix](docs/SUPPORT.md) · [Security](SECURITY.md)
+**Your phone. A wider view.**
 
-Mirror your Android or iPhone screen inside a desktop app, with screenshots, video recording and multilingual text input.
+Bring your Android or iPhone screen to your desktop.<br>
+Connect, capture, record, and type with room to work.
 
-The main cross-platform app is **Rust + Tauri + React** in `desktop/`, for macOS and Windows. The original native Swift macOS app remains in `Sources/` and has separate instructions in [the Swift app guide](docs/SWIFT_APP.ko.md). The optional iPhone sender and keyboard extension live in `ios/`.
+[![Desktop CI](https://github.com/JungSeunghun/phone/actions/workflows/desktop.yml/badge.svg?branch=main)](https://github.com/JungSeunghun/phone/actions/workflows/desktop.yml)
+[![License: MIT](docs/assets/license-mit.svg)](LICENSE)
+[![UI: English / Korean](docs/assets/ui-languages.svg)](#features)
 
-## What works
+[Quick start](#quick-start) · [Support status](#support-status) · [Documentation](#documentation) · [한국어](README.ko.md)
 
-- Android USB and Wi-Fi mirroring, device discovery, wireless pairing and automatic reconnection.
-- Android mouse control, audio playback and recording, multilingual paste, and committed IME text input.
-- PNG screenshots during active or paused MP4 recording, fullscreen and picture-in-picture.
-- iPhone USB/Wi-Fi receiving paths and optional encrypted multilingual keyboard input. **iPhone hardware validation is pending.**
-- In-app update checks, signed downloads and user-requested installation. An official published update feed has not been connected yet.
-- Connection diagnostics. Diagnostic summaries contain allowlisted check codes and outcomes rather than raw logs, device identifiers or screen contents.
+</div>
 
-See [the support matrix](docs/SUPPORT.md) for platform differences and evidence. Implemented support is not a claim of hardware validation. The desktop, native Swift macOS, and iPhone sender UIs support Korean and English. Choose **한국어** or **English** under **언어 / Language** in settings; the choice takes effect immediately and is saved locally.
+![Illustrative Phone Mirror desktop UI with a USB connection, recording controls, and a fictional planner on the phone screen. All content is synthetic.](docs/assets/phone-mirror-demo.svg)
 
-## Build and run
+<p align="center"><sub>Illustrative desktop preview with synthetic content. This is not a real-device screenshot or hardware verification evidence.</sub></p>
 
-There is no public installer release documented yet. To build the desktop app:
+## Features
 
-1. Install Node.js 22, Rust 1.90 or later, and [Tauri's platform prerequisites](https://v2.tauri.app/start/prerequisites/).
-2. For Android, install Android SDK Platform Tools and put the full `platform-tools` directory on `PATH`.
-3. From the repository root:
+- **Connect your way.** Android USB and Wi-Fi, QR or code pairing, and automatic reconnection. iPhone receiver paths use native macOS USB capture or the optional sender app.
+- **Work from your desktop.** Control Android with your mouse and keyboard, paste text, and send committed multilingual IME input. iPhone text input uses a separate encrypted keyboard connection.
+- **Keep the useful moments.** Save PNG screenshots and MP4 recordings, including screenshots during active or paused recording. Play and record phone audio where the device and app allow it.
+- **Make it your workspace.** Full screen, picture-in-picture, and Korean or English UI. Language changes apply immediately and persist across restarts.
+
+## Support status
+
+The primary desktop app targets **macOS 14+ and Windows**. Implemented support and hardware verification are tracked separately.
+
+| Phone and host             | Connection  | Verification status                                                                   |
+| -------------------------- | ----------- | ------------------------------------------------------------------------------------- |
+| Android on macOS           | USB · Wi-Fi | Real-device mirroring and media checks; multilingual input verified over Wi-Fi        |
+| Android on Windows         | USB · Wi-Fi | Implemented and covered by automated checks; native Windows/device validation pending |
+| iPhone on macOS or Windows | USB · Wi-Fi | Receiver and sender paths implemented; iPhone hardware validation pending             |
+
+See the [full support matrix](docs/SUPPORT.md) for differences between hosts and connection methods. iPhone mouse/touch control is not implemented; text input requires the Phone Mirror keyboard, Full Access, a local network connection, and a compatible field. Audio availability depends on OS, application, and protected-content policies.
+
+**Release status:** public installers and the official update feed are still in preparation. The app supports signed updates, but the official feed has not been connected yet. Use the source build below to try the app.
+
+## Quick start
+
+### Run from source
+
+Install **Node.js 22**, **Rust 1.90+**, and [Tauri's platform prerequisites](https://v2.tauri.app/start/prerequisites/). Android connections also need the complete Android SDK Platform Tools folder, with `adb` on `PATH`.
 
 ```sh
 cd desktop
@@ -31,45 +54,37 @@ npm ci
 npm run tauri dev
 ```
 
-On macOS, building needs Xcode Command Line Tools and running requires macOS 14 or later. On Windows, building needs MSVC C++ Build Tools and Windows SDK; running needs WebView2.
+macOS builds require Xcode Command Line Tools. Windows builds require MSVC C++ Build Tools and the Windows SDK; running the app requires WebView2.
 
-```sh
-# macOS application bundle
-npm run tauri build -- --bundles app
-# Windows NSIS installer (run on Windows)
-npm run tauri build -- --bundles nsis
-```
+### Connect your first phone
 
-Detailed setup: [desktop](desktop/README.md), [iPhone sender and keyboard](ios/README.md), [packaging and updates](desktop/RELEASING.md).
+1. **Android USB:** connect a data cable, enable USB debugging, and approve the computer on your phone. Select the USB device and click **View phone screen**.
+2. **Android Wi-Fi:** on the same network, enable wireless debugging on Android 11+ and open **Android Wi-Fi connection**. Pair by QR or code, then use the phone's connection port. Pairing and connection ports are different.
+3. **iPhone:** follow the [sender and keyboard setup](ios/README.md). macOS native USB capture needs an unlocked phone, computer trust, and camera permission. Windows USB and Wi-Fi receiving use the sender app and an active screen broadcast.
 
-## First connection
+The in-app **First connection** guide walks through each method. Saved devices are not automatically mirrored at launch. Choose **한국어** or **English** under **언어 / Language** in settings.
 
-**Android USB:** connect a data cable, enable USB debugging, approve this computer on the phone, select the USB device, then click **폰 화면 보기** (View phone screen).
+## Documentation
 
-**Android Wi-Fi:** use the same network, enable wireless debugging on Android 11 or later, and open **Android Wi-Fi 연결**. Pair by QR or code, then connect to the phone's connection port. Pairing and connection ports are different.
+| Guide                                                             | What you will find                                           |
+| ----------------------------------------------------------------- | ------------------------------------------------------------ |
+| [Desktop setup](desktop/README.md)                                | Connection, input, media, build, and troubleshooting details |
+| [iPhone setup](ios/README.md)                                     | Sender app, screen broadcasting, and keyboard extension      |
+| [Support matrix](docs/SUPPORT.md)                                 | Platform capabilities and evidence limits                    |
+| [Packaging and updates](desktop/RELEASING.md)                     | Local installers and signed update distribution              |
+| [Contributing](CONTRIBUTING.md)                                   | Development checks, TDD, and commit conventions              |
+| [Architecture](docs/ARCHITECTURE.md) · [Roadmap](docs/ROADMAP.md) | Project structure and planned work                           |
+| [Verification records](desktop/TESTING.md)                        | Automated, native, and real-device evidence                  |
+| [Original Swift app](docs/SWIFT_APP.ko.md)                        | Separate native macOS application                            |
 
-**iPhone:** macOS USB capture requires an unlocked phone, computer trust and macOS camera permission. Windows USB and Wi-Fi receiving require the iPhone sender app and an active ReplayKit broadcast. Multilingual input also requires the PhoneMirror keyboard extension with Full Access and the encrypted input connection. See [iPhone setup](ios/README.md).
+The primary app uses **Rust + Tauri + React** in `desktop/`. The original Swift macOS app remains in `Sources/`; the optional iPhone sender and keyboard extension live in `ios/`.
 
-The app does not start mirroring a saved device on launch. The app's **처음 연결하기** (First connection) panel describes each setup path.
+## Privacy and reporting
 
-## Report a problem
+Report problems with the OS, app version, phone OS, connection method, reproduction steps, and verification environment. The app's **Connection diagnostics → Save diagnostic summary** exports allowlisted results; review the JSON before attaching it to an issue.
 
-Include OS, app version, phone OS, connection method, reproduction steps, and whether you used real hardware. Use **연결 문제 진단 → 진단 요약 저장** (Connection diagnostics → Save diagnostic summary) to save a JSON summary for review before attaching it to an issue.
-
-Do not attach real phone screenshots, recordings, clipboard contents, connection codes or unreviewed logs. Synthetic test media is suitable for public demonstrations. Vulnerabilities should follow [SECURITY.md](SECURITY.md), not a public bug report.
-
-## Development
-
-```sh
-cd desktop
-npm test
-npm run test:browser
-npm run test:backend
-npm run test:release
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md), [test evidence](desktop/TESTING.md), and [architecture](docs/ARCHITECTURE.md). Tests and cross-compilation do not replace Windows or iPhone real-device verification.
+Keep real phone screenshots, recordings, clipboard contents, connection codes, and unreviewed logs out of public reports. Use synthetic content for public demonstrations, as in the [preview illustration](docs/assets/README.md). Report vulnerabilities through [SECURITY.md](SECURITY.md).
 
 ## License
 
-Project-authored code is licensed under [MIT](LICENSE). Bundled upstream code and dependencies retain their own licenses, including scrcpy's Apache-2.0 license. See [third-party notices](THIRD_PARTY_NOTICES.md).
+Project-authored code is licensed under [MIT](LICENSE). Upstream code and dependencies retain their own licenses, including scrcpy's Apache-2.0 license. See [third-party notices](THIRD_PARTY_NOTICES.md).

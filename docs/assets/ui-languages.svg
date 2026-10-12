@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="143" height="20" viewBox="0 0 143 20" role="img" aria-label="UI: English and Korean">
+<title>UI: English and Korean</title>
+<!-- Project-authored static badge; no scripts, images, or external resources. -->
+<rect width="143" height="20" rx="3" fill="#263445"/>
+<rect x="28" width="115" height="20" rx="3" fill="#2dd4bf"/>
+<rect x="28" width="3" height="20" fill="#2dd4bf"/>
+<g font-family="-apple-system,BlinkMacSystemFont,Segoe UI,sans-serif" font-size="11" text-anchor="middle">
+<text x="14.0" y="14" fill="#f0f6fc">UI</text>
+<text x="85.5" y="14" fill="#082f2b">English / Korean</text>
+</g>
+</svg>

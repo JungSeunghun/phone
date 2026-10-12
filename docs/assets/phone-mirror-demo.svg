@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="980" viewBox="0 0 1440 980" role="img" aria-labelledby="title description">
+<title id="title">Phone Mirror — synthetic desktop preview</title>
+<desc id="description">An illustrative Phone Mirror desktop window with USB connection, display settings, recording controls and a fictional daily planner on the phone screen. All data is synthetic. This is not a real-device screenshot.</desc>
+<!-- Authored entirely as SVG vectors. No captured media, embedded images, scripts, or external resources. -->
+<defs>
+  <linearGradient id="backdrop" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#111f2b"/><stop offset="1" stop-color="#080e17"/></linearGradient>
+  <radialGradient id="glow"><stop stop-color="#2dd4bf" stop-opacity=".14"/><stop offset="1" stop-color="#2dd4bf" stop-opacity="0"/></radialGradient>
+  <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#f5f7ec"/><stop offset="1" stop-color="#e8f3e8"/></linearGradient>
+  <linearGradient id="mint" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b6f2cf"/><stop offset="1" stop-color="#8bdfca"/></linearGradient>
+  <filter id="shadow" x="-15%" y="-15%" width="130%" height="140%"><feDropShadow dx="0" dy="24" stdDeviation="24" flood-color="#000" flood-opacity=".35"/></filter>
+</defs>
+<rect width="1440" height="980" rx="24" fill="url(#backdrop)"/>
+<ellipse cx="1140" cy="210" rx="500" ry="370" fill="url(#glow)"/>
+<g font-family="-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif">
+<text x="68" y="64" font-size="14" fill="#7f9aad" font-weight="700">PHONE MIRROR</text>
+<text x="68" y="112" font-size="35" fill="#edf7fa" font-weight="650">Your phone. A wider view.</text>
+<rect x="1114" y="76" width="258" height="28" rx="14" fill="#173638"/>
+<text x="1243.0" y="95" font-size="12" fill="#83e6d5" font-weight="550" text-anchor="middle">SYNTHETIC UI DEMO</text>
+<g filter="url(#shadow)">
+<rect x="64" y="154" width="1312" height="722" rx="18" fill="#101620" stroke="#344657"/>
+</g>
+<rect x="65" y="155" width="1310" height="39" rx="17" fill="#1e2b3a"/>
+<rect x="65" y="176" width="1310" height="18" rx="0" fill="#1e2b3a"/>
+<circle cx="86" cy="175" r="4" fill="#647b8b"/>
+<circle cx="103" cy="175" r="4" fill="#647b8b"/>
+<circle cx="120" cy="175" r="4" fill="#647b8b"/>
+<text x="720" y="180" font-size="12" fill="#a4b5c7" font-weight="500" text-anchor="middle">Phone Mirror</text>
+<rect x="65" y="194" width="290" height="664" rx="0" fill="#18212d"/>
+<rect x="65" y="842" width="290" height="33" rx="16" fill="#18212d"/>
+<rect x="330" y="842" width="25" height="33" rx="0" fill="#18212d"/>
+<path d="M355 194L355 875" stroke="#2c3b4c"/>
+<rect x="89" y="220" width="25" height="36" rx="6" fill="none" stroke="#2dd4bf"/>
+<path d="M96 248H107" stroke="#2dd4bf"/>
+<text x="128" y="239" font-size="23" fill="#edf4fc" font-weight="650">Phone Mirror</text>
+<text x="128" y="259" font-size="12" fill="#91a2b9" font-weight="400">Android · iPhone</text>
+<text x="87" y="304" font-size="14" fill="#dce7f4" font-weight="600">Connected devices</text>
+<text x="333" y="304" font-size="11" fill="#9ab2c8" font-weight="400" text-anchor="end">Refresh</text>
+<rect x="87" y="319" width="247" height="42" rx="9" fill="#202b3a" stroke="#344155"/>
+<text x="100" y="344" font-size="12" fill="#d2ddeb" font-weight="400">Demo Android · USB · Available</text>
+<text x="319" y="344" font-size="15" fill="#90a2b7" font-weight="400">⌄</text>
+<text x="88" y="388" font-size="11" fill="#91a2b9" font-weight="400">Allow USB debugging on your phone.</text>
+<path d="M65 407H355" stroke="#2c3b4c"/>
+<text x="88" y="439" font-size="13" fill="#b5c2d4" font-weight="400">Language</text>
+<rect x="188" y="418" width="145" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="201" y="439" font-size="13" fill="#c6d3e3" font-weight="400">English</text>
+<text x="318" y="439" font-size="14" fill="#91a2b9" font-weight="400">⌄</text>
+<text x="88" y="488" font-size="14" fill="#dce7f4" font-weight="600">Device connection</text>
+<rect x="88" y="506" width="15" height="15" rx="4" fill="#2dd4bf"/>
+<path d="M91 513l3 3 6-7" fill="none" stroke="#092a29" stroke-width="1.7"/>
+<text x="113" y="518" font-size="13" fill="#c6d3e3" font-weight="400">Automatically reconnect</text>
+<text x="89" y="557" font-size="13" fill="#c8d5e4" font-weight="550">›  Android Wi-Fi connection</text>
+<text x="89" y="597" font-size="13" fill="#c8d5e4" font-weight="550">›  iPhone Wi-Fi receiver</text>
+<path d="M88 616H333" stroke="#2c3b4c"/>
+<text x="88" y="650" font-size="14" fill="#dce7f4" font-weight="600">Display settings</text>
+<text x="88" y="690" font-size="13" fill="#b5c2d4" font-weight="400">Video quality</text>
+<rect x="205" y="668" width="128" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="218" y="690" font-size="13" fill="#c6d3e3" font-weight="400">1920px</text>
+<text x="318" y="690" font-size="14" fill="#91a2b9" font-weight="400">⌄</text>
+<text x="88" y="735" font-size="13" fill="#b5c2d4" font-weight="400">Frame rate</text>
+<rect x="205" y="713" width="128" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="218" y="735" font-size="13" fill="#c6d3e3" font-weight="400">60 fps</text>
+<text x="318" y="735" font-size="14" fill="#91a2b9" font-weight="400">⌄</text>
+<rect x="88" y="766" width="15" height="15" rx="4" fill="#2dd4bf"/>
+<path d="M91 773l3 3 6-7" fill="none" stroke="#092a29" stroke-width="1.7"/>
+<text x="113" y="778" font-size="13" fill="#c6d3e3" font-weight="400">Android Wi-Fi adaptive quality</text>
+<rect x="88" y="799" width="15" height="15" rx="4" fill="#2dd4bf"/>
+<path d="M91 806l3 3 6-7" fill="none" stroke="#092a29" stroke-width="1.7"/>
+<text x="113" y="811" font-size="13" fill="#c6d3e3" font-weight="400">Keep phone screen awake</text>
+<text x="89" y="852" font-size="12" fill="#91a2b9" font-weight="500">›  Connection diagnostics</text>
+<text x="379" y="228" font-size="14" fill="#e4edf6" font-weight="600">Demo Android</text>
+<rect x="493" y="209" width="44" height="28" rx="14" fill="#202e3e"/>
+<text x="515.0" y="228" font-size="12" fill="#a9bacf" font-weight="550" text-anchor="middle">USB</text>
+<circle cx="553" cy="223" r="4" fill="#2dd4bf"/>
+<text x="564" y="228" font-size="12" fill="#8fe3ce" font-weight="550">Receiving screen</text>
+<rect x="929" y="206" width="83" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="970.5" y="228" font-size="12" fill="#dbe5f2" font-weight="500" text-anchor="middle">Settings</text>
+<rect x="1020" y="206" width="94" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="1067.0" y="228" font-size="12" fill="#dbe5f2" font-weight="500" text-anchor="middle">Full screen</text>
+<rect x="1122" y="206" width="44" height="34" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="1144.0" y="228" font-size="12" fill="#dbe5f2" font-weight="500" text-anchor="middle">PiP</text>
+<rect x="1174" y="206" width="177" height="34" rx="8" fill="#24313e" stroke="#41616c"/>
+<text x="1262" y="228" font-size="12" fill="#dbe5f2" font-weight="500" text-anchor="middle">Disconnect</text>
+<path d="M355 255H1375" stroke="#2c3b4c"/>
+<rect x="726" y="281" width="275" height="488" rx="4" fill="url(#paper)"/>
+<text x="746" y="307" font-size="11" fill="#274c45" font-weight="650">9:41</text>
+<text x="980" y="307" font-size="10" fill="#274c45" font-weight="550" text-anchor="end">LTE  ▰</text>
+<text x="748" y="353" font-size="10" fill="#5f8375" font-weight="700">DAILY RHYTHM</text>
+<text x="748" y="388" font-size="30" fill="#173d35" font-weight="650">Make room</text>
+<text x="748" y="423" font-size="30" fill="#173d35" font-weight="650">for a good day.</text>
+<text x="748" y="453" font-size="11" fill="#648276" font-weight="400">A fictional planner for this demo.</text>
+<rect x="745" y="478" width="238" height="126" rx="18" fill="url(#mint)"/>
+<text x="763" y="505" font-size="9" fill="#367669" font-weight="700">TODAY’S FOCUS</text>
+<text x="763" y="538" font-size="19" fill="#174a40" font-weight="650">One thing at a time.</text>
+<text x="763" y="562" font-size="11" fill="#3b7568" font-weight="400">Create a little space to think.</text>
+<rect x="762" y="579" width="201" height="6" rx="3" fill="#6abfa8"/>
+<rect x="762" y="579" width="142" height="6" rx="3" fill="#236a58"/>
+<circle cx="760" cy="632" r="9" fill="#2c8b70"/>
+<path d="M756 632l3 3 5-6" fill="none" stroke="#f4fff5" stroke-width="1.5"/>
+<text x="779" y="635" font-size="13" fill="#284d41" font-weight="600">A quiet start</text>
+<text x="779" y="653" font-size="10" fill="#748e7f" font-weight="400">09:00 · 25 minutes</text>
+<circle cx="760" cy="693" r="9" fill="#d0e2d6"/>
+<text x="779" y="696" font-size="13" fill="#284d41" font-weight="600">Build something useful</text>
+<text x="779" y="714" font-size="10" fill="#748e7f" font-weight="400">10:30 · Focus session</text>
+<rect x="831" y="751" width="66" height="3" rx="2" fill="#457566"/>
+<rect x="374" y="278" width="128" height="30" rx="15" fill="#392a33"/>
+<circle cx="389" cy="293" r="4" fill="#f27685"/>
+<text x="401" y="298" font-size="11" fill="#f6b4bd" font-weight="550">Recording  00:12</text>
+<path d="M355 790H1375" stroke="#2c3b4c"/>
+<rect x="379" y="806" width="122" height="32" rx="8" fill="#202b3a" stroke="#344155"/>
+<text x="440" y="827" font-size="12" fill="#d5e1ee" font-weight="500" text-anchor="middle">Paste to phone</text>
+<rect x="511" y="806" width="840" height="32" rx="8" fill="#162331" stroke="#344155"/>
+<text x="526" y="827" font-size="12" fill="#8398af" font-weight="400">Select a text field on your phone, then type here</text>
+<text x="379" y="861" font-size="12" fill="#a7bacf" font-weight="400">☑  Mute</text>
+<text x="549" y="861" font-size="12" fill="#c9d8e8" font-weight="400">Save screenshot</text>
+<text x="726" y="861" font-size="12" fill="#c9d8e8" font-weight="400">Pause recording</text>
+<text x="920" y="861" font-size="12" fill="#c9d8e8" font-weight="400">Stop and save</text>
+<text x="1351" y="861" font-size="11" fill="#7f98af" font-weight="400" text-anchor="end">Esc · Normal view</text>
+<text x="69" y="923" font-size="13" fill="#b8cbd8" font-weight="600">USB + Wi-Fi</text>
+<text x="285" y="923" font-size="13" fill="#b8cbd8" font-weight="600">Capture + record</text>
+<text x="560" y="923" font-size="13" fill="#b8cbd8" font-weight="600">Full screen + PiP</text>
+<text x="1371" y="923" font-size="12" fill="#7791a5" font-weight="400" text-anchor="end">Illustrative preview · all content is synthetic</text>
+</g></svg>
