@@ -71,6 +71,14 @@ export function IosReceiverPanel({
             )}{" "}
           </p>
         </>
+      ) : state.phase === "stopError" || state.phase === "stopping" ? (
+        <button
+          disabled={state.phase === "stopping"}
+          onClick={() => void controller.stop()}
+        >
+          {" "}
+          {translate("수신 종료 다시 시도")}{" "}
+        </button>
       ) : (
         <button
           disabled={state.phase === "starting"}

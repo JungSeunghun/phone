@@ -41,7 +41,7 @@ it("clears connection codes on stop, reports failures and permits retry", async 
   await controller.stop();
   expect(controller.snapshot.codes).toEqual([]);
 });
-it("ignores a late stop failure after a new receiver starts", async () => {
+it("blocks a new receiver until outstanding cleanup is resolved", async () => {
   let reject!: (error: Error) => void;
   const backend = {
     start: vi.fn(async () => ({
@@ -55,7 +55,14 @@ it("ignores a late stop failure after a new receiver starts", async () => {
   await controller.start();
   const stopping = controller.stop();
   await controller.start();
+  expect(backend.start).toHaveBeenCalledTimes(1);
+  expect(controller.snapshot.phase).toBe("stopping");
   reject(Error("late"));
   await stopping;
+  expect(controller.snapshot.phase).toBe("stopError");
+  backend.stop.mockImplementation(async () => {});
+  await controller.stop();
+  await controller.start();
+  expect(backend.start).toHaveBeenCalledTimes(2);
   expect(controller.snapshot.phase).toBe("listening");
 });

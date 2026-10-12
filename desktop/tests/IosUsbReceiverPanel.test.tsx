@@ -36,3 +36,34 @@ it("shows USB setup, saves no code after stop and stops the active session befor
   await waitFor(() => expect(order).toEqual(["session", "receiver"]));
   expect(screen.queryByLabelText("iPhone USB 연결 코드 1")).toBeNull();
 });
+
+it("offers cleanup retry without exposing codes or starting another receiver", async () => {
+  const backend = {
+    start: vi.fn(async () => ({
+      receiverId: "usb",
+      port: 27483,
+      codes: ["secret"],
+    })),
+    stop: vi
+      .fn()
+      .mockRejectedValueOnce(Error("cleanup"))
+      .mockResolvedValue(undefined),
+  };
+  render(
+    <IosReceiverPanel
+      controller={new IosReceiverController(backend, "usb")}
+      transport="usb"
+    />,
+  );
+  fireEvent.click(screen.getByText("iPhone Windows USB 수신"));
+  fireEvent.click(screen.getByText("iPhone USB 수신 시작"));
+  await screen.findByText("iPhone USB 수신 종료");
+  fireEvent.click(screen.getByText("iPhone USB 수신 종료"));
+  fireEvent.click(
+    await screen.findByRole("button", { name: "수신 종료 다시 시도" }),
+  );
+  await waitFor(() => expect(backend.stop).toHaveBeenCalledTimes(2));
+  expect(backend.start).toHaveBeenCalledTimes(1);
+  expect(screen.queryByLabelText("iPhone USB 연결 코드 1")).toBeNull();
+  await screen.findByText("iPhone USB 수신 시작");
+});
