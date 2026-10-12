@@ -1,7 +1,6 @@
 //! Encoded recording is independent of Tauri and never waits on disk in the video sink.
 use crate::domain::VideoPacketHeader;
 use std::{
-    fs::File,
     path::{Path, PathBuf},
     sync::{
         atomic::{AtomicBool, AtomicUsize, Ordering},
@@ -139,7 +138,11 @@ impl RecordedFile {
             destination.with_file_name(format!(".phone-mirror-{}.tmp", uuid::Uuid::new_v4()));
         let result = (|| -> std::io::Result<()> {
             std::fs::copy(&self.path, &temporary)?;
-            File::open(&temporary)?.sync_all()?;
+            // Windows FlushFileBuffers requires a handle with write access.
+            std::fs::OpenOptions::new()
+                .write(true)
+                .open(&temporary)?
+                .sync_all()?;
             std::fs::hard_link(&temporary, destination)?;
             Ok(())
         })();

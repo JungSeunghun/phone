@@ -384,5 +384,6 @@ Windows GNU 타깃 `cargo check --target x86_64-pc-windows-gnu`는 업데이트 
 - 배포 아카이브의 서명 메타데이터 버전과 배포 버전 불일치 테스트가 먼저 실패한 뒤 검사를 추가해 통과했다. 이 배포 준비 검사는 메타데이터 검사이며, 앱의 공개 키 암호학적 검증을 대체하지 않는다.
 - Vitest를 4.1.11로 올린 뒤 npm 의존성 감사 0건, 프론트 155개, 배포 22개, Chromium 43개, Rust 서비스 114개, TypeScript/Vite 생산 빌드 및 포맷 검사를 통과했다. 브라우저 병렬 실행에서는 성능 검사의 디코더가 닫히는 실패가 한 번 발생했으며, 해당 검사 단독 실행과 전체 직렬 실행은 통과했다. 이 실행 환경 의존성은 제품 성능 성공으로 확대 해석하지 않는다.
 - 공개 파일·Git 이력의 제한된 패턴 검사에서 0건을 확인했다. 기존 Swift·iOS 소스를 변경하지 않았으며, 이번 재점검에서 추가 iPhone 실기기 검증이나 실제 HTTPS 업데이트 설치·재시작을 수행하지 않았다.
+- Windows 네이티브 CI에서 `published_recording_preserves_existing_destination_and_cleans_temporary_files`가 실패했다. 녹화 저장의 임시 파일 동기화에 읽기 전용 핸들을 사용해 Windows 쓰기 권한 요구를 충족하지 못했다. 쓰기 권한으로 열어 동기화하도록 수정하고 같은 회귀 테스트를 다시 실행한다. Mac CI의 Rust 테스트·Clippy·앱 번들은 먼저 통과했다.
 
 재현 실패 및 최종 로그는 ignored `desktop/src-tauri/target/overall-review/`에 보관한다. 공식 바이너리 공개 전 제3자 라이선스 목록 수집, 업데이트 피드 제공, 코드 서명·공증 준비가 남아 있다.
