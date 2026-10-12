@@ -165,3 +165,69 @@ fn recording_time_limit_has_exact_boundary() {
     assert!(recording_time_expired(Duration::from_secs(3600)));
     assert!(recording_time_expired(Duration::MAX));
 }
+
+#[test]
+fn completed_recording_save_failure_preserves_original_and_allows_retry() {
+    use phone_mirror_desktop::recording::CompletedRecordingStore;
+    let directory = tempfile::tempdir().unwrap();
+    let session = RecordingSession::default();
+    session.push(&config());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x65, 1]));
+    let file = session.finish(&id).unwrap();
+    let original = file.path().to_owned();
+    let store = CompletedRecordingStore::default();
+    store.insert("recording".into(), file);
+    let existing = directory.path().join("existing.mp4");
+    std::fs::write(&existing, b"existing file").unwrap();
+    assert!(store
+        .save("recording", |file| {
+            file.publish(&existing)?;
+            Ok(Some(existing.to_string_lossy().into_owned()))
+        })
+        .is_err());
+    assert!(original.exists());
+    assert!(store.has_pending());
+    let destination = directory.path().join("retry.mp4");
+    assert!(store
+        .save("recording", |file| {
+            assert!(store.save("recording", |_| Ok(None)).is_err());
+            file.publish(&destination)?;
+            Ok(Some(destination.to_string_lossy().into_owned()))
+        })
+        .unwrap()
+        .is_some());
+    assert!(!original.exists());
+    assert!(!store.has_pending());
+    assert!(destination.exists());
+    assert_eq!(std::fs::read(existing).unwrap(), b"existing file");
+    assert!(store.save("missing", |_| Ok(None)).is_err());
+}
+
+#[test]
+fn completed_recording_survives_missing_directory_and_save_panic_until_explicit_cancel() {
+    use phone_mirror_desktop::recording::CompletedRecordingStore;
+    let directory = tempfile::tempdir().unwrap();
+    let session = RecordingSession::default();
+    session.push(&config());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x65, 1]));
+    let file = session.finish(&id).unwrap();
+    let original = file.path().to_owned();
+    let store = CompletedRecordingStore::default();
+    store.insert("recording".into(), file);
+    assert!(store
+        .save("recording", |file| {
+            file.publish(&directory.path().join("missing/video.mp4"))?;
+            Ok(None)
+        })
+        .is_err());
+    assert!(original.exists());
+    assert!(
+        std::panic::catch_unwind(|| store.save("recording", |_| panic!("dialog failure"))).is_err()
+    );
+    assert!(original.exists());
+    assert_eq!(store.save("recording", |_| Ok(None)).unwrap(), None);
+    assert!(!original.exists());
+    assert!(!store.has_pending());
+}

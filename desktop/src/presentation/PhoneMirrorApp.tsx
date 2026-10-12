@@ -323,8 +323,13 @@ function PhoneMirrorContent({
     sync();
     const unsubscribe = controller.subscribe(sync);
     const unlisten = isTauri()
-      ? listen("media-shutdown", () => {
-          void media.finish().then(() => invoke("finish_media_shutdown"));
+      ? listen<string>("media-shutdown", (event) => {
+          const shutdownId = event.payload;
+          void (async () => {
+            await controller.stop();
+            const allowExit = await media.finish();
+            await invoke("finish_media_shutdown", { shutdownId, allowExit });
+          })();
         })
       : undefined;
     return () => {
@@ -348,7 +353,8 @@ function PhoneMirrorContent({
             controller.getSnapshot().phase,
           ) ||
           media.getSnapshot().busy ||
-          media.getSnapshot().recording,
+          media.getSnapshot().recording ||
+          media.getSnapshot().savePending,
         () => performance.now(),
       ),
     [controller, media],
@@ -728,6 +734,7 @@ function PhoneMirrorContent({
                 live={capture.live}
                 busy={capture.busy}
                 recording={capture.recording}
+                recordBlocked={capture.savePending}
                 onScreenshot={() => void media.screenshot()}
                 onRecord={() => void media.startRecording()}
               />
@@ -862,6 +869,7 @@ function PhoneMirrorContent({
               live={capture.live}
               busy={capture.busy}
               recording={capture.recording}
+              recordBlocked={capture.savePending}
               onScreenshot={() => void media.screenshot()}
               onRecord={() => void media.startRecording()}
             />
@@ -912,6 +920,15 @@ function PhoneMirrorContent({
               {translate(capture.message)}
             </p>
           )}
+        {capture.savePending && (
+          <button
+            disabled={capture.busy}
+            onClick={() => void media.retryRecordingSave()}
+          >
+            {" "}
+            {translate("녹화 저장 다시 시도")}{" "}
+          </button>
+        )}
         {state.inputMessage.includes("실패") && (
           <p className="view-message" role="alert">
             {translate(state.inputMessage)}

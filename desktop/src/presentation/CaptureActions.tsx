@@ -6,6 +6,7 @@ export function CaptureActions({
   live,
   busy,
   recording,
+  recordBlocked = false,
   compact,
   onScreenshot,
   onRecord,
@@ -13,6 +14,7 @@ export function CaptureActions({
   live: boolean;
   busy: boolean;
   recording: boolean;
+  recordBlocked?: boolean;
   compact: boolean;
   onScreenshot: () => void;
   onRecord: () => void;
@@ -33,7 +35,10 @@ export function CaptureActions({
         <ToolbarIcon name="capture" /> {translate("스크린샷 저장")}{" "}
       </button>
       {!recording && (
-        <button disabled={!live || busy} onClick={() => close(onRecord)}>
+        <button
+          disabled={!live || busy || recordBlocked}
+          onClick={() => close(onRecord)}
+        >
           <ToolbarIcon name="record" /> {translate("화면 녹화")}{" "}
         </button>
       )}

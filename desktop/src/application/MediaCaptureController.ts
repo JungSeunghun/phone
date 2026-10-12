@@ -24,10 +24,12 @@ export class MediaCaptureController {
     busy: false,
     screenshotBusy: false,
     screenshotMessage: "",
+    savePending: false,
     message: "",
   };
   private listeners = new Set<() => void>();
   private recording?: Recording;
+  private pendingRecording?: CapturedMedia;
   private finalizing?: Promise<void>;
   private screenshotTask?: Promise<void>;
   private cancelRecordingClock?: () => void;
@@ -85,12 +87,19 @@ export class MediaCaptureController {
       ...(!this.recording && !this.finalizing ? { message } : {}),
     });
   }
-  async finish(): Promise<void> {
+  async finish(): Promise<boolean> {
     this.setLive(false);
     await Promise.all([this.screenshotTask, this.stopRecording()]);
+    return !this.snapshot.savePending;
   }
   startRecording() {
-    if (!this.snapshot.live || this.snapshot.busy || this.recording) return;
+    if (
+      !this.snapshot.live ||
+      this.snapshot.busy ||
+      this.recording ||
+      this.snapshot.savePending
+    )
+      return;
     try {
       const startedAt = this.clock.now();
       if (!Number.isFinite(startedAt)) throw Error("Invalid recording clock");
@@ -210,8 +219,13 @@ export class MediaCaptureController {
       try {
         // Finalize the video immediately, but keep native save dialogs sequential.
         const media = await recording.stop();
+        this.validateMedia(media);
+        this.pendingRecording = media;
+        this.update({ savePending: true });
         if (screenshotTask) await screenshotTask;
         this.update({ message: await this.save(media) });
+        this.pendingRecording = undefined;
+        this.update({ savePending: false });
       } catch {
         if (screenshotTask) await screenshotTask;
         this.update({ message: "녹화 저장에 실패했습니다." });
@@ -223,12 +237,41 @@ export class MediaCaptureController {
     })();
     return task;
   }
-  private async save(blob: CapturedMedia) {
+  retryRecordingSave(): Promise<void> {
+    if (this.finalizing) return this.finalizing;
+    const media = this.pendingRecording;
+    if (!media || this.snapshot.busy) return Promise.resolve();
+    let complete!: () => void;
+    const task = new Promise<void>((resolve) => {
+      complete = resolve;
+    });
+    this.finalizing = task;
+    this.update({ busy: true, message: "녹화를 저장하고 있습니다." });
+    void (async () => {
+      try {
+        this.update({ message: await this.save(media), savePending: false });
+        this.pendingRecording = undefined;
+      } catch {
+        this.update({
+          message: "녹화 저장에 실패했습니다. 다른 경로로 다시 저장하세요.",
+        });
+      } finally {
+        this.finalizing = undefined;
+        this.update({ busy: !!this.screenshotTask });
+        complete();
+      }
+    })();
+    return task;
+  }
+  private validateMedia(blob: CapturedMedia) {
     if (
       blob instanceof Blob &&
       (blob.size === 0 || blob.size > 256 * 1024 * 1024)
     )
       throw Error("Invalid media size");
+  }
+  private async save(blob: CapturedMedia) {
+    this.validateMedia(blob);
     const path = await this.store.save(blob);
     return path ? `저장했습니다: ${path}` : "저장을 취소했습니다.";
   }

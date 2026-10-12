@@ -30,7 +30,7 @@ struct DesktopServices {
     sessions: Mutex<SessionRegistry>,
     controls: Mutex<std::collections::HashMap<String, ControlSession>>,
     recordings: Mutex<std::collections::HashMap<String, Arc<crate::recording::RecordingSession>>>,
-    completed_recordings: Mutex<std::collections::HashMap<String, crate::recording::RecordedFile>>,
+    completed_recordings: crate::recording::CompletedRecordingStore,
     tasks: Mutex<Vec<tauri::async_runtime::JoinHandle<()>>>,
 }
 pub(crate) struct DesktopState {
@@ -38,7 +38,7 @@ pub(crate) struct DesktopState {
     closing: AtomicBool,
     media_operations: AtomicUsize,
     updating: AtomicBool,
-    media_shutdown: Arc<tokio::sync::Notify>,
+    shutdown: crate::shutdown::ShutdownCoordinator,
     window_presentation: Mutex<crate::window_presentation::WindowPresentation>,
 }
 impl DesktopState {
@@ -48,7 +48,7 @@ impl DesktopState {
         crate::application_update::UpdateActivity {
             active_session: sessions.is_active(),
             media_operations: self.media_operations.load(Ordering::SeqCst),
-            pending_recordings: !services.completed_recordings.lock().unwrap().is_empty()
+            pending_recordings: services.completed_recordings.has_pending()
                 || services
                     .recordings
                     .lock()
@@ -73,7 +73,7 @@ impl DesktopState {
     fn begin_media_operation(&self) -> Result<MediaOperation<'_>, String> {
         let services = self.services()?;
         let _sessions = services.sessions.lock().unwrap();
-        if self.updating.load(Ordering::SeqCst) {
+        if self.updating.load(Ordering::SeqCst) || self.shutdown.is_committing() {
             return Err("앱을 종료하거나 업데이트하고 있습니다.".into());
         }
         self.media_operations.fetch_add(1, Ordering::SeqCst);
@@ -82,6 +82,11 @@ impl DesktopState {
     pub(crate) fn end_update(&self) {
         self.updating.store(false, Ordering::SeqCst);
         self.closing.store(false, Ordering::SeqCst);
+    }
+
+    fn should_prevent_exit_request(&self) -> bool {
+        // A quit request begins cleanup; only the final reservation permits exit.
+        !self.updating.load(Ordering::SeqCst) && !self.shutdown.is_committing()
     }
 
     fn services(&self) -> Result<Arc<DesktopServices>, String> {
@@ -737,11 +742,7 @@ async fn finish_native_recording(
         }
         let file = result?;
         let token = uuid::Uuid::new_v4().to_string();
-        services
-            .completed_recordings
-            .lock()
-            .unwrap()
-            .insert(token.clone(), file);
+        services.completed_recordings.insert(token.clone(), file);
         Ok(token)
     })
     .await
@@ -755,26 +756,22 @@ async fn save_native_recording(
 ) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
     let _operation = state.begin_media_operation()?;
-    let file = state
-        .services()?
-        .completed_recordings
-        .lock()
-        .unwrap()
-        .remove(&recording_id)
-        .ok_or("완료된 녹화 파일이 없습니다.")?;
+    let services = state.services()?;
     tauri::async_runtime::spawn_blocking(move || {
-        let path = app
-            .dialog()
-            .file()
-            .add_filter("Phone Mirror", &["mp4"])
-            .set_file_name(format!("Phone Mirror {}.mp4", uuid::Uuid::new_v4()))
-            .blocking_save_file();
-        let Some(path) = path else {
-            return Ok(None);
-        };
-        let path = path.into_path().map_err(|_| "저장 경로가 없습니다.")?;
-        file.publish(&path)?;
-        Ok(Some(path.to_string_lossy().into_owned()))
+        services.completed_recordings.save(&recording_id, |file| {
+            let path = app
+                .dialog()
+                .file()
+                .add_filter("Phone Mirror", &["mp4"])
+                .set_file_name(format!("Phone Mirror {}.mp4", uuid::Uuid::new_v4()))
+                .blocking_save_file();
+            let Some(path) = path else {
+                return Ok(None);
+            };
+            let path = path.into_path().map_err(|_| "저장 경로가 없습니다.")?;
+            file.publish(&path)?;
+            Ok(Some(path.to_string_lossy().into_owned()))
+        })
     })
     .await
     .map_err(|_| "녹화 저장 작업에 실패했습니다.".to_string())?
@@ -807,37 +804,63 @@ async fn save_diagnostic_summary(
     .map_err(|_| "진단 요약 저장 작업에 실패했습니다.".to_string())?
 }
 #[tauri::command]
-fn finish_media_shutdown(state: State<'_, DesktopState>) {
-    state.media_shutdown.notify_one();
+fn finish_media_shutdown(
+    state: State<'_, DesktopState>,
+    shutdown_id: String,
+    allow_exit: bool,
+) -> bool {
+    state.shutdown.respond(&shutdown_id, allow_exit)
 }
 fn shutdown(app: &tauri::AppHandle) {
     let state = app.state::<DesktopState>();
     if state.closing.swap(true, Ordering::SeqCst) {
         return;
     }
-    let notification = state.media_shutdown.clone();
-    let tasks = if let Ok(services) = state.services() {
-        services.sessions.lock().unwrap().stop_all();
-        let receiver_services = services.clone();
-        tauri::async_runtime::spawn(async move {
-            receiver_services.diagnostics.cancel_all().await;
-            receiver_services.ios_wifi.cancel_all().await;
-            receiver_services.ios_usb.cancel_all().await;
-            receiver_services.ios_keyboard.cancel_all().await;
-            receiver_services.android_qr.cancel_all().await;
-        });
-        std::mem::take(&mut *services.tasks.lock().unwrap())
-    } else {
-        Vec::new()
+    let Some(attempt) = state.shutdown.begin() else {
+        return;
     };
+    if let Ok(services) = state.services() {
+        services.sessions.lock().unwrap().stop_all();
+    }
     let app = app.clone();
-    app.emit("media-shutdown", ()).ok();
+    app.emit("media-shutdown", attempt.id()).ok();
     tauri::async_runtime::spawn(async move {
-        // The frontend finishes the recorder and native Save dialog before exit.
-        let _ = tokio::time::timeout(Duration::from_secs(180), notification.notified()).await;
+        let wake = attempt.wait().await;
+        let state = app.state::<DesktopState>();
+        let decision = if let Ok(services) = state.services() {
+            // Serialize the exit reservation with new sessions and media operations.
+            let _sessions = services.sessions.lock().unwrap();
+            let activity = crate::shutdown::ShutdownActivity {
+                media_operations: state.media_operations.load(Ordering::SeqCst),
+                pending_recordings: services.completed_recordings.has_pending(),
+                recording_jobs: services
+                    .recordings
+                    .lock()
+                    .unwrap()
+                    .values()
+                    .any(|recording| recording.has_job()),
+            };
+            state.shutdown.finish(&attempt, wake, activity)
+        } else {
+            state.shutdown.finish(&attempt, wake, Default::default())
+        };
+        if decision == crate::shutdown::ShutdownDecision::Cancel {
+            state.closing.store(false, Ordering::SeqCst);
+        }
+        if decision != crate::shutdown::ShutdownDecision::Exit {
+            return;
+        }
         let wait = async {
-            for task in tasks {
-                task.await.ok();
+            if let Ok(services) = state.services() {
+                services.diagnostics.cancel_all().await;
+                services.ios_wifi.cancel_all().await;
+                services.ios_usb.cancel_all().await;
+                services.ios_keyboard.cancel_all().await;
+                services.android_qr.cancel_all().await;
+                let tasks = std::mem::take(&mut *services.tasks.lock().unwrap());
+                for task in tasks {
+                    task.await.ok();
+                }
             }
         };
         let _ = tokio::time::timeout(Duration::from_secs(20), wait).await;
@@ -957,7 +980,7 @@ pub fn run() {
                     sessions: Mutex::new(SessionRegistry::default()),
                     controls: Mutex::new(std::collections::HashMap::new()),
                     recordings: Mutex::new(Default::default()),
-                    completed_recordings: Mutex::new(Default::default()),
+                    completed_recordings: Default::default(),
                     tasks: Mutex::new(Vec::new()),
                 }))
             })();
@@ -966,7 +989,7 @@ pub fn run() {
                 closing: AtomicBool::new(false),
                 media_operations: AtomicUsize::new(0),
                 updating: AtomicBool::new(false),
-                media_shutdown: Arc::new(tokio::sync::Notify::new()),
+                shutdown: Default::default(),
                 window_presentation: Mutex::new(Default::default()),
             });
             if let Some(window) = app.get_webview_window("main") {
@@ -1055,10 +1078,66 @@ pub fn run() {
         .expect("Phone Mirror Desktop could not start");
     app.run(|app, event| {
         if let tauri::RunEvent::ExitRequested { api, .. } = event {
-            if !app.state::<DesktopState>().closing.load(Ordering::SeqCst) {
+            if app.state::<DesktopState>().should_prevent_exit_request() {
                 api.prevent_exit();
                 shutdown(app);
             }
         }
     });
+}
+
+#[cfg(test)]
+mod exit_request_tests {
+    use super::*;
+    use crate::shutdown::{ShutdownActivity, ShutdownDecision, ShutdownWake};
+
+    fn state() -> DesktopState {
+        DesktopState {
+            services: Err("No hardware in this policy fixture".into()),
+            closing: AtomicBool::new(false),
+            media_operations: AtomicUsize::new(0),
+            updating: AtomicBool::new(false),
+            shutdown: Default::default(),
+            window_presentation: Mutex::new(Default::default()),
+        }
+    }
+
+    #[test]
+    fn repeated_native_exit_requests_wait_for_media_and_exit_reservation() {
+        let state = state();
+        assert!(state.should_prevent_exit_request());
+        state.closing.store(true, Ordering::SeqCst);
+        let attempt = state.shutdown.begin().unwrap();
+        assert!(state.should_prevent_exit_request());
+        assert!(state.shutdown.respond(attempt.id(), true));
+        assert!(state.should_prevent_exit_request());
+        assert_eq!(
+            state.shutdown.finish(
+                &attempt,
+                ShutdownWake::Allowed,
+                ShutdownActivity {
+                    media_operations: 1,
+                    ..Default::default()
+                }
+            ),
+            ShutdownDecision::Cancel
+        );
+        assert!(state.should_prevent_exit_request());
+        let retry = state.shutdown.begin().unwrap();
+        assert_eq!(
+            state
+                .shutdown
+                .finish(&retry, ShutdownWake::Allowed, ShutdownActivity::default()),
+            ShutdownDecision::Exit
+        );
+        assert!(!state.should_prevent_exit_request());
+    }
+
+    #[test]
+    fn approved_update_restart_preserves_its_exit_path() {
+        let state = state();
+        state.closing.store(true, Ordering::SeqCst);
+        state.updating.store(true, Ordering::SeqCst);
+        assert!(!state.should_prevent_exit_request());
+    }
 }

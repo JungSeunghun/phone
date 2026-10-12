@@ -39,3 +39,5 @@ pub mod application_update;
 mod application_update_adapter;
 
 pub mod diagnostic_summary;
+
+pub mod shutdown;

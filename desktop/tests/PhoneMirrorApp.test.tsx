@@ -286,3 +286,68 @@ it("groups connection and video settings and keeps manual Android input collapse
   expect(backend.pairDevice).not.toHaveBeenCalled();
   expect(backend.startSession).not.toHaveBeenCalled();
 });
+
+it("offers recording save retry after storage failure and disconnect", async () => {
+  const { MediaCaptureController } =
+    await import("../src/application/MediaCaptureController");
+  const { vi } = await import("vitest");
+  const { act } = await import("@testing-library/react");
+  const controller = new PhoneMirrorController(new FakeBackend());
+  const save = vi
+    .fn()
+    .mockRejectedValueOnce(Error("disk full"))
+    .mockResolvedValue("/retry.mp4");
+  const media = new MediaCaptureController(
+    {
+      screenshot: vi.fn(),
+      record: () => ({ stop: async () => ({ nativeRecordingId: "retained" }) }),
+    },
+    { save },
+  );
+  await controller.refreshDevices();
+  render(<PhoneMirrorApp controller={controller} mediaController={media} />);
+  await act(async () => {
+    media.setLive(true);
+    media.startRecording();
+    await media.finish();
+  });
+  await userEvent.click(
+    screen.getByRole("button", { name: "녹화 저장 다시 시도" }),
+  );
+  expect(save).toHaveBeenLastCalledWith({ nativeRecordingId: "retained" });
+  expect(
+    await screen.findByText("저장했습니다: /retry.mp4"),
+  ).toBeInTheDocument();
+});
+
+it("disables replacement recording while an unsaved recording awaits retry", async () => {
+  const { MediaCaptureController } =
+    await import("../src/application/MediaCaptureController");
+  const { vi } = await import("vitest");
+  const { act } = await import("@testing-library/react");
+  const controller = new PhoneMirrorController(new FakeBackend());
+  const media = new MediaCaptureController(
+    {
+      screenshot: vi.fn(),
+      record: () => ({ stop: async () => new Blob(["video"]) }),
+    },
+    {
+      save: async () => {
+        throw Error("write failure");
+      },
+    },
+  );
+  await controller.refreshDevices();
+  render(<PhoneMirrorApp controller={controller} mediaController={media} />);
+  await act(async () => {
+    await controller.start();
+    controller.frameRendered(320, 640);
+    media.startRecording();
+    await media.stopRecording();
+  });
+  expect(screen.getByRole("button", { name: "화면 녹화" })).toBeDisabled();
+  expect(screen.getByRole("button", { name: "스크린샷 저장" })).toBeEnabled();
+  expect(
+    screen.getByRole("button", { name: "녹화 저장 다시 시도" }),
+  ).toBeEnabled();
+});

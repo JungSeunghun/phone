@@ -155,6 +155,62 @@ impl Drop for RecordedFile {
         let _ = std::fs::remove_file(&self.path);
     }
 }
+
+/// Owns completed recordings until a save succeeds or the user explicitly cancels.
+#[derive(Default)]
+pub struct CompletedRecordingStore {
+    files: Mutex<std::collections::HashMap<String, CompletedRecording>>,
+}
+struct CompletedRecording {
+    file: Arc<RecordedFile>,
+    saving: bool,
+}
+struct RecordingSaveReservation<'a> {
+    store: &'a CompletedRecordingStore,
+    id: &'a str,
+}
+impl Drop for RecordingSaveReservation<'_> {
+    fn drop(&mut self) {
+        if let Some(entry) = self.store.files.lock().unwrap().get_mut(self.id) {
+            entry.saving = false;
+        }
+    }
+}
+impl CompletedRecordingStore {
+    pub fn insert(&self, id: String, file: RecordedFile) {
+        self.files.lock().unwrap().insert(
+            id,
+            CompletedRecording {
+                file: Arc::new(file),
+                saving: false,
+            },
+        );
+    }
+    pub fn has_pending(&self) -> bool {
+        !self.files.lock().unwrap().is_empty()
+    }
+    pub fn save(
+        &self,
+        id: &str,
+        save: impl FnOnce(&RecordedFile) -> Result<Option<String>, String>,
+    ) -> Result<Option<String>, String> {
+        let file = {
+            let mut files = self.files.lock().unwrap();
+            let entry = files.get_mut(id).ok_or("완료된 녹화 파일이 없습니다.")?;
+            if entry.saving {
+                return Err("녹화를 저장하고 있습니다.".into());
+            }
+            entry.saving = true;
+            entry.file.clone()
+        };
+        let _reservation = RecordingSaveReservation { store: self, id };
+        let result = save(&file);
+        if result.is_ok() {
+            self.files.lock().unwrap().remove(id);
+        }
+        result
+    }
+}
 struct RecordingJob {
     id: String,
     input: Option<SyncSender<RecordingInput>>,
