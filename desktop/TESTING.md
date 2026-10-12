@@ -388,6 +388,30 @@ Windows GNU 타깃 `cargo check --target x86_64-pc-windows-gnu`는 업데이트 
 
 재현 실패 및 최종 로그는 ignored `desktop/src-tauri/target/overall-review/`에 보관한다. 공식 바이너리 공개 전 제3자 라이선스 목록 수집, 업데이트 피드 제공, 코드 서명·공증 준비가 남아 있다.
 
+## 저장·수신 정리·키보드 인증 회귀 수정 (2026-10-12)
+
+- 녹화 저장 실패 후 재시도와 종료 취소, iPhone 수신 정리 실패 및 늦은 시작 완료, 재시도 버튼의 화면 테스트를 먼저 추가하고 실패를 확인했다. Rust 완료 녹화 저장소 테스트는 새 API가 없는 컴파일 실패를 먼저 확인했다. 키보드 인증 테스트는 실제 로컬 TCP 서버가 challenge와 hello 교환 후 ready 응답을 보내지 않을 때 9초가 지나도 종료되지 않는 실패를 확인했다.
+- 완료 녹화는 저장 성공 또는 사용자의 저장 대화상자 취소까지 보존한다. 파일명 충돌·없는 디렉터리·저장 중 예외 이후 원본 유지와 재시도, 기존 파일 보호, 중복 저장 차단을 검사한다. 화면은 재시도 식별자를 유지하고 새 녹화를 차단하며, 저장 실패 시 일반 앱 종료를 취소한다. 강제 종료·프로세스 충돌 후 복원 기능을 추가한 것은 아니다.
+- iPhone USB/Wi-Fi 수신은 정리가 끝나기 전 새 시작을 차단하고, 정리 실패 시 수신 식별자를 유지한다. 연결 코드는 즉시 숨기며 별도 종료 재시도 버튼으로 복구한다. 취소 후 늦은 시작 완료와 반복 종료도 검사한다. 기존의 “정리 중 새 수신 시작” 테스트는 새 동작에 맞춰 정리 완료 전 시작 차단과 이후 재시작을 검증하도록 변경했다.
+- 키보드는 암호 객체 생성 여부 대신 인증된 ready 수신 여부로 8초 제한을 판단한다. 기본 타이머를 사용하는 실제 로컬 TCP 시간 초과 시험과 주입한 타이머를 사용하는 정상 인증·다음 연결에 도착하는 이전 타이머·수동 취소 후 늦은 콜백 시험이 통과했다.
+- 최종 프런트엔드 167개, Rust 백엔드 116개, Chromium 43개, 기존 Swift macOS 88개, iPhone 공유 코드 21개, 릴리스 스크립트 22개 테스트가 통과했다. TypeScript/Vite 빌드, Prettier, rustfmt, 전체 타깃 Clippy(`-D warnings`), 기존 Swift release 빌드와 iPhone simulator/device SDK 빌드(서명 없음), macOS Tauri release 앱 번들 빌드가 통과했다.
+- Windows Rust 서비스 계층은 `--no-default-features --target x86_64-pc-windows-gnu` 교차 컴파일 검사로 확인했다. Windows 네이티브 UI·설치·실행 및 Android/iPhone 실기기 시험은 수행하지 않았다. 로컬 TCP와 합성 녹화 검증을 실기기 증거로 취급하지 않는다.
+
+실패/통과와 빌드 로그는 ignored `dist/Verification/RegressionFixes/TestLogs`에 보관한다.
+
+## 종료 경계·이전 응답 격리 회귀 수정 (2026-10-12)
+
+- 종료 정책을 Tauri·기기·미디어 API와 독립적인 Rust `ShutdownCoordinator`로 분리했다. 각 종료 시도는 UUID와 개별 알림을 가지며, 프런트엔드는 이벤트로 받은 식별자를 응답에 그대로 전달한다. 이전·잘못된·중복 응답과 종료 확정 후 응답은 상태를 바꾸지 않는다.
+- 종료 판단은 완료 녹화와 녹화 job뿐 아니라 `media_operations`를 확인한다. 판단과 종료 확정을 세션/미디어 작업 시작의 잠금과 직렬화하고, 종료 확정 후 새 미디어 작업을 거부한다. 따라서 worker를 꺼낸 뒤 `has_job()`이 false가 되는 마무리 구간도 보호한다.
+- 테스트를 먼저 추가해 네이티브 정책 API 부재 및 프런트엔드 식별자 누락 실패를 확인했다. 추가 경계 시험에서는 정확히 180초에 타이머가 깨어난 직후 도착한 종료 거부 응답을 무시하는 실제 assertion 실패(`Exit` 대 `Cancel`)를 확인하고 최종 응답을 잠금 안에서 다시 검사하도록 수정했다. 이 실패는 `exact-boundary-full-red.log`에도 남겨 두었다.
+- Tokio의 가상 시간으로 179.999초·180초·180.001초를 검사한다. 미디어 작업 수 1/usize::MAX, 미저장 녹화, 활성 job, 정상 종료, 거부 응답, 중복 시작·응답, 취소 후 재시도, 새 종료 뒤 이전 허용/거부 응답, 이전 완료 처리, 타이머와 응답의 동일 시점 경합을 포함한다. 실제 녹화 worker의 인코더 flush를 주입한 장벽으로 멈추고 마무리 중임에도 `has_job()`이 false인 구간을 재현했다. 프런트엔드 시험은 두 종료 이벤트의 완료가 늦어져도 각각 원래 식별자를 응답하는지 확인한다.
+
+이 시험은 합성 녹화와 로컬 서비스/IPC 모의 검증이며 실제 폰 시험이나 실제 180초 대기가 아니다. 실패/통과와 빌드 로그는 ignored `dist/Verification/ShutdownFixes/TestLogs`에 보관한다.
+
+최종 종료 정책 7개 및 네이티브 전체 123개 테스트, 종료 화면 응답 2개 테스트, 릴리스 스크립트 22개가 통과했다. macOS 네이티브 debug 빌드, TypeScript/Vite 빌드, 전체 타깃 Clippy(`-D warnings`), rustfmt와 Prettier도 통과했다. Windows 서비스 계층은 GNU 타깃 교차 컴파일 검사로 확인했으며 Windows 네이티브 실행과 폰 실기기 검증은 수행하지 않았다.
+
+공유 작업공간 전체 프런트엔드 검사는 병렬 실행에서 시간 초과가 발생했고, 단일 worker 재검사도 181개 중 167개 통과·14개 실패(시간 초과 13개 및 별도 언어 설정 테스트 1개)였다. 실행 당시 호스트 메모리 스왑 사용량 약 11–12GB를 확인했으나 이를 모든 실패의 확정 원인으로 간주하지 않는다. 동시에 진행 중인 언어 설정 변경을 보존했고 테스트 제한·검증 조건은 변경하지 않았다. 전체 UI/브라우저 회귀를 모두 통과한 것으로 보고하지 않는다. 종료 화면 시험은 별도로 재실행해 통과했다.
+
 
 ## 한국어·영어 UI — 2026-10-12
 
@@ -398,3 +422,12 @@ Windows GNU 타깃 `cargo check --target x86_64-pc-windows-gnu`는 업데이트 
 - `swift test --build-system native --scratch-path .build/localization-native`: 92개 통과. iPhone 코어 `swift test --package-path ios --build-system native --scratch-path .build/localization-ios-core`: 22개 통과. `xcodebuild ... -sdk iphoneos CODE_SIGNING_ALLOWED=NO build` 성공은 서명 없는 SDK 빌드이며 iPhone 실행 증거가 아니다.
 - 실제 macOS Swift 검증용 앱 창에서 한국어→영어 전환, 영어 Wi-Fi 설정 시트, 재실행 후 영어 복원을 확인했다. 검증용 앱과 빌드/테스트 로그는 ignored `.build/localization-*` 아래에만 보관했다.
 - `adb devices -l`에 연결된 Android 기기가 없었다. 이번 검증에는 Android/iPhone 실기기 연결, 물리적 케이블 분리, Windows 네이티브 실행이 포함되지 않는다. 기존 macOS·Windows CI는 프런트엔드 언어 테스트를 포함하며 iOS CI는 공용 `localization/**` 변경에도 실행되도록 수정했다. CI 설정 자체는 이번 Windows 실행 증거가 아니다.
+
+## 반복 종료 요청 및 회귀 수정 최종 검증 — 2026-10-12
+
+- iPhone 수신 정리 실패 시 식별자를 유지하고 코드 노출 없이 재시도하는 동작, 저장 실패한 녹화를 유지하고 같은 파일로 재시도하는 동작, 키보드 challenge 수신만으로 인증 시간 제한이 해제되지 않는 동작을 검토했다. 관련 구현·회귀 테스트를 목적별로 분리했다.
+- 네이티브 `ExitRequested`가 반복되면 `closing == true`만으로 정리를 우회해 종료를 허용하던 조건을 발견했다. 기존 조건을 사용하는 `repeated_native_exit_requests_wait_for_media_and_exit_reservation`의 assertion 실패를 확인한 후, 종료 확정 또는 승인된 업데이트 경로에서만 종료를 허용하도록 수정했다. 작업 중인 미디어가 있는 경우·허용 응답 후 최종 확정 전·종료 취소 후 재시도·최종 확정·업데이트 재시작을 검사한다. 실제 운영체제에서 중복 종료를 조작한 증거와 정책 테스트는 구분한다.
+- 현재 공유 작업공간 전체 프런트엔드 `npm test -- --maxWorkers=1` 183개, Rust 기본 desktop 기능을 포함한 `cargo test --locked` 125개, Chromium `npm run test:browser -- --workers=2` 45개, iPhone 코어 22개, 릴리스 스크립트 22개가 통과했다. 위 종료 경계 수정 당시의 181개 중 실패 기록은 당시 증거로 보존하며, 현재 재검사 결과는 전체 통과다.
+- Prettier, TypeScript/Vite 빌드, rustfmt, 모든 Rust 타깃 Clippy(`-D warnings`)와 iOS 기기 SDK unsigned 빌드가 통과했다. Windows는 `cargo check --locked --no-default-features --target x86_64-pc-windows-gnu`로 서비스 계층을 교차 컴파일했다. 이는 Windows 네이티브 앱 실행이나 iPhone 설치·실행 증거가 아니다.
+- 실제 Samsung SM-S901N Android USB 영상 886×1920으로 `android_recording_screenshot_smoke`를 수행했다. 녹화·일시정지 중 PNG 저장, 중복 저장 경로 실패 후 녹화 유지, MP4 전체 디코딩과 세션 정리를 확인했다. 실기기 미디어는 ignored `desktop/src-tauri/target/verification/recording-screenshot/`에만 보관하며 외부에 공유하지 않는다. 이 검사는 네이티브 WebView 저장 대화상자·종료 UI 조작, 물리적 케이블 분리 또는 iPhone 검증을 포함하지 않는다.
+- 검토, 실패/통과, 빌드 및 교차 컴파일 로그는 ignored `.build/remaining-change-review/`에 보관한다. Windows 네이티브 실행, iPhone 하드웨어 및 물리적 케이블 분리는 이번 검증에서 수행하지 않았다.
