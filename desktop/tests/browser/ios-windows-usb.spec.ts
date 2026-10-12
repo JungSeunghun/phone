@@ -7,7 +7,7 @@ test("Windows USB presentation drives wired receiver, app sound, AV recording an
     "Native synthetic packet fixture requires macOS; Windows UI is simulated here",
   );
   await page.goto("/tests/browser/layout.html?ios=1&native=1&iosusb=1");
-  await page.getByText("iPhone Windows USB 송출", { exact: true }).click();
+  await page.getByText("iPhone Windows USB 수신", { exact: true }).click();
   await page
     .getByRole("button", { name: "iPhone USB 수신 시작", exact: true })
     .click();
@@ -55,7 +55,7 @@ test("Windows USB presentation drives wired receiver, app sound, AV recording an
       .getByRole("button", { name: "iPhone USB 수신 종료", exact: true })
       .isVisible())
   )
-    await page.getByText("iPhone Windows USB 송출", { exact: true }).click();
+    await page.getByText("iPhone Windows USB 수신", { exact: true }).click();
   await page
     .getByRole("button", { name: "iPhone USB 수신 종료", exact: true })
     .click();

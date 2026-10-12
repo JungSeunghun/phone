@@ -257,7 +257,7 @@ pub async fn read_audio(
                 .await
                 .map_err(|_| "폰 소리 연결이 종료됐습니다.")?;
             let size = u32::from_be_bytes(header[8..12].try_into().unwrap()) as usize;
-            if size == 0 || size > 4096 || size % 4 != 0 {
+            if size == 0 || size > 4096 || !size.is_multiple_of(4) {
                 return Err("잘못된 오디오 패킷입니다.".into());
             }
             let mut packet = vec![0; 12 + size];
@@ -276,7 +276,7 @@ pub async fn read_audio(
     Ok(())
 }
 pub async fn write_control(
-    mut writer: impl tokio::io::AsyncWrite + Unpin,
+    mut writer: impl tokio::io::AsyncWrite + tokio::io::AsyncRead + Unpin,
     mut receiver: tokio::sync::mpsc::Receiver<Vec<u8>>,
     cancellation: CancellationToken,
 ) -> Result<(), String> {
@@ -288,6 +288,21 @@ pub async fn write_control(
             // Complete each small message to preserve framing even on Stop.
             tokio::time::timeout(Duration::from_secs(2),writer.write_all(&packet)).await
                 .map_err(|_|"폰 입력 응답 시간이 초과됐습니다.")?.map_err(|_|"폰 입력 연결이 종료됐습니다.")?;
+            if packet.first() == Some(&9) {
+                // Android handles PASTE asynchronously. Await server processing, then give
+                // its key event time to consume this clipboard before replacing it again.
+                let mut acknowledgement = [0; 9];
+                let read = tokio::time::timeout(Duration::from_secs(2), writer.read_exact(&mut acknowledgement));
+                tokio::select! { biased;
+                    _ = cancellation.cancelled() => return Ok(()),
+                    result = read => { result.map_err(|_| "폰 붙여넣기 확인 시간이 초과됐습니다.")?.map_err(|_| "폰 입력 연결이 종료됐습니다.")?; }
+                }
+                if acknowledgement[0] != 1 || packet.get(1..9) != Some(&acknowledgement[1..]) { return Err("폰 붙여넣기 확인이 올바르지 않습니다.".into()); }
+                tokio::select! { biased;
+                    _ = cancellation.cancelled() => return Ok(()),
+                    _ = tokio::time::sleep(Duration::from_millis(100)) => {}
+                }
+            }
             if packet.len()==32 && packet[0]==2 { if packet[1]==0 || packet[1]==2 {pressed=Some(packet);} else {pressed=None;} }
         }
     }.await;

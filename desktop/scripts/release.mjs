@@ -13,6 +13,7 @@ import {
 } from "./release-policy.mjs";
 import { stageArtifact, prepareArtifacts } from "./release-artifacts.mjs";
 import { GitHubReleaseClient, uploadDraftRelease } from "./draft-release.mjs";
+import { stageUpdate, prepareUpdates } from "./application-update-release.mjs";
 const root = fileURLToPath(new URL("..", import.meta.url));
 const releaseRoot = join(root, "..", "dist", "Release");
 async function versions() {
@@ -64,6 +65,9 @@ async function context(options) {
 }
 async function signing(target, mode) {
   const configuration = signingConfiguration(target, mode, process.env);
+  configuration.bundle.createUpdaterArtifacts = Boolean(
+    process.env.TAURI_SIGNING_PRIVATE_KEY,
+  );
   const directory = join(releaseRoot, "config");
   await mkdir(directory, { recursive: true });
   const configurationPath = join(directory, `${target}.json`);
@@ -161,6 +165,21 @@ async function main() {
         ? resolve(options.output)
         : join(releaseRoot, "stages", target.id),
     });
+    await stageUpdate({
+      version: release.version,
+      target: target.id,
+      sourceDirectory: join(
+        root,
+        "src-tauri",
+        "target",
+        target.target,
+        "release",
+        "bundle",
+      ),
+      outputDirectory: options.output
+        ? resolve(options.output)
+        : join(releaseRoot, "stages", target.id),
+    });
     console.log(`Staged ${entry.name} (${entry.size} bytes).`);
     return;
   }
@@ -182,6 +201,18 @@ async function main() {
       ? resolve(options.output)
       : join(releaseRoot, "ready"),
   });
+  plan.artifacts.push(
+    ...(await prepareUpdates({
+      version: release.version,
+      sourceDirectory: options.source
+        ? resolve(options.source)
+        : join(releaseRoot, "stages"),
+      outputDirectory: options.output
+        ? resolve(options.output)
+        : join(releaseRoot, "ready"),
+      baseUrl: process.env.DESKTOP_UPDATE_ASSET_BASE_URL,
+    })),
+  );
   if (plan.signingMode !== release.signingMode)
     throw new Error(
       "Staged signing mode differs from the release configuration.",

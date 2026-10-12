@@ -6,7 +6,7 @@ use crate::{
 use serde::Serialize;
 use std::{
     sync::{
-        atomic::{AtomicBool, Ordering},
+        atomic::{AtomicBool, AtomicUsize, Ordering},
         Arc, Mutex,
     },
     time::Duration,
@@ -25,6 +25,7 @@ struct DesktopServices {
     ios_capture: crate::ios_capture::IosCaptureService,
     ios_wifi: Arc<crate::ios_wifi::IosWifiReceiverService>,
     ios_usb: Arc<crate::ios_usb::IosUsbReceiverService>,
+    ios_keyboard: crate::ios_keyboard::IosKeyboardInputService,
     diagnostics: crate::connection_diagnostics::ConnectionDiagnosticsService,
     sessions: Mutex<SessionRegistry>,
     controls: Mutex<std::collections::HashMap<String, ControlSession>>,
@@ -32,15 +33,65 @@ struct DesktopServices {
     completed_recordings: Mutex<std::collections::HashMap<String, crate::recording::RecordedFile>>,
     tasks: Mutex<Vec<tauri::async_runtime::JoinHandle<()>>>,
 }
-struct DesktopState {
+pub(crate) struct DesktopState {
     services: Result<Arc<DesktopServices>, String>,
     closing: AtomicBool,
+    media_operations: AtomicUsize,
+    updating: AtomicBool,
     media_shutdown: Arc<tokio::sync::Notify>,
     window_presentation: Mutex<crate::window_presentation::WindowPresentation>,
 }
 impl DesktopState {
+    pub(crate) fn begin_update(&self) -> Result<(), String> {
+        let services = self.services()?;
+        let sessions = services.sessions.lock().unwrap();
+        crate::application_update::UpdateActivity {
+            active_session: sessions.is_active(),
+            media_operations: self.media_operations.load(Ordering::SeqCst),
+            pending_recordings: !services.completed_recordings.lock().unwrap().is_empty()
+                || services
+                    .recordings
+                    .lock()
+                    .unwrap()
+                    .values()
+                    .any(|recording| recording.has_job()),
+            background_tasks: services
+                .tasks
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|task| !task.inner().is_finished()),
+            closing: self.closing.load(Ordering::SeqCst),
+        }
+        .validate_installation()?;
+        self.closing
+            .compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst)
+            .map_err(|_| "앱을 종료하거나 업데이트하고 있습니다.".to_string())?;
+        self.updating.store(true, Ordering::SeqCst);
+        Ok(())
+    }
+    fn begin_media_operation(&self) -> Result<MediaOperation<'_>, String> {
+        let services = self.services()?;
+        let _sessions = services.sessions.lock().unwrap();
+        if self.updating.load(Ordering::SeqCst) {
+            return Err("앱을 종료하거나 업데이트하고 있습니다.".into());
+        }
+        self.media_operations.fetch_add(1, Ordering::SeqCst);
+        Ok(MediaOperation(&self.media_operations))
+    }
+    pub(crate) fn end_update(&self) {
+        self.updating.store(false, Ordering::SeqCst);
+        self.closing.store(false, Ordering::SeqCst);
+    }
+
     fn services(&self) -> Result<Arc<DesktopServices>, String> {
         self.services.clone()
+    }
+}
+struct MediaOperation<'a>(&'a AtomicUsize);
+impl Drop for MediaOperation<'_> {
+    fn drop(&mut self) {
+        self.0.fetch_sub(1, Ordering::SeqCst);
     }
 }
 #[derive(Clone, Serialize)]
@@ -84,7 +135,18 @@ async fn set_window_view_mode(
     mode: crate::window_presentation::WindowViewMode,
     dimensions: Option<(u32, u32)>,
 ) -> Result<crate::window_presentation::WindowViewMode, String> {
-    tauri::async_runtime::spawn_blocking(move || {
+    // macOS Spaces transitions finish asynchronously. Leave native fullscreen
+    // before applying normal/PiP geometry, without blocking the UI thread.
+    if mode != crate::window_presentation::WindowViewMode::Fullscreen
+        && window.is_fullscreen().map_err(|error| error.to_string())?
+    {
+        window
+            .set_fullscreen(false)
+            .map_err(|error| error.to_string())?;
+        wait_for_native_fullscreen(&window, false).await?;
+    }
+    let transition_window = window.clone();
+    let result = tauri::async_runtime::spawn_blocking(move || {
         let app = window.app_handle().clone();
         let state = app.state::<DesktopState>();
         if state.closing.load(Ordering::SeqCst) {
@@ -100,7 +162,73 @@ async fn set_window_view_mode(
         result
     })
     .await
-    .map_err(|_| "창 표시 작업에 실패했습니다.".to_string())?
+    .map_err(|_| "창 표시 작업에 실패했습니다.".to_string())??;
+    if mode == crate::window_presentation::WindowViewMode::Fullscreen {
+        wait_for_native_fullscreen(&transition_window, true).await?;
+    }
+    Ok(result)
+}
+async fn wait_for_native_fullscreen(
+    window: &tauri::WebviewWindow,
+    expected: bool,
+) -> Result<(), String> {
+    crate::window_presentation::await_fullscreen_transition(
+        &crate::window_presentation_adapter::TauriFullscreenTransitionPort {
+            window: window.clone(),
+            started: tokio::time::Instant::now(),
+        },
+        expected,
+        Duration::from_secs(2),
+    )
+    .await
+}
+pub(crate) fn window_is_closing(window: &tauri::WebviewWindow) -> bool {
+    window
+        .app_handle()
+        .state::<DesktopState>()
+        .closing
+        .load(Ordering::SeqCst)
+}
+
+fn observe_native_window(window: &tauri::WebviewWindow) {
+    use crate::window_presentation::WindowPresentationPort;
+    let Some(state) = window.app_handle().try_state::<DesktopState>() else {
+        return;
+    };
+    if state.closing.load(Ordering::SeqCst) {
+        return;
+    }
+    let Ok(mut presentation) = state.window_presentation.try_lock() else {
+        return;
+    };
+    let Ok(fullscreen) = window.is_fullscreen() else {
+        return;
+    };
+    let snapshot = if !fullscreen
+        && presentation.mode() == crate::window_presentation::WindowViewMode::Normal
+    {
+        crate::window_presentation_adapter::TauriWindowPresentationPort(window.clone())
+            .snapshot()
+            .ok()
+    } else {
+        None
+    };
+    if let Ok(true) = presentation.observe_native_fullscreen(fullscreen, snapshot) {
+        window.emit("window-view-mode", presentation.mode()).ok();
+    }
+}
+#[tauri::command]
+async fn read_clipboard_text() -> Result<String, String> {
+    tokio::task::spawn_blocking(|| {
+        let mut clipboard = arboard::Clipboard::new().map_err(|_| "클립보드를 열 수 없습니다.")?;
+        let text = clipboard
+            .get_text()
+            .map_err(|_| "클립보드에 읽을 수 있는 텍스트가 없습니다.")?;
+        crate::interaction::validate_phone_text(&text)?;
+        Ok(text)
+    })
+    .await
+    .map_err(|_| "클립보드를 읽을 수 없습니다.".to_string())?
 }
 #[tauri::command]
 fn send_control(
@@ -114,6 +242,53 @@ fn send_control(
         .get(&session_id)
         .ok_or("폰 입력 세션이 종료됐습니다.")?
         .send(&input)
+}
+
+#[tauri::command]
+async fn start_ios_keyboard_input(
+    state: State<'_, DesktopState>,
+    target_id: String,
+) -> Result<crate::ios_keyboard::KeyboardReceiverInfo, String> {
+    if state.closing.load(Ordering::SeqCst) {
+        return Err("앱이 종료 중입니다.".into());
+    }
+    state.services()?.ios_keyboard.start(target_id).await
+}
+#[tauri::command]
+async fn ios_keyboard_input_status(
+    state: State<'_, DesktopState>,
+    receiver_id: String,
+) -> Result<serde_json::Value, String> {
+    let services = state.services()?;
+    Ok(
+        serde_json::json!({"connected": services.ios_keyboard.status(&receiver_id).await?, "generation": services.ios_keyboard.generation(&receiver_id).await?.to_string()}),
+    )
+}
+#[tauri::command]
+async fn send_ios_keyboard_input(
+    state: State<'_, DesktopState>,
+    receiver_id: String,
+    input: crate::interaction::ControlInput,
+    generation: String,
+) -> Result<(), String> {
+    state
+        .services()?
+        .ios_keyboard
+        .send_for_generation(
+            &receiver_id,
+            input,
+            generation
+                .parse()
+                .map_err(|_| "잘못된 키보드 연결입니다.")?,
+        )
+        .await
+}
+#[tauri::command]
+async fn stop_ios_keyboard_input(
+    state: State<'_, DesktopState>,
+    receiver_id: String,
+) -> Result<(), String> {
+    state.services()?.ios_keyboard.stop(&receiver_id).await
 }
 
 async fn discover_all_devices(
@@ -261,11 +436,13 @@ fn start_session(
         return Err("앱을 종료하고 있습니다.".into());
     }
     let services = state.services()?;
-    let cancellation = services
-        .sessions
-        .lock()
-        .unwrap()
-        .start(&request.session_id)?;
+    let cancellation = {
+        let mut sessions = services.sessions.lock().unwrap();
+        if state.closing.load(Ordering::SeqCst) {
+            return Err("앱을 종료하거나 업데이트하고 있습니다.".into());
+        }
+        sessions.start(&request.session_id)?
+    };
     let (control_session, control_receiver) = ControlSession::new(cancellation.clone());
     if !crate::ios::is_ios_target(&request.target) {
         services
@@ -428,9 +605,11 @@ fn stop_session(state: State<'_, DesktopState>, session_id: String) -> Result<()
 #[tauri::command]
 async fn save_media_capture(
     app: tauri::AppHandle,
+    state: State<'_, DesktopState>,
     request: tauri::ipc::Request<'_>,
 ) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
+    let _operation = state.begin_media_operation()?;
     let format = crate::media::MediaFormat::parse(
         request
             .headers()
@@ -481,6 +660,10 @@ fn start_native_recording(
         return Err("앱을 종료하고 있습니다.".into());
     }
     let services = state.services()?;
+    let _sessions = services.sessions.lock().unwrap();
+    if state.closing.load(Ordering::SeqCst) {
+        return Err("앱을 업데이트하고 있습니다.".into());
+    }
     let recording = services
         .recordings
         .lock()
@@ -538,6 +721,7 @@ async fn finish_native_recording(
     session_id: String,
     recording_id: String,
 ) -> Result<String, String> {
+    let _operation = state.begin_media_operation()?;
     let services = state.services()?;
     let recording = services
         .recordings
@@ -570,6 +754,7 @@ async fn save_native_recording(
     recording_id: String,
 ) -> Result<Option<String>, String> {
     use tauri_plugin_dialog::DialogExt;
+    let _operation = state.begin_media_operation()?;
     let file = state
         .services()?
         .completed_recordings
@@ -595,6 +780,33 @@ async fn save_native_recording(
     .map_err(|_| "녹화 저장 작업에 실패했습니다.".to_string())?
 }
 #[tauri::command]
+async fn save_diagnostic_summary(
+    app: tauri::AppHandle,
+    state: State<'_, DesktopState>,
+    summary: crate::diagnostic_summary::DiagnosticSummary,
+) -> Result<bool, String> {
+    use tauri_plugin_dialog::DialogExt;
+    let _operation = state.begin_media_operation()?;
+    let version = app.package_info().version.to_string();
+    summary.serialize(&version)?;
+    tauri::async_runtime::spawn_blocking(move || {
+        let Some(path) = app
+            .dialog()
+            .file()
+            .add_filter("Diagnostic summary", &["json"])
+            .set_file_name("phone-mirror-diagnostic-summary.json")
+            .blocking_save_file()
+        else {
+            return Ok(false);
+        };
+        let path = path.into_path().map_err(|_| "저장 경로가 없습니다.")?;
+        summary.save(&version, &path)?;
+        Ok(true)
+    })
+    .await
+    .map_err(|_| "진단 요약 저장 작업에 실패했습니다.".to_string())?
+}
+#[tauri::command]
 fn finish_media_shutdown(state: State<'_, DesktopState>) {
     state.media_shutdown.notify_one();
 }
@@ -611,6 +823,7 @@ fn shutdown(app: &tauri::AppHandle) {
             receiver_services.diagnostics.cancel_all().await;
             receiver_services.ios_wifi.cancel_all().await;
             receiver_services.ios_usb.cancel_all().await;
+            receiver_services.ios_keyboard.cancel_all().await;
             receiver_services.android_qr.cancel_all().await;
         });
         std::mem::take(&mut *services.tasks.lock().unwrap())
@@ -634,6 +847,8 @@ fn shutdown(app: &tauri::AppHandle) {
 pub fn run() {
     let app = tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
+        .plugin(tauri_plugin_updater::Builder::new().build())
+        .manage(crate::application_update_adapter::ApplicationUpdateState::default())
         .menu(|app| {
             use tauri::menu::{Menu, MenuItem, PredefinedMenuItem, Submenu};
             // A native macOS predefined Quit terminates before async recording
@@ -737,6 +952,7 @@ pub fn run() {
                     ios_capture: Default::default(),
                     ios_wifi,
                     ios_usb,
+                    ios_keyboard: Default::default(),
                     diagnostics,
                     sessions: Mutex::new(SessionRegistry::default()),
                     controls: Mutex::new(std::collections::HashMap::new()),
@@ -748,18 +964,28 @@ pub fn run() {
             app.manage(DesktopState {
                 services,
                 closing: AtomicBool::new(false),
+                media_operations: AtomicUsize::new(0),
+                updating: AtomicBool::new(false),
                 media_shutdown: Arc::new(tokio::sync::Notify::new()),
                 window_presentation: Mutex::new(Default::default()),
             });
+            if let Some(window) = app.get_webview_window("main") {
+                observe_native_window(&window);
+            }
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            crate::application_update_adapter::application_update_configuration,
+            crate::application_update_adapter::check_application_update,
+            crate::application_update_adapter::install_application_update,
+            crate::application_update_adapter::cancel_application_update,
             start_ios_usb_receiver,
             stop_ios_usb_receiver,
             start_ios_wifi_receiver,
             stop_ios_wifi_receiver,
             discover_devices,
             run_connection_diagnostics,
+            save_diagnostic_summary,
             cancel_connection_diagnostics,
             discover_services,
             start_android_qr_pairing,
@@ -777,9 +1003,24 @@ pub fn run() {
             save_native_recording,
             finish_media_shutdown,
             send_control,
+            start_ios_keyboard_input,
+            ios_keyboard_input_status,
+            send_ios_keyboard_input,
+            stop_ios_keyboard_input,
+            read_clipboard_text,
             set_window_view_mode
         ])
         .on_window_event(|window, event| {
+            if matches!(
+                event,
+                tauri::WindowEvent::Resized(_)
+                    | tauri::WindowEvent::Moved(_)
+                    | tauri::WindowEvent::Focused(_)
+            ) {
+                if let Some(webview) = window.app_handle().get_webview_window(window.label()) {
+                    observe_native_window(&webview);
+                }
+            }
             if let tauri::WindowEvent::CloseRequested { api, .. } = event {
                 api.prevent_close();
                 let state = window.app_handle().state::<DesktopState>();

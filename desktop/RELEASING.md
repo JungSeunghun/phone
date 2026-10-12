@@ -48,7 +48,7 @@ ADB는 설치 파일에 포함하지 않는다. Android 사용자는 최신 Andr
 
 ## 태그 기반 GitHub Releases 초안
 
-`.github/workflows/desktop-release.yml`은 `desktop-v*` 태그 푸시에 반응한다. 허용 형식은 `desktop-v0.1.0`, `desktop-v0.2.0-beta.1`처럼 정규 MAJOR.MINOR.PATCH와 선택적인 `alpha.N`, `beta.N`, `rc.N`이다. 버전 구성 요소는 0~65535, 사전 배포 번호는 1~9999이며 앞자리 0·빌드 메타데이터·공백은 허용하지 않는다.
+`.github/workflows/desktop-release.yml`은 `desktop-v*` 태그 푸시에 반응한다. 허용 형식은 `desktop-v0.2.0`, `desktop-v0.2.0-beta.1`처럼 정규 MAJOR.MINOR.PATCH와 선택적인 `alpha.N`, `beta.N`, `rc.N`이다. 버전 구성 요소는 0~65535, 사전 배포 번호는 1~9999이며 앞자리 0·빌드 메타데이터·공백은 허용하지 않는다.
 
 태그를 만들기 **전에** 다음 값 여섯 개를 같은 버전으로 맞춘다.
 
@@ -109,6 +109,30 @@ CI는 .NET 8과 `artifact-signing-cli` 0.11.0을 준비하고 Tauri의 signComma
 
 배포 정책/파일 처리/GitHub API 포트는 Tauri·OS 미디어 코드와 독립적이다. 모의 API로 초안 생성·재실행·공개 릴리즈 수정 거부·취소·오류와 태그 커밋 검증을 테스트하며 테스트는 GitHub에 쓰지 않는다. API 쓰기 CLI는 GitHub Actions 태그 push 환경에서만 실행되도록 제한한다.
 
-로컬 준비만 확인하려면 세 타깃의 stage 폴더를 모은 뒤 `node scripts/release.mjs prepare --source <폴더> --tag desktop-v0.1.0`을 사용한다. 출력은 프로젝트 루트의 `dist/Release/ready`이며 네트워크 업로드는 하지 않는다. `release-manifest.json`의 commit과 SHA256SUMS는 빌드 추적/무결성 정보로, 코드 서명을 대신하지 않는다.
+로컬 준비만 확인하려면 세 타깃의 stage 폴더를 모은 뒤 `node scripts/release.mjs prepare --source <폴더> --tag desktop-v0.2.0`을 사용한다. 출력은 프로젝트 루트의 `dist/Release/ready`이며 네트워크 업로드는 하지 않는다. `release-manifest.json`의 commit과 SHA256SUMS는 빌드 추적/무결성 정보로, 코드 서명을 대신하지 않는다.
 
 실행 기록은 [TESTING.md](TESTING.md)에 기록한다. GitHub 호스팅 CI 실제 실행, Windows 네이티브 실행, iPhone 실기기, 장시간 검증은 이번 작업에 포함하지 않는다.
+
+## 앱 내 업데이트 (0.2.0부터)
+
+앱 설정의 **앱 업데이트**에서 현재 버전, 자동 확인 설정, 수동 확인, 다운로드 취소, **업데이트하고 다시 시작**을 제공한다. 자동 확인은 실행 시와 실행 중 24시간 간격이며 연결 중 정기 확인은 대기한다. 설치는 사용자의 버튼 동작으로 시작하고, 활성 미러링·녹화·파일 저장·아직 끝나지 않은 기기 작업이 있으면 네이티브 계층에서도 거부한다. 다운로드는 512 MiB로 제한하고 HTTPS·공개 키 서명·서명에 포함된 버전을 확인한다. 앱 종료 시 기존 녹화 저장 흐름은 유지한다.
+
+현재 업데이트 서버와 GitHub 원격 저장소는 없다. 앱은 ‘배포 주소를 등록’ 상태를 표시하며 최신 버전이라고 표시하지 않는다. 서버를 마련한 뒤 앱의 **업데이트 배포 주소**에 공개 HTTPS `latest.json` 주소를 저장하면 된다. 주소는 앱 로컬 설정에 저장한다. 해당 공개 키로 서명된 파일만 설치할 수 있다.
+
+업데이트 서명 개인 키는 이 Mac의 `~/.config/phone-mirror/updater-signing.key`에 권한 600으로 생성했고, 공개 키는 `desktop/src-tauri/tauri.conf.json`에 포함했다. 개인 키는 저장소 밖에 유지하고 별도로 안전하게 백업한다. 키가 바뀌면 기존 설치 앱은 새 키의 업데이트를 받을 수 없으므로 기존 키를 유지하거나 기존 키로 키 교체 버전을 배포해야 한다. OS 코드 서명·Apple 공증과 업데이트 서명은 서로 별개다.
+
+로컬에서 서명 업데이트 파일을 만들 때:
+
+```sh
+export TAURI_SIGNING_PRIVATE_KEY="$HOME/.config/phone-mirror/updater-signing.key"
+export TAURI_SIGNING_PRIVATE_KEY_PASSWORD=''
+cd desktop
+node scripts/release.mjs package --target macos-arm64
+node scripts/release.mjs stage --target macos-arm64
+```
+
+개인 키를 지정하면 Mac `.app.tar.gz`와 Windows NSIS `.exe`에 `.sig`를 함께 만든다. 키가 없는 개발 패키지는 일반 설치 프로그램만 만든다. GitHub Actions에는 `TAURI_SIGNING_PRIVATE_KEY`(키 파일 내용), `TAURI_SIGNING_PRIVATE_KEY_PASSWORD`를 secrets로 등록한다. ARM Mac·Intel Mac·Windows의 서명 업데이트가 모두 준비되면 기존 초안 배포 흐름은 `latest.json`과 3개 파일·서명을 추가한다. 부분적으로 준비된 업데이트는 실패한다. CLI `prepare`에는 HTTPS `DESKTOP_UPDATE_ASSET_BASE_URL`을 지정하며, 태그 워크플로는 해당 태그의 GitHub 다운로드 경로를 사용한다. 초안은 자동 공개하지 않는다.
+
+최초 서버 연결 시 3개 플랫폼 파일과 `.sig`를 공개하고, `latest.json`을 앱에 등록한 고정 HTTPS 주소에 제공한다. GitHub라면 `https://github.com/OWNER/REPO/releases/latest/download/latest.json`을 사용할 수 있다. 미리보기 버전은 정식 앱의 자동 업데이트 대상으로 허용하지 않는다. Rust 최소 버전은 업데이트 플러그인에 맞춰 1.90으로 올렸다.
+
+GitHub의 `releases/latest/download/latest.json` 주소를 사용할 때는 검토한 공개 정식 릴리스가 해당 주소에 연결되도록 최신 릴리스 설정도 확인한다. 버전별 다운로드 주소는 매니페스트 내부 파일 URL에 사용하고, 앱에는 새 매니페스트를 따라갈 수 있는 고정 주소를 등록한다.

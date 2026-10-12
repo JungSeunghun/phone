@@ -7,6 +7,7 @@ import { IosWifiReceiverController } from "../../src/application/IosWifiReceiver
 import { createRoot } from "react-dom/client";
 import { PhoneMirrorController } from "../../src/application/PhoneMirrorController";
 import { PhoneMirrorApp } from "../../src/presentation/PhoneMirrorApp";
+import { IosKeyboardInputController } from "../../src/application/IosKeyboardInputController";
 import type {
   PhoneMirrorBackend,
   PhoneDevice,
@@ -241,7 +242,7 @@ const diagnostics = new ConnectionDiagnosticsController({
         : [
             {
               code: "ios-wifi-receiver",
-              title: "iPhone Wi-Fi 송출 수신",
+              title: "iPhone Wi-Fi 수신 수신",
               status: "warning",
               message: "방송 대기 중입니다.",
               action: "최신 QR을 송출 앱에 저장하고 화면 방송을 시작하세요.",
@@ -253,6 +254,25 @@ const diagnostics = new ConnectionDiagnosticsController({
 createRoot(document.getElementById("root")!).render(
   <PhoneMirrorApp
     controller={controller}
+    iosKeyboardInputController={
+      new URLSearchParams(location.search).has("ioskeyboard")
+        ? new IosKeyboardInputController({
+            start: async () => ({
+              receiverId: "mock-keyboard",
+              codes: ["PMK1|127.0.0.1:1234|" + "ab".repeat(32)],
+            }),
+            status: async () => ({ connected: true, generation: "1" }),
+            stop: async () => {},
+            send: async (_receiver, input) => {
+              const fixture = window as unknown as {
+                keyboardControls: unknown[];
+              };
+              fixture.keyboardControls ??= [];
+              fixture.keyboardControls.push(input);
+            },
+          })
+        : undefined
+    }
     connectionDiagnosticsController={diagnostics}
     androidQrPairingController={androidQrFixture ? androidQrPairing : undefined}
     iosWifiReceiverController={receiver}

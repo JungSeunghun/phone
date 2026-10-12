@@ -9,6 +9,7 @@ export class ConnectionDiagnosticsController {
     phase: "idle" | "running" | "done" | "error";
     message: string;
     report?: DiagnosticReport;
+    reportTarget?: Pick<DiagnosticRequest, "platform" | "transport">;
     cancelBusy: boolean;
   } = {
     phase: "idle",
@@ -45,6 +46,7 @@ export class ConnectionDiagnosticsController {
       });
       return;
     }
+    const target = { platform: request.platform, transport: request.transport };
     const generation = ++this.generation;
     const id = this.createIdentifier();
     this.diagnosticId = id;
@@ -60,6 +62,7 @@ export class ConnectionDiagnosticsController {
         this.update({
           phase: "done",
           report,
+          reportTarget: target,
           message: "진단 완료 · 해결 안내를 확인하세요.",
           cancelBusy: false,
         });

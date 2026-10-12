@@ -4,7 +4,7 @@ test("Android QR scans to exact ADB payload, keeps USB available and restores ma
 }) => {
   await page.setViewportSize({ width: 800, height: 600 });
   await page.goto("/tests/browser/layout.html?androidqr=1");
-  await page.getByText("Wi-Fi 페어링 · 연결", { exact: true }).click();
+  await page.getByText("Android Wi-Fi 연결", { exact: true }).click();
   await page
     .getByRole("button", { name: "Android QR 페어링 시작", exact: true })
     .click();
@@ -19,6 +19,7 @@ test("Android QR scans to exact ADB payload, keeps USB available and restores ma
       ).decodeAndroidQr(),
     ),
   ).toBe(`WIFI:T:ADB;S:studio-${"ab".repeat(16)};P:${"cd".repeat(16)};;`);
+  await page.getByText("코드·주소로 연결", { exact: true }).click();
   await expect(
     page.getByRole("button", { name: "무선 기기 검색", exact: true }),
   ).toBeDisabled();
@@ -46,7 +47,7 @@ test("Android QR cancellation removes credentials even if an old connection call
   page,
 }) => {
   await page.goto("/tests/browser/layout.html?androidqr=1");
-  await page.getByText("Wi-Fi 페어링 · 연결", { exact: true }).click();
+  await page.getByText("Android Wi-Fi 연결", { exact: true }).click();
   await page
     .getByRole("button", { name: "Android QR 페어링 시작", exact: true })
     .click();

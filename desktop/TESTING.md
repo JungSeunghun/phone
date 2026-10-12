@@ -1,5 +1,29 @@
 # Rust + Tauri 검증 — 2026-10-11
 
+## 좌측 메뉴 개선 TDD (2026-10-11)
+
+- 메뉴 영역·설정 분류·수동 입력 접기 부재를 프론트 failing test로 확인한 후 구현했다. 기기 선택은 고정하고 기기 연결 → 화면 설정 → 연결 진단은 별도로 스크롤한다. Android 연결 패널은 별도 컴포넌트로 분리하며 기존 서비스·검증·저장 정책을 유지한다.
+- 자동 재연결은 연결 설정, Android Wi-Fi 자동 화질은 화면 설정으로 옮겼다. 수신 측 iPhone 메뉴 명칭과 Android 연결 명칭을 일관되게 정리하고 기기 목록의 전송 준비 상태를 ‘사용 가능’으로 표시한다.
+- QR 우선 표시와 수동 입력 접기/펼치기 반복, 입력값 보존, 자동 페어링·세션 시작 없음, 포트 0 거부·65535 허용 및 5/6자리 코드 경계를 검사했다. 800×540과 800×600에서 긴 메뉴를 스크롤해도 기기 선택과 새로 고침이 고정되고 수동 연결 입력에 접근할 수 있는지 브라우저로 검사했다.
+- 프론트 전체 108개 및 최종 입력 경계 행동 10개 재검사, Chromium 전체 34개, 기존 Rust 백엔드 99개 회귀가 통과했다. 초기 QR 브라우저 검사는 새 접힌 수동 메뉴의 버튼을 검사하려다 실패했으며, 메뉴를 펼치는 실제 사용자 행동을 반영한 후 다시 통과했다. TypeScript/Vite 빌드도 통과했다. 서비스 구현 변경이 없어 백엔드에 같은 동작을 복제하는 테스트는 추가하지 않았다.
+- Apple Silicon Mac 앱을 다시 빌드하고 ad-hoc 서명 검증 후 설치본에 반영했다. 설치 앱에서 QR 우선 메뉴, 수동 입력 펼치기, 스크롤 중 기기 선택 고정과 기본 상태 복원을 확인했다. 기기 연결이나 실기기 캡처·녹화는 실행하지 않았다. 이전 설치본은 ignored `dist/Verification/UX/SidebarInstalledBackup.*`에 보관한다. Windows UI 행동은 브라우저 모의 환경으로만 검증했으며 Windows 네이티브 빌드·실행은 수행하지 않았다.
+- 기존 Swift 앱과 iPhone 송출 앱은 변경하지 않았다. 브라우저의 Android/iPhone 연결·캡처·녹화 회귀는 합성 미디어와 모의 IPC이며 실기기 증거가 아니다. 장시간 검증과 공개 배포·태그 푸시는 수행하지 않았다.
+
+TDD 실패/통과 및 빌드 로그는 ignored `dist/Verification/UX/TestLogs/phone-sidebar-*`에 보관한다.
+
+## 설치 앱 UI·UX 개선 TDD (2026-10-11)
+
+- 전체 화면 상태 동기화와 기본 창 스냅샷 검증을 Rust 실패 테스트로 먼저 확인했다. macOS 창 버튼과 앱 버튼을 같은 native fullscreen API로 통일하고, OS 이벤트를 별도 창 정책에 전달한다. 초기 이벤트는 앱 서비스 등록 전에 안전하게 무시한다.
+- 전체 화면 전환 대기는 OS 조회·시간·취소·대기를 주입하는 포트로 분리했다. 모의 시간으로 0/20/40ms 완료, 정확한 제한 시점 완료, 제한 이후 완료 거부, 취소·조회 실패·0 제한 값·기본 보기 상태를 검사했다. 테스트 자체는 실제로 기다리지 않는다. 네이티브 어댑터는 최대 2초 동안 OS 응답을 확인하고 UI 스레드를 막지 않는다.
+- 연결 헤더 통합, 설정 버튼 문구, 비활성 설정의 접근성 설명, 전체 화면·PiP 캡처 메뉴 행동을 프론트 실패 테스트 후 구현했다. 캡처 조작은 재사용 가능한 CaptureActions로 분리하고 기존 서비스에 연결했다. 같은 캔버스와 세션을 유지한다.
+- 최소 240×180에서 메뉴가 창 밖으로 넘치고 PiP 녹화 종료 버튼이 가려지는 실패를 기록한 뒤 레이아웃을 수정했다. 브라우저에서 메뉴 안의 스크린샷 저장·녹화 시작·녹화 중 캡처 차단·종료, 포커스 복원, 메뉴 Esc와 보기 Esc의 구분을 확인한다. 녹화 상태·시간·일시 정지·재개·종료는 항상 메뉴 밖에 남는다.
+- 자동 검증: Rust 백엔드 99개, 프론트 107개, Chromium 행동 32개, 릴리즈 정책 14개 통과. 기존 iPhone USB/Wi-Fi·Android 연결, 마우스 조작, 소리, 캡처, 녹화 일시 정지·재개, 자동 화질, 연결 진단 회귀를 포함한다. 영상 성능은 기존 짧은 합성 영상 검증만 실행했다.
+- 최종 Apple Silicon Mac 앱을 빌드하고 로컬 ad-hoc 서명 검증 후 `/Applications/Phone Mirror Desktop.app`에 반영했다. 이전 설치본은 ignored `dist/Verification/UX/InstalledBackup.*`에 보관했다. 설치 앱에서 Android Wi-Fi 영상 수신, macOS 창 버튼과 앱 버튼의 전체 화면 상태 동기화, 기본 보기 복원, PiP 캡처 메뉴와 Esc 닫기, 설정 잠금 안내 및 연결 종료 후 설정 활성화를 짧게 확인했다. 실제 폰 캡처·녹화 파일은 생성하지 않았으며 녹화 행동은 합성 브라우저 테스트로 검증했다. 검증 연결은 종료했다.
+- Windows GNU 백엔드 교차 컴파일과 Mac 전체 기능 Clippy 검사는 통과했다. Windows 전체 데스크톱 교차 컴파일은 이 Mac에 `x86_64-w64-mingw32-windres`가 없어 완료하지 못했다. 기존 Windows 네이티브 CI 구성은 유지했으며 이번 작업에서 원격 CI나 Windows 앱 실행을 수행하지 않았다.
+- 기존 Swift 앱과 iPhone 송출 소스는 수정하지 않았다. 장시간 검증, iPhone 실기기 검증, 태그 푸시·공개 배포는 실행하지 않는다.
+
+관련 red/green·플랫폼 검사·로컬 빌드 로그는 ignored `dist/Verification/UX/TestLogs/phone-ux-*`에 보관한다.
+
 ## DMG·Windows 설치 프로그램·릴리즈 초안 자동화 (2026-10-11)
 
 - 배포 정책과 모의 GitHub API 테스트를 먼저 실행해 모듈 부재로 실패한 로그를 남기고 구현했다. unsigned 환경 변수 제거와 최종 DMG 검사·프론트 출력 분리도 각각 red 후 수정했다.
@@ -266,3 +290,88 @@ TDD red/green과 최종 검증 로그는 ignored `dist/Verification/RustTauri/Te
 - Rust 96개, 프론트 104개, Chromium 30개, 기존 Swift 53개, iOS 코어 15개가 통과했다. TypeScript/Vite·Prettier·rustfmt·Clippy 경고 금지, Windows GNU 백엔드 교차 컴파일, Mac Tauri release 빌드와 ad-hoc 서명을 확인했다. 이번 변경은 iPhone 송출 앱이나 기존 Swift Mac 앱 소스·번들을 수정하지 않는다. Windows 전체 앱 네이티브 실행·원격 CI·Android/iPhone 실기기 검증은 수행하지 않았다.
 
 TDD red/green 및 최종 검증 로그는 ignored `dist/Verification/RustTauri/TestLogs/phone-diagnostics-*`에 보관한다. 실기기 미디어를 생성하거나 외부에 공유하지 않았다.
+
+## Android 다국어 입력 — 2026-10-11
+
+- TDD 실패 확인: `TextInputController`와 `TextInputPanel`이 없는 상태에서 새 Vitest 테스트가 import 실패했으며 Rust의 `ControlInput::Paste` 부재로 프로토콜 테스트가 컴파일 실패했다. 구현 후 통과했다. 조합 완료 후 microtask를 거쳐 도착하는 마지막 입력이 중복 전송되는 테스트도 먼저 실패(1회 대신 2회 전송)한 뒤 이벤트 처리 보강으로 통과했다.
+- 실제 Samsung SM-S901N Wi-Fi 설정 검색창에서 최초 다국어 붙여넣기와 같은 내용의 반복 붙여넣기를 확인했다. 빠른 연속 확정 텍스트는 일부 문자가 뒤바뀌는 실패를 재현했다. 기기 ACK 및 100ms 처리 간격을 추가하기 전 시간 경계 테스트가 실패했으며, 추가 후 99ms에는 다음 메시지를 보내지 않고 100ms에 전송하는 테스트, 2초 ACK 제한과 취소 테스트가 통과했다.
+- 최종 실기기 검사 `android_text_input_smoke`는 한국어·일본어·중국어·아랍어·이모지·결합 문자의 정확한 입력, 같은 텍스트 반복 붙여넣기, 즉시 큐에 넣은 `한`→`日`→`中`→`ع`→`Z`와 Backspace의 순서를 확인했다. 실제 영상 패킷 329개를 수신했고 세션을 정리했다. USB 다국어 입력, 물리적 케이블 분리, Windows 네이티브 실행, 실제 macOS IME 조합 UI는 이번 실기기 검사의 범위가 아니다.
+- Vitest 전체 123개, Rust 백엔드 전체 및 Chromium Playwright 전체 35개가 통과했다. 새 테스트는 빈 값·NUL·잘못된 유니코드·UTF-8 최대 길이, 공백·줄바꿈, 읽기 실패, 반복 행동, 대기열 상한, 늦은 클립보드 결과·전송 오류, 기기 교체·취소, 조합 확정·취소·마지막 이벤트, 버튼·⌘V·Ctrl+V, 설정칸 포커스 분리 및 iPhone에서 입력 UI 제외를 다룬다. 브라우저 입력 테스트는 실제 텍스트/클립보드 이벤트를 쓰지만 Android 수신은 모의 백엔드다. OS IME 조합 테스트는 합성 DOM 이벤트다.
+- macOS 전체 데스크톱 컴파일·Clippy·앱 번들과 Windows GNU 백엔드 교차 컴파일이 통과했다. 전체 Windows 데스크톱 교차 컴파일은 `x86_64-w64-mingw32-windres` 부재로 완료하지 못했다. Windows 네이티브 CI는 기존 구성을 유지하며 이번에 원격 실행하지 않았다.
+- 실제 기기 UI XML은 ignored `desktop/src-tauri/target/verification/text-input/`에만 보관한다. 스크린샷·녹화·원본 클립보드를 외부에 공유하지 않았다.
+
+재현할 때 잠금 해제된 Android의 빈 **설정 검색칸**에 커서를 둔 뒤 명시적으로 ADB 식별자를 지정한다. 예제는 Settings 패키지의 입력칸을 확인하고 사용자 텍스트가 있으면 중단한다. 이전 검사에서 남은 알려진 테스트 문구만 지울 수 있다.
+
+```sh
+cargo run --manifest-path desktop/src-tauri/Cargo.toml --no-default-features \
+  --example android_text_input_smoke -- ADB_IDENTIFIER
+```
+
+## 녹화 중 스크린샷 — 2026-10-11
+
+- TDD: 녹화 중·일시 정지 중 반복 캡처, 캡처/녹화 저장 창 순서, 저장 취소·인코딩/저장 실패, 종료 대기, 일반/전체 화면/PiP UI를 검사하는 신규 테스트 7개가 구현 전에 모두 실패했다. 녹화 제한과 버튼 비활성화를 해제한 후 통과했다. 녹화 마무리 실패 뒤 늦은 PNG 저장 결과가 실패 안내를 덮어쓰는 별도 테스트도 먼저 실패한 뒤 결과 채널과 종료 대기를 보강해 통과했다.
+- `RecordingScreenshot.test.tsx` 11개는 위 행동에 더해 0/1/256MiB/256MiB+1 크기 경계(큰 크기는 모의 Blob 메타데이터), 대기 중 중복 클릭, 늦은 인코딩 완료, 녹화 시간과 일시 정지 보존, 동기 캡처·녹화 마무리 예외 후 복구를 확인한다. 동기 예외로 종료 대기 상태가 남는 두 테스트도 실패를 확인한 뒤 작업 Promise를 먼저 등록하는 방식으로 수정했다. 기존 unit/behavior 및 Rust 백엔드 회귀 검사도 통과했다.
+- 최종 Vitest 전체 134개 중 133개가 기본 제한 시간으로 통과했다. 컴퓨터 부하 중 기존 `PhoneMirrorApp` 연결/종료 테스트가 5초 제한을 넘겼고, 코드 변경 없이 해당 파일 10개를 단일 worker·15초 제한으로 재실행해 모두 통과했다(해당 테스트 실제 실행 시간 2.0초). Chromium 전체 실행에서 변경된 캡처 동작을 반영하지 않은 기존 최소 창 크기 기대값 두 개를 갱신한 뒤, 최종 미디어·뷰어 10개를 다시 실행해 통과했다. 나머지 Chromium 28개는 앞선 전체 실행에서 통과했다.
+- Chromium에서는 실제 Canvas PNG 인코딩과 MediaRecorder를 사용해 일반/전체 화면/PiP 모두에서 빨간 프레임을 녹화 중 저장하고 파란 프레임을 일시 정지 중 저장한다. 캡처 직후 미리보기를 녹색으로 바꾸어도 PNG 픽셀은 클릭 당시 색과 원본 320×640 크기를 유지한다. 재개·종료 후 생성된 영상도 디코딩한다. 기기 입력은 모의 백엔드이며 iPhone 브라우저 검증의 미디어는 합성 데이터다.
+- Samsung SM-S901N의 실제 Wi-Fi H.264를 `RecordingSession`에 전달하면서 로컬 PNG를 저장했다. 활성 녹화와 일시 정지 중 PNG 저장 및 기존 파일 경로 중복 저장 실패 후에도 같은 녹화 작업이 유지되고, 완료된 886×1920 MP4를 FFmpeg로 끝까지 디코딩했다. `android_recording_screenshot_smoke`의 PNG는 클릭 시 복사한 실제 H.264의 마지막 프레임을 FFmpeg로 변환해 생성한다. **네이티브 WebView의 캡처 버튼·운영체제 저장 창을 실기기로 조작한 검증은 아니며**, 프론트 Canvas 경로 검증과 별도의 로컬 백엔드 실기기 검증이다. 실제 iPhone·Windows UI·USB 케이블 분리는 검사하지 않았다.
+- 실제 PNG/MP4/H.264는 ignored `desktop/src-tauri/target/verification/recording-screenshot/` 아래에만 보관하며 외부에 공유하지 않는다. macOS 전체 Clippy 및 앱 빌드, Windows GNU 백엔드 교차 컴파일이 통과했다. Windows 네이티브 실행·설치 프로그램 빌드·원격 CI 실행과는 구분한다. 기존 Swift 코드는 변경하지 않았다.
+
+```sh
+npm --prefix desktop test
+(cd desktop && npx playwright test)
+cargo test --manifest-path desktop/src-tauri/Cargo.toml --no-default-features
+cargo run --manifest-path desktop/src-tauri/Cargo.toml --no-default-features \
+  --example android_recording_screenshot_smoke -- ADB_IDENTIFIER
+```
+
+## iPhone 키보드 다국어 입력 — 2026-10-11
+
+- TDD: 프론트 `IosKeyboardInputController`, Swift 키보드 입력 도메인, Rust `ios_keyboard` 부재로 신규 테스트가 각각 import/컴파일 실패했다. iPhone 앱 UI 통합 테스트도 붙여넣기 버튼 부재로 먼저 실패했다. 구현 후 통과했다. 늦은 시작 이후 중복 시작, 종료 실패 시 재시도용 수신 ID 보존, 짧은 키보드 재연결 후 이전 입력 세대 폐기 테스트의 실패를 확인한 뒤 수명 처리를 보강했다. Swift 설정 중복 준비가 이전 확인 토큰을 무효화하는 실패도 먼저 확인한 뒤 중복 요청을 거부하도록 수정했다.
+- 프론트 전체 139개와 Chromium 전체 41개, Swift iOS 코어 전체 19개 및 Rust 백엔드 전체가 통과했다. Chromium은 실제 클립보드·단축키·DOM 입력을 사용하며 일반/전체 화면/PiP에서 iPhone 붙여넣기와 직접 입력, 연결 종료 시 비활성화 및 마우스 제어 미활성화를 확인한다. 브라우저 기기 수신은 모의 구현이다. IME 조합 확정/취소와 마지막 이벤트 중복은 합성 DOM 이벤트 테스트이며 OS IME 실사용 검증은 아니다.
+- Rust 키보드 테스트는 방향별 키 분리·변조·순서/재전송 거부, 인증 없는 입력 거부, 중복 수신 시작/종료, UTF-8 0/1/262130/262131바이트 경계, NUL·미지원 키 거부, 실제 loopback TCP 인증·다국어 전송과 ACK 대기, 재접속 세대 폐기, 가상 시각 2999/3000ms ACK 제한 및 대기 입력 취소를 확인한다. Swift는 코드 포트 1/65535/0·잘못된 접두사, 누락/손상된 저장 값, 암호화 재전송 거부, Unicode·편집 명령·최대 길이 및 UI 독립 설정 수명 정책을 확인한다.
+- `ios_keyboard_mock_receiver` ↔ `KeyboardInputMock`는 실제 loopback TCP에서 생산용 Swift `KeyboardConnection`과 Rust 서비스를 연결하여 한국어·일본어·중국어·아랍어·이모지·결합 문자, 같은 텍스트 반복 전송, Backspace·좌우 이동·줄바꿈과 ACK 순서를 확인했다. 문서는 합성 `KeyboardTextDocument`이며 실제 `UITextDocumentProxy`를 쓰는 iPhone 입력칸 검증이 아니다. 일회용 코드는 ignored `desktop/src-tauri/target/verification/keyboard-input/`에서 0600으로 생성하고 검증 종료 시 삭제한다. 실제 화면 미디어를 생성하거나 외부에 공유하지 않았다.
+- iPhone 키보드 확장을 포함한 송출 앱의 시뮬레이터 및 기기 SDK unsigned 빌드를 확인했다. 실제 iPhone은 연결되어 있지 않다(`devicectl`에는 simulated 기기만 표시). 기기 SDK 빌드는 설치·전체 접근 허용·로컬 네트워크 권한·타 앱 입력칸에 대한 실기기 증거가 아니다. Windows GNU 백엔드 교차 컴파일, macOS 전체 Clippy 및 Desktop 앱 빌드/서명을 확인하며 Windows 네이티브 실행·설치 프로그램·원격 CI 실행과 구분한다. 기존 macOS Swift 앱은 변경하지 않는다.
+
+재현 명령:
+
+```sh
+npm --prefix desktop test -- --maxWorkers=1
+(cd desktop && npx playwright test --workers=2)
+swift test --package-path ios
+cargo test --manifest-path desktop/src-tauri/Cargo.toml --no-default-features
+swift build --package-path ios --product KeyboardInputMock
+cargo build --manifest-path desktop/src-tauri/Cargo.toml --no-default-features --example ios_keyboard_mock_receiver
+```
+
+두 검증 실행 파일을 미리 빌드한 뒤 Rust 예제에 기존 파일이 없는 private 코드 경로를 주고, 같은 경로를 Swift 검증기에 전달한다. 제한 시간 10초 안에 연결한다. 실제 설치/사용은 `ios/README.md`의 키보드 절차를 따른다.
+
+## 앱 내 업데이트 — 2026-10-11
+
+새 동작의 실패를 먼저 확인했다. 프론트 컨트롤러·Rust 정책·배포 모듈이 없는 상태에서 import/컴파일 실패를 기록했고, 설치 중 잘못된 진행률이 `NaN`이 되는 실패와 반복 배포가 다른 파일을 덮어쓰는 실패를 재현한 뒤 수정했다.
+
+검증 범위는 자동 확인과 수동 설치 분리, 설정 없음·잘못된 설정, HTTPS 주소 검증, 같은 작업 중복 실행, 취소 뒤 늦은 응답, 설치 시작 뒤 취소 거부, 24시간 경계, 네트워크 오류 후 재시도, 연결·녹화·파일 저장·백그라운드 작업 중 설치 거부다. 실제 배포 키로 서명한 장치 데이터 없는 고정 파일을 이용해 서명 검증과 본문·서명된 버전 변조 거부를 확인한다. 배포 파일 준비 테스트는 3개 플랫폼·미완성 목록·잘못된 URL·누락 서명·체크섬 변조·동일 파일 반복 작업을 검사한다.
+
+전체 Rust 서비스 테스트 112개, 프론트 전체 테스트와 Chromium 전체 42개, 배포 테스트 17개를 통과했다. `verify_application_update` 예제로 로컬 업데이트 아카이브의 공개 키 서명과 버전을 검증할 수 있다. 검증 중 생성하는 패키지와 로그는 무시된 `desktop/src-tauri/target` 안에 둔다.
+
+업데이트 서버와 원격 GitHub 저장소가 없으므로 인터넷 서버에서 다운로드하여 실제 설치·재시작하는 배포 통합 검증은 수행하지 않았다. iPhone은 연결되지 않았고, 이 작업에서 iPhone 하드웨어 검증을 하지 않았다. Windows 네이티브 설치·업데이트 실행과 원격 CI 실행도 이 Mac에서 수행한 검증과 구분한다. 기존 Swift Mac 앱은 변경하지 않았다.
+
+Windows GNU 타깃 `cargo check --target x86_64-pc-windows-gnu`는 업데이트 플러그인을 포함해 통과했다. TLS 라이브러리의 C 코드 때문에 MinGW-w64 14.0.0 도구를 준비해 Mac에서 크로스 컴파일했으며 Windows에서 앱을 실행한 증거는 아니다. macOS의 `cargo clippy --all-targets -- -D warnings`도 통과했다. 로컬 Mac 업데이트 아카이브는 실제 공개 키와 서명된 버전 `0.2.0`으로 검증했다.
+
+최종 프론트 전체 147개는 `npm test -- --maxWorkers=1 --minWorkers=1 --testTimeout=15000`으로 통과했다. 같은 Mac에서 병렬 Rust 빌드와 기본 5초 테스트 예산을 함께 사용했을 때 UI 테스트가 시간 초과되어 실행 조건을 조정했다. 제품 코드의 동작 단언은 유지했다. 최종 Mac 0.2.0 `.app`과 서명된 `.app.tar.gz`를 생성하고 아카이브 서명·버전을 다시 검증했다. 아카이브 첫 바이트 변조와 다른 버전 선언도 각각 거부했다.
+
+`/Applications/Phone Mirror Desktop.app`은 이전 앱을 무시된 `target/update-backups`에 백업한 뒤 교체했고, 코드 서명과 원본/설치 바이너리 체크섬이 일치함을 확인했다. 실제 설치 앱을 실행해 **현재 버전 0.2.0**, **자동으로 새 버전 확인**, **배포 주소 미등록** 안내와 HTTPS 주소 입력란을 네이티브 macOS UI에서 확인했다. 실서버 업데이트 설치 검증은 위에 적은 배포 주소 부재로 여전히 수행하지 않았다.
+
+## 공개 전 검증 — 2026-10-12
+
+공개 예정 파일과 전체 Git 이력을 다시 검사했다. 현재 파일 425개와 이력의 파일 내용 370개에서 스캐너가 검사하는 자격 증명·개인 키·검토 대상 미디어 패턴은 발견되지 않았다. 이름·개인 경로·네트워크 주소 후보는 추가 검토했고, 발견된 경로와 주소는 테스트용 합성 입력 또는 UI 예시였다. 이 검사는 모든 비밀이나 개인정보가 없다는 보장은 아니다. 실제 폰 화면, UI XML, 녹화와 실행 로그는 무시된 `target`에 유지한다.
+
+검토 중 업데이트 서명 키가 CI 패키지 작업 전체에 전달되는 설정을 발견했다. 패키징 단계에만 키를 전달하도록 회귀 테스트를 먼저 실패시킨 뒤 설정을 수정했고 테스트가 통과했다. 일반 설치·단위 테스트 단계에서는 서명 키를 전달하지 않는다. 서드파티 문서에서 아직 존재하지 않는 업데이트 라이선스 리소스를 포함했다고 설명한 문구도 수정했다. 완전한 바이너리 배포용 고지 수집은 첫 공개 바이너리 릴리스 전 별도 점검 대상이다.
+
+- 프론트 단위·행동 테스트 152개 통과 (`--maxWorkers=1 --minWorkers=1 --testTimeout=15000`).
+- Chromium 브라우저 테스트 43개 통과. 합성 H.264 영상과 진단 요약 다운로드를 포함한다.
+- 배포·공개 점검·CI 키 범위 테스트 20개 통과.
+- Rust 서비스 테스트 114개, 원래 Swift Mac 앱 테스트 88개, iOS 코어 테스트 19개 통과.
+- 프론트 생산 빌드, Prettier, Rust 포맷, macOS 전체 타깃 Clippy, Windows GNU 타깃 크로스 컴파일 통과.
+- iOS 시뮬레이터와 기기 SDK의 서명 없는 빌드 통과. 실제 iPhone 설치·실행 검증은 아니다.
+
+연결된 Samsung Android의 실제 연결 방식은 Wi-Fi 검색 서비스였다. 검증 예제는 ADB 목록에서 전체 서비스 식별자와 실제 USB/Wi-Fi 분류를 사용하는 방식으로 수정했다. Wi-Fi 영상 886×1920에서 녹화·일시정지 중 PNG 저장, 중복 경로 저장 실패 처리, MP4 전체 디코딩을 확인했다. 다국어 입력 재검증은 설정 검색칸에 커서가 없어 입력 전 중단됐으며, 오늘의 실기기 성공으로 표시하지 않는다. 이전 다국어 입력의 Wi-Fi 실기기 검증 기록과 자동 테스트 증거는 위 기록을 참고한다. 물리적 케이블 분리, Windows 네이티브 실행, iPhone 하드웨어, 실제 HTTPS 업데이트 서버 설치·재시작은 이번에 검증하지 않았다.

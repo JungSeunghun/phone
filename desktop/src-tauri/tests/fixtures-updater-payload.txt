@@ -1,0 +1,1 @@
+Phone Mirror updater signature verification fixture. Contains no device data.

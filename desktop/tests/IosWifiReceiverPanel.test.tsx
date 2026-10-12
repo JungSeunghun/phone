@@ -17,7 +17,7 @@ it("starts listening, exposes code only while active, and stops", async () => {
       controller={new IosWifiReceiverController(backend)}
     />,
   );
-  fireEvent.click(screen.getByText("iPhone Wi-Fi 송출"));
+  fireEvent.click(screen.getByText("iPhone Wi-Fi 수신"));
   fireEvent.click(screen.getByText("iPhone 수신 시작"));
   await waitFor(() =>
     expect(screen.getByLabelText("iPhone 연결 코드 1")).toHaveValue(

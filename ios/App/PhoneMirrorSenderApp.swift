@@ -51,6 +51,7 @@ struct SenderView: View {
             "시스템 화면 방송 창에서 송출을 시작하세요. 종료는 iPhone의 화면 방송 표시에서 할 수 있습니다. 마이크는 사용하지 않습니다. 콘텐츠에 따라 화면·앱 소리 송출이 제한될 수 있습니다."
           )
         }
+        KeyboardSetupView()
       }
     }.navigationTitle("Phone Mirror Sender").onAppear { restore() }
       .sheet(isPresented: $scanningCode) {

@@ -34,8 +34,10 @@ impl AudioPacketSink for AudioCapture {
         self.packets.fetch_add(1, Ordering::SeqCst);
         self.nonzero.fetch_add(
             packet[12..]
-                .chunks_exact(2)
-                .filter(|sample| sample != &[0, 0])
+                .as_chunks::<2>()
+                .0
+                .iter()
+                .filter(|sample| **sample != [0, 0])
                 .count(),
             Ordering::SeqCst,
         );

@@ -212,9 +212,14 @@ export class PhoneMirrorController {
   }
   async sendControl(
     input: import("../domain/PhoneInput").ControlInput,
+    expectedSessionId?: string,
   ): Promise<void> {
     const id = this.sessionId;
-    if (!id || this.snapshot.phase !== "live")
+    if (
+      !id ||
+      this.snapshot.phase !== "live" ||
+      (expectedSessionId !== undefined && expectedSessionId !== id)
+    )
       throw Error("Inactive input session");
     if (!this.getCapabilities().control || !this.backend.sendControl)
       throw Error("Input unavailable");

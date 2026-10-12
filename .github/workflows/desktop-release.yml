@@ -90,6 +90,8 @@ jobs:
         if: startsWith(matrix.id, 'macos-')
         run: node scripts/release.mjs package --target ${{ matrix.id }}
         env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           APPLE_CERTIFICATE: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_CERTIFICATE || '' }}
           APPLE_CERTIFICATE_PASSWORD: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_CERTIFICATE_PASSWORD || '' }}
           APPLE_SIGNING_IDENTITY: ${{ needs.validate.outputs.signing-mode == 'signed' && secrets.APPLE_SIGNING_IDENTITY || '' }}
@@ -100,6 +102,8 @@ jobs:
         if: matrix.id == 'windows-x64'
         run: node scripts/release.mjs package --target ${{ matrix.id }}
         env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
           AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
           AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
           AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
@@ -169,4 +173,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_COMMIT: ${{ github.sha }}
+          DESKTOP_UPDATE_ASSET_BASE_URL: https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/
           DESKTOP_RELEASE_SIGNING: ${{ needs.validate.outputs.signing-mode }}

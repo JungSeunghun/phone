@@ -65,6 +65,7 @@ export function usePhoneInteraction(controller: PhoneMirrorController) {
       const point = position(event);
       if (point) {
         event.preventDefault();
+        event.currentTarget.focus();
         event.currentTarget.setPointerCapture?.(event.pointerId);
         mouse.down(point);
       }

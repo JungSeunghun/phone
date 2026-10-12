@@ -1,5 +1,43 @@
 //! Window policy is independent of Tauri, the stream and operating system APIs.
 use serde::{Deserialize, Serialize};
+use std::time::Duration;
+
+#[async_trait::async_trait]
+pub trait FullscreenTransitionPort: Sync {
+    fn now(&self) -> Duration;
+    fn fullscreen(&self) -> Result<bool, String>;
+    fn cancelled(&self) -> bool;
+    async fn wait(&self, duration: Duration);
+}
+
+/// Wait for an OS acknowledgement, with injected time and no real timer in tests.
+pub async fn await_fullscreen_transition(
+    port: &impl FullscreenTransitionPort,
+    expected: bool,
+    timeout: Duration,
+) -> Result<(), String> {
+    if timeout.is_zero() {
+        return Err("전체 화면 대기 시간이 올바르지 않습니다.".into());
+    }
+    let started = port.now();
+    loop {
+        if port.cancelled() {
+            return Err("전체 화면 전환이 취소되었습니다.".into());
+        }
+        let elapsed = port
+            .now()
+            .checked_sub(started)
+            .ok_or("전체 화면 전환 시각을 확인할 수 없습니다.")?;
+        if elapsed <= timeout && port.fullscreen()? == expected {
+            return Ok(());
+        }
+        if elapsed >= timeout {
+            return Err("전체 화면 전환이 지연되고 있습니다. 잠시 후 다시 시도하세요.".into());
+        }
+        port.wait(Duration::from_millis(20).min(timeout - elapsed))
+            .await;
+    }
+}
 #[derive(Clone, Copy, Debug, Default, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "lowercase")]
 pub enum WindowViewMode {
@@ -98,8 +136,49 @@ pub fn pip_rectangle(
 pub struct WindowPresentation {
     mode: WindowViewMode,
     original: Option<WindowSnapshot>,
+    normal_snapshot: Option<WindowSnapshot>,
+    native_fullscreen: bool,
 }
 impl WindowPresentation {
+    /// Observe OS transitions without issuing another transition or capturing
+    /// fullscreen geometry as the normal window's restore rectangle.
+    pub fn observe_native_fullscreen(
+        &mut self,
+        fullscreen: bool,
+        normal_snapshot: Option<WindowSnapshot>,
+    ) -> Result<bool, String> {
+        if let Some(snapshot) = normal_snapshot {
+            if ![snapshot.x, snapshot.y, snapshot.width, snapshot.height]
+                .iter()
+                .all(|value| value.is_finite())
+                || snapshot.width <= 0.0
+                || snapshot.height <= 0.0
+            {
+                return Err("기본 창 크기를 확인할 수 없습니다.".into());
+            }
+            if !fullscreen && self.mode == WindowViewMode::Normal {
+                self.normal_snapshot = Some(snapshot);
+            }
+        }
+        let previous = self.mode;
+        if fullscreen {
+            if self.mode == WindowViewMode::Normal {
+                self.original = Some(
+                    self.normal_snapshot
+                        .ok_or("기본 창 위치가 준비되지 않았습니다.")?,
+                );
+                self.mode = WindowViewMode::Fullscreen;
+            }
+            self.native_fullscreen = self.mode == WindowViewMode::Fullscreen;
+        } else if self.native_fullscreen {
+            self.native_fullscreen = false;
+            if self.mode == WindowViewMode::Fullscreen {
+                self.mode = WindowViewMode::Normal;
+                self.original = None;
+            }
+        }
+        Ok(previous != self.mode)
+    }
     pub fn mode(&self) -> WindowViewMode {
         self.mode
     }
@@ -146,6 +225,9 @@ impl WindowPresentation {
             return Err(error);
         }
         self.mode = mode;
+        if mode != WindowViewMode::Fullscreen {
+            self.native_fullscreen = false;
+        }
         self.original = if mode == WindowViewMode::Normal {
             None
         } else {

@@ -25,7 +25,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>컴퓨터의 Phone Mirror 연결 QR 코드를 읽습니다. 사진이나 소리를 저장하지 않습니다.</string>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>같은 Wi-Fi의 컴퓨터에 암호화된 화면과 앱 소리를 송출합니다.</string>
+	<string>같은 로컬 네트워크의 컴퓨터에 화면과 앱 소리를 송출하고 암호화된 키보드 입력을 받습니다.</string>
 	<key>UILaunchScreen</key>
 	<dict/>
 	<key>UISupportedInterfaceOrientations</key>

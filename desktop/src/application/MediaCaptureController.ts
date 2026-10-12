@@ -22,6 +22,8 @@ export class MediaCaptureController {
     pauseBusy: false,
     elapsedSeconds: 0,
     busy: false,
+    screenshotBusy: false,
+    screenshotMessage: "",
     message: "",
   };
   private listeners = new Set<() => void>();
@@ -54,20 +56,34 @@ export class MediaCaptureController {
     if (!live) void this.stopRecording();
   }
   screenshot(): Promise<void> {
-    if (!this.snapshot.live || this.snapshot.busy || this.recording)
-      return Promise.resolve();
-    this.update({ busy: true, message: "스크린샷을 저장하고 있습니다." });
-    this.screenshotTask = (async () => {
+    if (!this.snapshot.live || this.snapshot.busy) return Promise.resolve();
+    let complete!: () => void;
+    const task = new Promise<void>((resolve) => {
+      complete = resolve;
+    });
+    this.screenshotTask = task;
+    this.update({ busy: true, screenshotBusy: true });
+    this.setScreenshotMessage("스크린샷을 저장하고 있습니다.");
+    void (async () => {
       try {
-        await this.save(await this.source.screenshot());
+        this.setScreenshotMessage(
+          await this.save(await this.source.screenshot()),
+        );
       } catch {
-        this.update({ message: "스크린샷 저장에 실패했습니다." });
+        this.setScreenshotMessage("스크린샷 저장에 실패했습니다.");
       } finally {
         this.screenshotTask = undefined;
-        this.update({ busy: false });
+        this.update({ busy: !!this.finalizing, screenshotBusy: false });
+        complete();
       }
     })();
-    return this.screenshotTask;
+    return task;
+  }
+  private setScreenshotMessage(message: string) {
+    this.update({
+      screenshotMessage: message,
+      ...(!this.recording && !this.finalizing ? { message } : {}),
+    });
   }
   async finish(): Promise<void> {
     this.setLive(false);
@@ -177,6 +193,11 @@ export class MediaCaptureController {
     this.recordingGeneration++;
     this.cancelRecordingClock?.();
     this.cancelRecordingClock = undefined;
+    let complete!: () => void;
+    const task = new Promise<void>((resolve) => {
+      complete = resolve;
+    });
+    this.finalizing = task;
     this.update({
       recording: false,
       paused: false,
@@ -184,17 +205,23 @@ export class MediaCaptureController {
       busy: true,
       message: "녹화를 마무리하고 있습니다.",
     });
-    this.finalizing = (async () => {
+    const screenshotTask = this.screenshotTask;
+    void (async () => {
       try {
-        await this.save(await recording.stop());
+        // Finalize the video immediately, but keep native save dialogs sequential.
+        const media = await recording.stop();
+        if (screenshotTask) await screenshotTask;
+        this.update({ message: await this.save(media) });
       } catch {
+        if (screenshotTask) await screenshotTask;
         this.update({ message: "녹화 저장에 실패했습니다." });
       } finally {
         this.finalizing = undefined;
-        this.update({ busy: false });
+        this.update({ busy: !!this.screenshotTask });
+        complete();
       }
     })();
-    return this.finalizing;
+    return task;
   }
   private async save(blob: CapturedMedia) {
     if (
@@ -203,8 +230,6 @@ export class MediaCaptureController {
     )
       throw Error("Invalid media size");
     const path = await this.store.save(blob);
-    this.update({
-      message: path ? `저장했습니다: ${path}` : "저장을 취소했습니다.",
-    });
+    return path ? `저장했습니다: ${path}` : "저장을 취소했습니다.";
   }
 }

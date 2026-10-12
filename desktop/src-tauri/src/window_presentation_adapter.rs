@@ -1,5 +1,26 @@
 use crate::window_presentation::*;
 pub struct TauriWindowPresentationPort(pub tauri::WebviewWindow);
+pub struct TauriFullscreenTransitionPort {
+    pub window: tauri::WebviewWindow,
+    pub started: tokio::time::Instant,
+}
+#[async_trait::async_trait]
+impl FullscreenTransitionPort for TauriFullscreenTransitionPort {
+    fn now(&self) -> std::time::Duration {
+        self.started.elapsed()
+    }
+    fn fullscreen(&self) -> Result<bool, String> {
+        self.window
+            .is_fullscreen()
+            .map_err(|error| error.to_string())
+    }
+    fn cancelled(&self) -> bool {
+        crate::desktop::window_is_closing(&self.window)
+    }
+    async fn wait(&self, duration: std::time::Duration) {
+        tokio::time::sleep(duration).await;
+    }
+}
 impl WindowPresentationPort for TauriWindowPresentationPort {
     fn snapshot(&self) -> Result<WindowSnapshot, String> {
         let scale = self.0.scale_factor().map_err(|e| e.to_string())?;
@@ -69,17 +90,11 @@ impl WindowPresentationPort for TauriWindowPresentationPort {
         let operation = || -> tauri::Result<()> {
             if mode == WindowViewMode::Fullscreen {
                 window.set_always_on_top(snapshot.always_on_top)?;
-                #[cfg(target_os = "macos")]
-                window.set_simple_fullscreen(true)?;
-                #[cfg(not(target_os = "macos"))]
                 window.set_fullscreen(true)?;
                 window.set_focus()?;
                 window.as_ref().set_focus()?;
                 return Ok(());
             }
-            #[cfg(target_os = "macos")]
-            window.set_simple_fullscreen(false)?;
-            #[cfg(not(target_os = "macos"))]
             window.set_fullscreen(false)?;
             window.unmaximize()?;
             if mode == WindowViewMode::Pip {

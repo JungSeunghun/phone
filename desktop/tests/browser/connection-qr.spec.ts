@@ -7,7 +7,7 @@ for (const transport of ["usb", "wifi"] as const) {
     await page.goto(`/tests/browser/qr.html?transport=${transport}`);
     await page
       .getByText(
-        transport === "usb" ? "iPhone Windows USB 송출" : "iPhone Wi-Fi 송출",
+        transport === "usb" ? "iPhone Windows USB 수신" : "iPhone Wi-Fi 수신",
         { exact: true },
       )
       .click();

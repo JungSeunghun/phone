@@ -35,6 +35,9 @@ impl SessionRegistry {
             self.stopped.pop_front();
         }
     }
+    pub fn is_active(&self) -> bool {
+        !self.active.is_empty()
+    }
     pub fn stop_all(&mut self) {
         let active: Vec<_> = self.active.keys().cloned().collect();
         for id in active {

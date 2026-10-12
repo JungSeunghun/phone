@@ -1,0 +1,53 @@
+name: Bug report / 버그 신고
+description: Report a reproducible problem without private device data.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Use SECURITY.md for vulnerabilities. Do not attach phone screenshots, recordings, identifiers, IPs, connection codes or unreviewed logs."
+  - type: input
+    id: version
+    attributes:
+      label: App version / 앱 버전
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Computer OS and phone OS / 컴퓨터·폰 OS
+      placeholder: macOS 14, Android 16 (no serial numbers)
+    validations:
+      required: true
+  - type: dropdown
+    id: connection
+    attributes:
+      label: Connection / 연결 방식
+      options:
+        - Android USB
+        - Android Wi-Fi
+        - iPhone USB
+        - iPhone Wi-Fi
+        - No phone connected
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps, expected behavior and actual behavior / 재현·기대·실제 결과
+    validations:
+      required: true
+  - type: dropdown
+    id: evidence
+    attributes:
+      label: Verification evidence / 검증 환경
+      options:
+        - Real device / 실기기
+        - Synthetic fixture / 모의 환경
+        - Build only / 빌드만
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: Reviewed diagnostic summary / 내용을 확인한 진단 요약
+      description: Optional JSON from Save diagnostic summary; do not paste raw logs.

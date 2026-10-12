@@ -113,7 +113,8 @@ pub fn forward_ios_packet(
 
 /// USB audio uses the same 48 kHz stereo Int16 packet contract as Android and Wi-Fi.
 pub fn ios_audio_packet(pcm: &[u8], timestamp: u64) -> Result<Vec<u8>, String> {
-    if pcm.is_empty() || pcm.len() > 4096 || pcm.len() % 4 != 0 || timestamp >= 1u64 << 53 {
+    if pcm.is_empty() || pcm.len() > 4096 || !pcm.len().is_multiple_of(4) || timestamp >= 1u64 << 53
+    {
         return Err("잘못된 iPhone USB 오디오 패킷입니다.".into());
     }
     let packet = ios_video_packet(pcm, timestamp, false, false)?;

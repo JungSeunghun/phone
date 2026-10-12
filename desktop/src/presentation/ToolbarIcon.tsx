@@ -2,7 +2,7 @@ export type ToolbarIconName =
   "settings" | "capture" | "record" | "stop" | "sound" | "muted" | "disconnect";
 const paths: Record<ToolbarIconName, string> = {
   settings:
-    "M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8M12 2v3m0 14v3M2 12h3m14 0h3M5 5l2 2m10 10 2 2M5 19l2-2M17 7l2-2",
+    "M9 3h6l1 3 3 1 2 5-2 5-3 1-1 3H9l-1-3-3-1-2-5 2-5 3-1ZM12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8",
   capture: "M3 7h4l2-3h6l2 3h4v13H3ZM12 10a3 3 0 1 0 0 6 3 3 0 0 0 0-6",
   record: "M12 4a8 8 0 1 0 0 16 8 8 0 0 0 0-16",
   stop: "M6 6h12v12H6Z",

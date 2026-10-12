@@ -24,7 +24,7 @@ it("shows USB setup, saves no code after stop and stops the active session befor
       }}
     />,
   );
-  fireEvent.click(screen.getByText("iPhone Windows USB 송출"));
+  fireEvent.click(screen.getByText("iPhone Windows USB 수신"));
   expect(screen.getByText(/Apple 기기 드라이버/)).toBeVisible();
   fireEvent.click(screen.getByText("iPhone USB 수신 시작"));
   await waitFor(() =>

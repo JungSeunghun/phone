@@ -61,7 +61,7 @@ pub enum ProbeObservation {
     MultipleDevices,
     TimedOut,
 }
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum DiagnosticStatus {
     Passed,

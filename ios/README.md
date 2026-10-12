@@ -5,7 +5,7 @@
 ## 빌드와 사용
 
 1. `PhoneMirrorSender.xcodeproj`를 Xcode에서 열고 `PhoneMirrorSender` scheme을 선택합니다.
-2. 실기기 설치 시 앱과 `PhoneMirrorBroadcast` 두 타깃의 Signing Team을 설정합니다. 본인의 등록 가능한 bundle ID 및 App Group으로 변경하면 두 entitlements와 `SenderSharedContainer.identifier`, 앱 bundle ID + `.Broadcast` 확장 ID를 함께 맞추세요.
+2. 실기기 설치 시 앱·`PhoneMirrorBroadcast`·`PhoneMirrorKeyboard` 세 타깃의 Signing Team을 설정합니다. 본인의 등록 가능한 bundle ID 및 App Group으로 변경하면 세 entitlements와 `SenderSharedContainer.identifier`, 앱 bundle ID + `.Broadcast` / `.Keyboard` 확장 ID를 함께 맞추세요.
 3. 컴퓨터 앱의 **iPhone Wi-Fi 송출 → iPhone 수신 시작**을 누릅니다. 여러 주소가 표시되면 폰과 같은 네트워크의 주소를 고릅니다.
 4. 폰 앱에 연결 코드를 붙여 넣고 해상도·프레임·앱 소리를 설정한 뒤 **연결 코드 저장**을 누릅니다. 로컬 네트워크 접근을 허용하세요. 먼저 앱의 TCP 연결 확인을 수행하므로 방송 확장에서 권한 알림을 띄우려고 하지 않습니다.
 5. 시스템 방송 버튼을 눌러 화면 방송을 시작합니다. 컴퓨터의 연결된 기기에서 iPhone Wi-Fi를 선택하고 **폰 화면 보기**를 누릅니다.
@@ -40,6 +40,25 @@ cargo build --manifest-path desktop/src-tauri/Cargo.toml --no-default-features -
 
 Apple 자료: [ReplayKit 방송 버튼](https://developer.apple.com/documentation/replaykit/rpsystembroadcastpickerview), [로컬 네트워크와 앱 확장 권한](https://developer.apple.com/documentation/technotes/tn3179-understanding-local-network-privacy).
 
+## iPhone 다국어 붙여넣기와 직접 입력
+
+`PhoneMirrorKeyboard`는 공개 `UITextDocumentProxy` API로 현재 선택한 입력칸에 텍스트를 삽입하는 키보드 확장입니다. 다른 앱의 입력칸에서 사용하려면 업데이트된 송출 앱과 키보드 확장을 iPhone에 설치해야 합니다. 기존 Mac Swift 앱은 변경하지 않으며 Rust/Tauri 데스크톱에서 사용합니다.
+
+1. 컴퓨터에서 iPhone을 선택하고 설정의 **iPhone 다국어 입력 연결 → iPhone 키보드 연결 시작**을 누릅니다. 표시된 `PMK1` 코드를 복사합니다. 화면 송출용 `PMW1` / `PMU1` 코드와 별개입니다.
+2. iPhone 송출 앱의 **컴퓨터 키보드 입력**에 코드를 붙여 넣고 **키보드 연결 코드 저장**을 누릅니다. 앱에서 로컬 네트워크 권한을 허용합니다.
+3. iPhone 설정 → 일반 → 키보드 → 키보드 → 새로운 키보드 추가에서 **Phone Mirror**를 추가합니다. 해당 키보드의 **전체 접근 허용**을 켭니다.
+4. 입력할 앱에서 텍스트 칸을 선택하고 지구본 버튼으로 **Phone Mirror** 키보드를 선택합니다. 컴퓨터에서 화면 수신이 시작되고 키보드 연결이 확인되면 **폰에 붙여넣기**, 영상에 포커스한 **⌘V / Ctrl+V**, **다국어 직접 입력**을 사용할 수 있습니다. 한글·일본어 등 IME 조합은 확정된 문자열만 전송합니다.
+
+화면은 Mac USB·Windows USB·Wi-Fi 중 어느 경로로 보더라도 입력 채널은 같은 로컬 네트워크를 사용합니다. 키보드를 닫거나 다른 키보드로 전환하면 입력 연결을 종료합니다. 키보드를 다시 선택하거나 **연결** 버튼을 누르면 다시 인증하며, 이전 연결에서 대기하던 입력은 재전송하지 않습니다. 컴퓨터에서 연결 종료·기기 변경·앱 종료 시 입력을 중단합니다. 새 입력 수신을 시작하면 새 코드가 필요합니다. 앱에서 코드를 삭제하거나 바꾸면 열린 키보드도 이후 원격 입력을 거부합니다.
+
+텍스트는 iPhone 클립보드를 변경하지 않고 현재 입력칸에 삽입합니다. Backspace·Delete·Enter·좌우 이동을 지원하며 위·아래 이동과 마우스 조작은 지원하지 않습니다. 비밀번호 입력칸, 전화번호 키패드, 외부 키보드를 금지한 앱에서는 iOS가 기본 키보드를 사용하므로 이 기능을 사용할 수 없습니다. 전체 접근을 허용하지 않아도 확장의 기본 영문·숫자 키, 삭제·공백·줄바꿈·키보드 전환은 동작하지만 컴퓨터 입력은 비활성화됩니다.
+
+입력은 임의 키와 연결별 challenge에서 파생한 방향별 AES-256-GCM 키로 암호화하고 순서를 검증합니다. 입력 문자열은 기록하거나 영구 저장하지 않습니다. 코드는 기존 App Group 설정에 로컬 저장하고 수신 키는 컴퓨터 메모리에만 둡니다. 인증 제한은 8초, 입력 ACK 제한은 3초이며 ACK는 키보드의 삽입 API 호출 후 전송합니다. 대상 앱의 글자 수 제한이나 입력 거부까지 보증하는 ACK는 아닙니다. 재시도 시 이미 전송한 텍스트를 자동으로 다시 보내지 않습니다.
+
+Swift 도메인 테스트·Rust 수신 테스트·Chromium UI 테스트와 실제 TCP의 Rust ↔ 생산용 Swift 키보드 네트워크 코드 통합 테스트로 검증합니다. TCP 검증의 문서는 합성이며 iPhone 입력칸을 조작하지 않습니다. 시뮬레이터/기기 SDK unsigned 빌드는 실기기 설치와 다릅니다. 실제 iPhone 설치·전체 접근 권한·다른 앱 입력칸 검증은 아직 수행하지 않았습니다.
+
+Apple 자료: [키보드의 텍스트 삽입](https://developer.apple.com/documentation/uikit/handling-text-interactions-in-custom-keyboards), [전체 접근과 지원 제한](https://developer.apple.com/library/archive/documentation/General/Conceptual/ExtensibilityPG/CustomKeyboard.html).
+
 ## Windows USB 송출
 
 Windows 앱에서 `iPhone USB 수신 시작`을 눌러 표시된 `PMU1|27483|연결 키` 코드를 저장하세요. USB 코드에서는 네트워크 사전 접속 확인 대신 코드 저장 후 화면 방송을 활성화합니다. 시스템 방송을 시작하면 확장이 iPhone 루프백 포트에서 연결을 기다리고, Windows의 Apple USB 서비스가 이 포트에 접속합니다. 같은 Wi-Fi에 연결할 필요가 없습니다. 기존 `PMW1|주소:포트|연결 키` Wi-Fi 코드는 그대로 지원합니다.
@@ -59,3 +78,7 @@ USB `PMU1`과 Wi-Fi `PMW1` 코드를 모두 지원하며 기존 입력 검증을
 정책은 Network.framework와 인코더에서 분리한 `SenderAdaptiveQualityPolicy`이며 단조 시각을 입력으로 받습니다. 150ms 이상 송출 완료 지연이 연속 3개 측정 구간에 발생하면 하향, 40ms 이하가 10개 구간 지속되면 상향합니다. 최소 변경 간격은 각각 15초와 30초입니다. `contentProcessed`는 로컬 송출 완료이며 컴퓨터가 받은 시각이나 RTT가 아닙니다. 인코더가 비트레이트 변경을 거부하면 방송을 유지합니다. 기존 4MiB 송출 큐 제한도 유지합니다.
 
 설정 누락은 기본값으로 복원하고 잘못된 저장 형식은 기존 오류 처리로 안내합니다. 정책·저장 경계 및 합성 프레임을 사용한 실제 Mac VideoToolbox 비트레이트 변경을 테스트했습니다. iPhone 실기기·ReplayKit 방송·실제 Wi-Fi 혼잡·장시간 검증은 하지 않았습니다. [Apple 목표 비트레이트 API](https://developer.apple.com/documentation/videotoolbox/kvtcompressionpropertykey_averagebitrate)를 사용합니다.
+
+## 프로젝트 라이선스
+
+프로젝트 자체 코드는 [MIT 라이선스](../LICENSE)를 따릅니다. 외부 코드와 라이브러리는 각각의 원래 라이선스를 따르며 [서드파티 고지](../THIRD_PARTY_NOTICES.md)를 유지합니다.

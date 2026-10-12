@@ -26,6 +26,31 @@ pub enum ControlInput {
         vertical: f64,
     },
     Back,
+    Paste {
+        text: String,
+    },
+    Key {
+        key: EditingKey,
+    },
+}
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum EditingKey {
+    Backspace,
+    Delete,
+    Enter,
+    Left,
+    Right,
+    Up,
+    Down,
+}
+
+pub const MAXIMUM_PHONE_TEXT_BYTES: usize = (1 << 18) - 14;
+pub fn validate_phone_text(text: &str) -> Result<(), String> {
+    if text.is_empty() || text.contains('\0') || text.len() > MAXIMUM_PHONE_TEXT_BYTES {
+        return Err("지원하지 않는 텍스트 또는 텍스트 길이입니다.".into());
+    }
+    Ok(())
 }
 fn position(x: u32, y: u32, width: u16, height: u16) -> Result<Vec<u8>, String> {
     if width == 0
@@ -46,6 +71,15 @@ fn position(x: u32, y: u32, width: u16, height: u16) -> Result<Vec<u8>, String> 
 }
 impl ControlInput {
     pub fn encode(&self) -> Result<Vec<u8>, String> {
+        if let Self::Paste { text } = self {
+            validate_phone_text(text)?;
+            let mut bytes = vec![9];
+            bytes.extend(1_u64.to_be_bytes()); // One outstanding clipboard message per writer
+            bytes.push(1); // paste into the focused Android field
+            bytes.extend((text.len() as u32).to_be_bytes());
+            bytes.extend(text.as_bytes());
+            return Ok(bytes);
+        }
         match *self {
             Self::Touch {
                 action,
@@ -102,6 +136,25 @@ impl ControlInput {
                 Ok(bytes)
             }
             Self::Back => Ok(vec![4, 0, 4, 1]),
+            Self::Paste { .. } => unreachable!(),
+            Self::Key { key } => {
+                let code: u32 = match key {
+                    EditingKey::Backspace => 67,
+                    EditingKey::Delete => 112,
+                    EditingKey::Enter => 66,
+                    EditingKey::Left => 21,
+                    EditingKey::Right => 22,
+                    EditingKey::Up => 19,
+                    EditingKey::Down => 20,
+                };
+                let mut bytes = Vec::with_capacity(28);
+                for action in [0, 1] {
+                    bytes.extend([0, action]);
+                    bytes.extend(code.to_be_bytes());
+                    bytes.extend([0; 8]);
+                }
+                Ok(bytes)
+            }
         }
     }
 }

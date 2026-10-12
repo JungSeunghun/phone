@@ -1,0 +1,19 @@
+name: Feature request / 기능 제안
+description: Describe the user problem and a proposed result.
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: User problem / 해결할 문제
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior / 원하는 동작
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives and affected platforms / 대안·대상 플랫폼

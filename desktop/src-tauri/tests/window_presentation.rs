@@ -170,3 +170,132 @@ fn window_frame_is_reserved_so_the_entire_pip_fits_the_monitor() {
     )
     .is_ok());
 }
+
+#[test]
+fn native_fullscreen_uses_cached_normal_geometry_and_restores_once() {
+    let window = FakeWindow::default();
+    let mut presentation = WindowPresentation::default();
+    presentation
+        .observe_native_fullscreen(false, Some(window.snapshot().unwrap()))
+        .unwrap();
+    assert!(presentation.observe_native_fullscreen(true, None).unwrap());
+    assert_eq!(presentation.mode(), WindowViewMode::Fullscreen);
+    assert!(!presentation.observe_native_fullscreen(true, None).unwrap());
+    presentation
+        .set_mode(&window, WindowViewMode::Normal, None)
+        .unwrap();
+    assert_eq!(*window.calls.borrow(), vec!["Normal"]);
+    assert!(!presentation.observe_native_fullscreen(false, None).unwrap());
+}
+
+#[test]
+fn native_exit_and_invalid_snapshots_do_not_corrupt_pip_or_restore_geometry() {
+    let window = FakeWindow::default();
+    let mut presentation = WindowPresentation::default();
+    assert!(presentation.observe_native_fullscreen(true, None).is_err());
+    for width in [0.0, -1.0, f64::NAN, f64::INFINITY] {
+        let mut snapshot = window.snapshot().unwrap();
+        snapshot.width = width;
+        assert!(presentation
+            .observe_native_fullscreen(false, Some(snapshot))
+            .is_err());
+    }
+    presentation
+        .observe_native_fullscreen(false, Some(window.snapshot().unwrap()))
+        .unwrap();
+    presentation.observe_native_fullscreen(true, None).unwrap();
+    assert!(presentation.observe_native_fullscreen(false, None).unwrap());
+    assert_eq!(presentation.mode(), WindowViewMode::Normal);
+    presentation
+        .set_mode(&window, WindowViewMode::Pip, Some((886, 1920)))
+        .unwrap();
+    assert!(!presentation.observe_native_fullscreen(false, None).unwrap());
+    assert_eq!(presentation.mode(), WindowViewMode::Pip);
+}
+
+#[derive(Default)]
+struct FakeFullscreenTransition {
+    milliseconds: std::sync::atomic::AtomicU64,
+    completes_at: u64,
+    cancelled: bool,
+    fail_query: bool,
+    waits: std::sync::Mutex<Vec<std::time::Duration>>,
+}
+#[async_trait::async_trait]
+impl FullscreenTransitionPort for FakeFullscreenTransition {
+    fn now(&self) -> std::time::Duration {
+        std::time::Duration::from_millis(
+            self.milliseconds.load(std::sync::atomic::Ordering::SeqCst),
+        )
+    }
+    fn fullscreen(&self) -> Result<bool, String> {
+        if self.fail_query {
+            Err("native query failed".into())
+        } else {
+            Ok(self.milliseconds.load(std::sync::atomic::Ordering::SeqCst) >= self.completes_at)
+        }
+    }
+    fn cancelled(&self) -> bool {
+        self.cancelled
+    }
+    async fn wait(&self, duration: std::time::Duration) {
+        self.waits.lock().unwrap().push(duration);
+        self.milliseconds.fetch_add(
+            duration.as_millis() as u64,
+            std::sync::atomic::Ordering::SeqCst,
+        );
+    }
+}
+#[tokio::test]
+async fn native_transition_observes_deadline_cancellation_and_errors_without_real_sleep() {
+    use std::time::Duration;
+    let timeout = Duration::from_millis(40);
+    for completes_at in [0, 20, 40] {
+        let port = FakeFullscreenTransition {
+            completes_at,
+            ..Default::default()
+        };
+        await_fullscreen_transition(&port, true, timeout)
+            .await
+            .unwrap();
+        assert!(port.milliseconds.load(std::sync::atomic::Ordering::SeqCst) <= 40);
+    }
+    let late = FakeFullscreenTransition {
+        completes_at: 41,
+        ..Default::default()
+    };
+    assert!(await_fullscreen_transition(&late, true, timeout)
+        .await
+        .is_err());
+    assert_eq!(
+        late.milliseconds.load(std::sync::atomic::Ordering::SeqCst),
+        40
+    );
+    let cancelled = FakeFullscreenTransition {
+        cancelled: true,
+        ..Default::default()
+    };
+    assert!(await_fullscreen_transition(&cancelled, true, timeout)
+        .await
+        .is_err());
+    assert!(cancelled.waits.lock().unwrap().is_empty());
+    let failed = FakeFullscreenTransition {
+        fail_query: true,
+        ..Default::default()
+    };
+    assert!(await_fullscreen_transition(&failed, true, timeout)
+        .await
+        .is_err());
+    assert!(failed.waits.lock().unwrap().is_empty());
+    assert!(await_fullscreen_transition(&late, true, Duration::ZERO)
+        .await
+        .is_err());
+    let normal = FakeFullscreenTransition {
+        completes_at: 1,
+        ..Default::default()
+    };
+    await_fullscreen_transition(&normal, false, timeout)
+        .await
+        .unwrap();
+    assert!(normal.waits.lock().unwrap().is_empty());
+}

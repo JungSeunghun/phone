@@ -5,6 +5,7 @@ let package = Package(
   name: "PhoneMirrorSenderCore", platforms: [.macOS(.v14), .iOS(.v16)],
   products: [.library(name: "PhoneMirrorSenderCore", targets: ["PhoneMirrorSenderCore"])],
   targets: [
+    .executableTarget(name: "KeyboardInputMock", dependencies: ["PhoneMirrorSenderCore"], path: "KeyboardVerification"),
     .executableTarget(
       name: "SenderMock", dependencies: ["PhoneMirrorSenderCore"], path: "Verification"),
     .target(name: "PhoneMirrorSenderCore", path: "Shared"),

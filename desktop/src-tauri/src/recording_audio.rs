@@ -93,7 +93,7 @@ impl AlignedAudio {
         self.frames
     }
     pub fn append(&mut self, timestamp: u64, pcm: &[u8]) -> Result<Vec<u8>, String> {
-        if pcm.is_empty() || pcm.len() > 4096 || pcm.len() % 4 != 0 {
+        if pcm.is_empty() || pcm.len() > 4096 || !pcm.len().is_multiple_of(4) {
             return Err("잘못된 녹화 PCM 크기입니다.".into());
         }
         let target = audio_sample_position(timestamp)?;
@@ -162,7 +162,7 @@ pub fn validate_pcm_packet(packet: &[u8]) -> Result<(), String> {
     let header = crate::domain::VideoPacketHeader::parse(&packet[..12])?;
     if header.configuration
         || header.key_frame
-        || header.payload_size % 4 != 0
+        || !header.payload_size.is_multiple_of(4)
         || header.payload_size != packet.len() - 12
     {
         return Err("잘못된 PCM 오디오입니다.".into());

@@ -277,6 +277,9 @@ test("workflow triggers only desktop tags, builds three installers, gates upload
 });
 
 test("CLI dry preparation stays local, rejects mismatched tags and refuses uploads outside tag workflows", async () => {
+  const version = JSON.parse(
+    await readFile(new URL("../../package.json", import.meta.url), "utf8"),
+  ).version;
   const { execFileSync } = await import("node:child_process");
   const { fileURLToPath } = await import("node:url");
   const directory = await mkdtemp(join(tmpdir(), "phone-release-cli-"));

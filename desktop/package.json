@@ -1,6 +1,6 @@
 {
   "name": "phone-mirror-desktop",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
@@ -16,10 +16,11 @@
     "test:recording-audio": "node scripts/verify-recording-audio.mjs",
     "test:ios-usb-audio": "node scripts/verify-recording-audio.mjs --ios-usb",
     "test:ios-windows-usb": "node scripts/verify-ios-windows-usb.mjs",
-    "test:release": "node --test scripts/release-tests/release-policy.test.mjs scripts/release-tests/draft-release.test.mjs",
+    "test:release": "node --test scripts/release-tests/*.test.mjs",
     "release:validate": "node scripts/release.mjs validate",
     "package:mac": "node scripts/release.mjs package --target macos-arm64",
-    "package:windows": "node scripts/release.mjs package --target windows-x64"
+    "package:windows": "node scripts/release.mjs package --target windows-x64",
+    "audit:public": "node scripts/public-release-audit.mjs"
   },
   "dependencies": {
     "@tauri-apps/api": "^2.10.0",
@@ -44,5 +45,6 @@
     "vite": "^7.2.0",
     "vitest": "^3.2.4",
     "yaml": "^2.9.1"
-  }
+  },
+  "license": "MIT"
 }

@@ -470,7 +470,7 @@ p {
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.connection-panel button {
+.connection-panel > button {
   width: auto;
   margin: 0 0 0 auto;
   padding: 7px 12px;
@@ -613,12 +613,12 @@ p {
   font-size: 10px;
   font-weight: 500;
 }
-.view-pip .connection-panel button {
+.view-pip .connection-panel > button {
   padding: 2px 5px;
   font-size: 10px;
   min-height: 22px;
 }
-.view-pip .connection-panel button svg {
+.view-pip .connection-panel > button svg {
   width: 12px;
   height: 12px;
 }
@@ -664,28 +664,6 @@ p {
 }
 .view-pip .viewer {
   position: relative;
-}
-.view-pip .connection-panel {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 64px;
-  z-index: 1;
-  border: 0;
-  min-height: 28px;
-  padding: 2px 5px;
-}
-.view-pip .connection-state {
-  display: none;
-}
-.view-pip .connection-panel button {
-  padding: 2px 4px;
-}
-.view-pip .connection-panel button svg {
-  display: none;
-}
-.view-pip .viewer-header {
-  padding-right: 68px;
 }
 
 .performance-info {
@@ -796,4 +774,263 @@ p {
 .connection-diagnostics li p {
   font-size: 13px;
   line-height: 1.5;
+}
+
+/* One connection header across normal, fullscreen and PiP views. */
+.viewer-header.connection-panel {
+  position: relative;
+  height: auto;
+  min-height: 48px;
+  padding: 8px 12px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.connection-summary {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 200px;
+}
+.connection-device {
+  color: #dce7f3;
+  font-weight: 600;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.connection-message {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 6px 12px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  max-height: 64px;
+  overflow-y: auto;
+}
+.settings-toggle {
+  gap: 5px;
+}
+.capture-actions {
+  display: flex;
+  gap: 8px;
+}
+.capture-menu {
+  flex-shrink: 0;
+}
+.capture-menu summary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  cursor: pointer;
+  padding: 6px;
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid #344155;
+  border-radius: 8px;
+  background: #202c3d;
+  color: #dce7f3;
+}
+.capture-menu summary::-webkit-details-marker {
+  display: none;
+}
+.capture-menu .capture-actions {
+  position: absolute;
+  right: 8px;
+  top: calc(100% + 4px);
+  width: 156px;
+  max-width: calc(100vw - 16px);
+  z-index: 5;
+  flex-direction: column;
+  padding: 6px;
+  border: 1px solid #344155;
+  border-radius: 8px;
+  background: #18212d;
+  box-shadow: 0 8px 24px #0008;
+}
+.capture-menu .capture-actions button {
+  margin: 0;
+  gap: 6px;
+  width: 100%;
+  padding: 8px;
+  justify-content: flex-start;
+  white-space: nowrap;
+}
+.view-pip .viewer-header.connection-panel {
+  min-height: 32px;
+  padding: 3px 5px;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+.view-pip .connection-summary {
+  flex: 0 1 auto;
+  gap: 0;
+}
+.view-pip .connection-device,
+.view-pip .connection-summary .connection-state,
+.view-pip .connection-summary .metrics,
+.view-pip
+  .connection-summary
+  .transport-badge
+  + .connection-state
+  + .transport-badge {
+  display: none;
+}
+.view-pip .view-controls {
+  margin-left: auto;
+  gap: 4px;
+}
+.view-pip .connection-panel > button {
+  margin-left: 0;
+  white-space: nowrap;
+}
+.view-pip .capture-menu summary {
+  min-width: 24px;
+  min-height: 24px;
+  padding: 3px;
+}
+.view-pip .capture-menu svg {
+  width: 14px;
+  height: 14px;
+}
+@media (max-width: 500px) {
+  .view-fullscreen .connection-summary {
+    flex: 0 1 auto;
+    gap: 0;
+  }
+  .view-fullscreen .connection-device,
+  .view-fullscreen .connection-state,
+  .view-fullscreen .metrics {
+    display: none;
+  }
+  .view-fullscreen .viewer-header.connection-panel {
+    padding: 3px 5px;
+    gap: 4px;
+  }
+  .view-fullscreen .view-controls {
+    gap: 4px;
+  }
+  .view-fullscreen .view-controls button,
+  .view-fullscreen .connection-panel > button {
+    padding: 3px 5px;
+    font-size: 10px;
+    min-height: 24px;
+  }
+  .view-fullscreen .connection-panel > button svg {
+    display: none;
+  }
+}
+
+/* Keep device selection reachable while connection forms scroll. */
+.sidebar-device {
+  padding: 14px 18px 12px;
+  flex-shrink: 0;
+  border-bottom: 1px solid #2d394b;
+}
+.sidebar-device .brand {
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.sidebar-device .brand-icon {
+  font-size: 26px;
+}
+.sidebar-device .brand h1 {
+  font-size: 18px;
+}
+.sidebar-device .brand p {
+  margin-top: 2px;
+}
+.sidebar-device .section-title {
+  margin-bottom: 8px;
+}
+.sidebar-device .hint {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+.sidebar-content {
+  height: auto;
+  flex: 1;
+  padding-top: 14px;
+  gap: 18px;
+}
+.sidebar-content > section {
+  flex-shrink: 0;
+}
+.sidebar-content .wireless-panel {
+  margin-top: 14px;
+}
+.manual-connection {
+  margin-top: 14px;
+  border-top: 1px solid #2d394b;
+  padding-top: 12px;
+}
+.manual-connection > summary {
+  cursor: pointer;
+  font-size: 13px;
+  color: #c4d0e2;
+}
+.sidebar .checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.sidebar .checkbox input {
+  flex-shrink: 0;
+  margin-top: 3px;
+}
+.sidebar .hint {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+.sidebar-content section > h2 {
+  margin-bottom: 12px;
+}
+
+.text-input-panel {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 12px;
+  flex-shrink: 0;
+}
+.text-input-panel textarea {
+  flex: 1;
+  min-width: 120px;
+  min-height: 34px;
+  resize: none;
+  color: inherit;
+  background: var(--surface, #20232b);
+  border: 1px solid #505665;
+  border-radius: 8px;
+  padding: 7px 10px;
+  font: inherit;
+}
+.text-input-help,
+.text-input-status {
+  font-size: 11px;
+  color: #aeb6c5;
+}
+.text-input-status {
+  width: 100%;
+}
+.view-pip .text-input-help {
+  display: none;
+}
+.ios-keyboard-input summary {
+  cursor: pointer;
+}
+.ios-keyboard-input p {
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 8px 0;
+}
+.ios-keyboard-input textarea {
+  width: 100%;
+  resize: vertical;
+  overflow-wrap: anywhere;
+  font-size: 11px;
 }

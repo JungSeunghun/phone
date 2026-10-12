@@ -1,10 +1,12 @@
 name: Phone Mirror iPhone Sender
 on:
   push:
-    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
+    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_keyboard.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
   pull_request:
-    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
+    paths: ['ios/**', 'desktop/src-tauri/src/ios_wifi.rs', 'desktop/src-tauri/src/ios_receiver.rs', 'desktop/src-tauri/src/ios_keyboard.rs', 'desktop/src-tauri/src/ios_usb.rs', '.github/workflows/ios-sender.yml']
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   simulated-build:
     runs-on: macos-latest

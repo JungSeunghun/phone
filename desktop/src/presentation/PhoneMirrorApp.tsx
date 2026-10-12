@@ -1,9 +1,13 @@
+import { FirstConnectionGuide } from "./FirstConnectionGuide";
+import { ApplicationUpdateController } from "../application/ApplicationUpdateController";
+import { TauriApplicationUpdateBackend } from "../infrastructure/TauriApplicationUpdateBackend";
+import { ApplicationUpdatePanel } from "./ApplicationUpdatePanel";
 import { ConnectionDiagnosticsController } from "../application/ConnectionDiagnosticsController";
 import { TauriConnectionDiagnosticsBackend } from "../infrastructure/TauriConnectionDiagnosticsBackend";
 import { ConnectionDiagnosticsPanel } from "./ConnectionDiagnosticsPanel";
 import { AndroidQrPairingController } from "../application/AndroidQrPairingController";
 import { TauriAndroidQrPairingBackend } from "../infrastructure/TauriAndroidQrPairingBackend";
-import { AndroidQrPairingPanel } from "./AndroidQrPairingPanel";
+import { AndroidWirelessConnectionPanel } from "./AndroidWirelessConnectionPanel";
 import { IosReceiverController } from "../application/IosReceiverController";
 import { IosReceiverPanel } from "./IosReceiverPanel";
 import { TauriIosUsbReceiverBackend } from "../infrastructure/TauriIosUsbReceiverBackend";
@@ -34,6 +38,17 @@ import { TauriWindowPresentationBackend } from "../infrastructure/TauriWindowPre
 import type { VideoPerformanceSnapshot } from "../domain/VideoPerformance";
 import { RecordingStatus } from "./RecordingStatus";
 import { ToolbarIcon } from "./ToolbarIcon";
+import { CaptureActions } from "./CaptureActions";
+
+import {
+  TextInputController,
+  type TextClipboard,
+} from "../application/TextInputController";
+import { SystemTextClipboard } from "../infrastructure/SystemTextClipboard";
+import { TextInputPanel } from "./TextInputPanel";
+import { IosKeyboardInputController } from "../application/IosKeyboardInputController";
+import { TauriIosKeyboardInputBackend } from "../infrastructure/TauriIosKeyboardInputBackend";
+import { IosKeyboardInputPanel } from "./IosKeyboardInputPanel";
 
 import { usePhoneInteraction } from "./PhoneInteraction";
 
@@ -45,8 +60,12 @@ export function PhoneMirrorApp({
   iosUsbReceiverController,
   androidQrPairingController,
   connectionDiagnosticsController,
+  textClipboard,
+  iosKeyboardInputController,
 }: {
   controller: PhoneMirrorController;
+  textClipboard?: TextClipboard;
+  iosKeyboardInputController?: IosKeyboardInputController;
   mediaController?: MediaCaptureController;
   windowPresentationController?: WindowPresentationController;
   iosWifiReceiverController?: IosWifiReceiverController;
@@ -59,6 +78,75 @@ export function PhoneMirrorApp({
       controller.getSnapshot,
     ),
     canvas = useRef<HTMLCanvasElement>(null);
+  const keyboardInput = useMemo(
+    () =>
+      iosKeyboardInputController ??
+      new IosKeyboardInputController(new TauriIosKeyboardInputBackend()),
+    [iosKeyboardInputController],
+  );
+  const keyboardState = useSyncExternalStore(
+    keyboardInput.subscribe,
+    keyboardInput.getSnapshot,
+  );
+  const textSession = () => {
+    if (controller.getCapabilities().control)
+      return controller.getActiveSessionId();
+    const current = controller.getSnapshot();
+    return current.phase === "live"
+      ? keyboardInput.session(current.selectedDeviceId)
+      : undefined;
+  };
+  const textInput = useMemo(
+    () =>
+      new TextInputController(
+        textSession,
+        (input, session) =>
+          controller.getCapabilities().control
+            ? controller.sendControl(input, session)
+            : keyboardInput.send(input, session),
+        textClipboard ?? new SystemTextClipboard(),
+      ),
+    [controller, textClipboard, keyboardInput],
+  );
+  useEffect(() => {
+    let session = controller.getActiveSessionId();
+    const unsubscribe = controller.subscribe(() => {
+      const current = controller.getActiveSessionId();
+      if (current !== session) {
+        if (session && !current) void keyboardInput.stop();
+        session = current;
+        textInput.reset();
+      }
+      const selectedId = controller.getSnapshot().selectedDeviceId;
+      if (
+        keyboardInput.getSnapshot().targetId &&
+        keyboardInput.getSnapshot().targetId !== selectedId
+      )
+        void keyboardInput.stop();
+    });
+    return () => {
+      unsubscribe();
+      textInput.reset();
+    };
+  }, [controller, textInput, keyboardInput]);
+  useEffect(() => {
+    let session = keyboardInput.session(
+      controller.getSnapshot().selectedDeviceId,
+    );
+    const unsubscribe = keyboardInput.subscribe(() => {
+      const current = keyboardInput.session(
+        controller.getSnapshot().selectedDeviceId,
+      );
+      if (session !== current) {
+        session = current;
+        textInput.reset();
+      }
+    });
+    return () => {
+      unsubscribe();
+      void keyboardInput.stop();
+    };
+  }, [controller, keyboardInput, textInput]);
   const diagnostics = useMemo(
     () =>
       connectionDiagnosticsController ??
@@ -190,6 +278,21 @@ export function PhoneMirrorApp({
   const interaction = usePhoneInteraction(controller);
   const capabilities = controller.getCapabilities();
   const active = ["connecting", "live", "reconnecting"].includes(state.phase);
+  const applicationUpdate = useMemo(
+    () =>
+      new ApplicationUpdateController(
+        new TauriApplicationUpdateBackend(),
+        localStorage,
+        () =>
+          ["connecting", "live", "reconnecting"].includes(
+            controller.getSnapshot().phase,
+          ) ||
+          media.getSnapshot().busy ||
+          media.getSnapshot().recording,
+        () => performance.now(),
+      ),
+    [controller, media],
+  );
   const selected = state.devices.find(
     (device) => device.id === state.selectedDeviceId,
   );
@@ -243,7 +346,7 @@ export function PhoneMirrorApp({
         id="mirror-settings"
         aria-label="기기 및 화면 설정"
       >
-        <div className="sidebar-content">
+        <div className="sidebar-device">
           <header className="brand">
             <span className="brand-icon">▣</span>
             <div>
@@ -251,7 +354,7 @@ export function PhoneMirrorApp({
               <p>Android · iPhone</p>
             </div>
           </header>
-          <section>
+          <section aria-label="기기 선택">
             <div className="section-title">
               <h2>연결된 기기</h2>
               <button
@@ -285,7 +388,7 @@ export function PhoneMirrorApp({
                   {device.name} ·{" "}
                   {device.endpoint.transport === "usb" ? "USB" : "Wi-Fi"} ·{" "}
                   {device.availability === "ready"
-                    ? "연결됨"
+                    ? "사용 가능"
                     : device.availability === "unauthorized"
                       ? "승인 필요"
                       : "오프라인"}
@@ -299,19 +402,59 @@ export function PhoneMirrorApp({
                   : selected.identity.startsWith("ios-usb:")
                     ? "USB 송출 앱에서 화면 방송을 시작하세요. USB 신뢰와 연결 코드를 확인하세요."
                     : "iPhone 잠금을 해제하고 ‘이 컴퓨터를 신뢰’를 승인하세요. Mac의 카메라 권한도 필요합니다."
-                : "Android USB는 폰에서 디버깅을 허용하세요. Wi-Fi는 폰과 컴퓨터가 같은 네트워크에 있어야 합니다."}
+                : "Android USB는 디버깅을 허용하고, Wi-Fi는 같은 네트워크에서 연결하세요."}
             </p>
-            <ConnectionDiagnosticsPanel
-              controller={diagnostics}
-              selectedDevice={selected}
-            />
           </section>
-          <section>
+        </div>
+        <div className="sidebar-content">
+          <section aria-label="기기 연결">
+            {!active && <FirstConnectionGuide />}
+            <h2>기기 연결</h2>
+            <label className="checkbox">
+              <input
+                type="checkbox"
+                checked={state.autoReconnect}
+                onChange={(event) =>
+                  controller.setAutoReconnect(event.target.checked)
+                }
+              />
+              연결이 끊기면 자동 재연결
+            </label>
+            <AndroidWirelessConnectionPanel
+              controller={controller}
+              pairingController={androidQr}
+              pairingBusy={androidQrBusy}
+            />
+            <IosWifiReceiverPanel
+              controller={receiver}
+              onStop={() => controller.stop()}
+            />
+            {(iosUsbReceiverController ||
+              navigator.userAgent.includes("Windows")) && (
+              <IosReceiverPanel
+                controller={usbReceiver}
+                transport="usb"
+                onStop={() => controller.stop()}
+              />
+            )}
+          </section>
+          <section aria-label="화면 설정">
             <h2>화면 설정</h2>
+            {active &&
+              !(
+                selected?.platform === "ios" &&
+                (selected.endpoint.transport === "wifi" ||
+                  selected.identity.startsWith("ios-usb:"))
+              ) && (
+                <p id="video-settings-guidance" className="hint">
+                  연결을 종료하면 화질과 프레임을 변경할 수 있습니다. 다음
+                  연결부터 적용됩니다.
+                </p>
+              )}
             {selected?.platform === "ios" &&
               (selected.endpoint.transport === "wifi" ||
                 selected.identity.startsWith("ios-usb:")) && (
-                <p className="hint">
+                <p className="hint" id="video-settings-guidance">
                   화질과 프레임은 iPhone 송출 앱에서 설정합니다.
                 </p>
               )}
@@ -319,6 +462,7 @@ export function PhoneMirrorApp({
               화질
               <select
                 aria-label="화질"
+                aria-describedby="video-settings-guidance"
                 value={state.settings.videoMaxDimension}
                 disabled={
                   active ||
@@ -344,6 +488,7 @@ export function PhoneMirrorApp({
               프레임
               <select
                 aria-label="프레임"
+                aria-describedby="video-settings-guidance"
                 value={state.settings.videoMaxFrameRate}
                 disabled={
                   active ||
@@ -368,6 +513,17 @@ export function PhoneMirrorApp({
             <label className="checkbox">
               <input
                 type="checkbox"
+                checked={state.adaptiveQuality}
+                onChange={(event) =>
+                  controller.setAdaptiveQuality(event.target.checked)
+                }
+              />
+              Android Wi-Fi 자동 화질
+            </label>
+            <p role="status">{state.qualityMessage}</p>
+            <label className="checkbox">
+              <input
+                type="checkbox"
                 checked={
                   capabilities.keepScreenAwake && state.settings.keepScreenAwake
                 }
@@ -381,169 +537,58 @@ export function PhoneMirrorApp({
               />
               연결 중 폰 화면 켜두기
             </label>
-            <label className="checkbox">
-              <input
-                type="checkbox"
-                checked={state.autoReconnect}
-                onChange={(event) =>
-                  controller.setAutoReconnect(event.target.checked)
-                }
-              />
-              연결이 끊기면 자동 재연결
-            </label>
           </section>
-          <IosWifiReceiverPanel
-            controller={receiver}
-            onStop={() => controller.stop()}
-          />
-          {(iosUsbReceiverController ||
-            navigator.userAgent.includes("Windows")) && (
-            <IosReceiverPanel
-              controller={usbReceiver}
-              transport="usb"
-              onStop={() => controller.stop()}
-            />
+          {selected?.platform === "ios" && (
+            <section aria-label="iPhone 키보드 설정">
+              <IosKeyboardInputPanel
+                controller={keyboardInput}
+                targetId={state.selectedDeviceId}
+              />
+            </section>
           )}
-          <details className="wireless-panel">
-            <summary>Wi-Fi 페어링 · 연결</summary>
-            <label>
-              <input
-                type="checkbox"
-                checked={state.adaptiveQuality}
-                onChange={(event) =>
-                  controller.setAdaptiveQuality(event.target.checked)
-                }
-              />
-              Android Wi-Fi 자동 화질
-            </label>
-            <p role="status">{state.qualityMessage}</p>
-            <AndroidQrPairingPanel
-              controller={androidQr}
-              disabled={state.wirelessBusy || androidQrBusy}
+          <ApplicationUpdatePanel controller={applicationUpdate} />
+          <section aria-label="연결 진단">
+            <ConnectionDiagnosticsPanel
+              controller={diagnostics}
+              selectedDevice={selected}
             />
-            <p className="hint">
-              Android 개발자 옵션 → 무선 디버깅 → 페어링 코드로 기기 페어링을
-              여세요.
-            </p>
-            <button
-              className="secondary"
-              disabled={state.wirelessBusy || androidQrBusy}
-              onClick={() => void controller.refreshServices()}
-            >
-              무선 기기 검색
-            </button>
-            <div className="service-list">
-              {state.services.map((service) => (
-                <button
-                  key={[service.kind, service.name, service.address].join(":")}
-                  disabled={state.wirelessBusy || androidQrBusy}
-                  className="service"
-                  onClick={() => controller.selectService(service)}
-                >
-                  <span>
-                    {service.kind === "pairing" ? "페어링" : "연결"} ·{" "}
-                    {service.name}
-                  </span>
-                  <small>{service.address}</small>
-                </button>
-              ))}
-            </div>
-            <label>
-              페어링 주소
-              <input
-                aria-label="페어링 주소"
-                value={state.pairingAddress}
-                placeholder="192.168.0.12:37123"
-                maxLength={128}
-                disabled={state.wirelessBusy || androidQrBusy}
-                onChange={(event) =>
-                  controller.setPairingAddress(event.target.value)
-                }
-              />
-            </label>
-            <label>
-              6자리 페어링 코드
-              <input
-                aria-label="6자리 페어링 코드"
-                type="password"
-                inputMode="numeric"
-                autoComplete="off"
-                value={state.pairingCode}
-                maxLength={6}
-                disabled={state.wirelessBusy || androidQrBusy}
-                onChange={(event) =>
-                  controller.setPairingCode(event.target.value)
-                }
-              />
-            </label>
-            <button
-              className="secondary"
-              disabled={!state.canPair || androidQrBusy}
-              onClick={() => void controller.pair()}
-            >
-              페어링
-            </button>
-            <label>
-              연결 주소
-              <input
-                aria-label="연결 주소"
-                value={state.connectionAddress}
-                placeholder="폰의 무선 디버깅 연결 IP:포트"
-                maxLength={128}
-                disabled={state.wirelessBusy || androidQrBusy}
-                onChange={(event) =>
-                  controller.setConnectionAddress(event.target.value)
-                }
-              />
-            </label>
-            <button
-              className="secondary"
-              disabled={!state.canConnect || androidQrBusy}
-              onClick={() => void controller.connect()}
-            >
-              Wi-Fi 연결
-            </button>
-            <p role="status" className="hint">
-              {state.wirelessMessage}
-            </p>
-          </details>
+          </section>
         </div>
       </aside>
       <section className="viewer">
-        <div className="connection-panel">
-          <p className={"connection-state " + state.phase} role="status">
-            <span className="status-dot" />
-            {phaseLabel}
-          </p>
-          <p className="connection-message" title={state.message}>
-            {state.message}
-          </p>
-          <button
-            className={active ? "connection-stop" : "primary"}
-            disabled={!active && selected?.availability !== "ready"}
-            onClick={() =>
-              active ? void controller.stop() : void controller.start()
-            }
+        <header className="viewer-header connection-panel">
+          <div
+            className="connection-summary"
+            role="group"
+            aria-label="연결 정보"
           >
-            {active && <ToolbarIcon name="disconnect" />}
-            <span>{active ? "연결 종료" : "폰 화면 보기"}</span>
-          </button>
-        </div>
-        <header className="viewer-header">
-          <span>내 폰 화면</span>
-          {selected?.platform === "ios" && (
-            <span className="transport-badge">iPhone · 보기 전용</span>
-          )}
-          {selected && (
-            <span className="transport-badge">
-              {selected.endpoint.transport === "usb" ? "USB" : "Wi-Fi"}
+            {selected && (
+              <span className="connection-device" title={selected.name}>
+                {selected.name}
+              </span>
+            )}
+            {selected && (
+              <span className="transport-badge">
+                {selected.endpoint.transport === "usb" ? "USB" : "Wi-Fi"}
+              </span>
+            )}
+            <span className={"connection-state " + state.phase} role="status">
+              <span className="status-dot" />
+              {phaseLabel}
             </span>
-          )}
-          {state.dimensions && (
-            <span className="metrics">
-              {state.dimensions.width} × {state.dimensions.height}
-            </span>
-          )}
+            {selected?.platform === "ios" && (
+              <span className="transport-badge">
+                {keyboardInput.session(state.selectedDeviceId)
+                  ? "iPhone · 키보드 입력 연결됨"
+                  : "iPhone · 보기 전용"}
+              </span>
+            )}
+            {state.dimensions && (
+              <span className="metrics">
+                {state.dimensions.width} × {state.dimensions.height}
+              </span>
+            )}
+          </div>
           <div className="view-controls">
             {view.mode === "normal" ? (
               <>
@@ -556,6 +601,7 @@ export function PhoneMirrorApp({
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   <ToolbarIcon name="settings" />
+                  <span>설정</span>
                 </button>
                 <button
                   disabled={!view.live || view.busy}
@@ -587,8 +633,33 @@ export function PhoneMirrorApp({
                 </button>
               </>
             )}
+            {view.mode !== "normal" && (
+              <CaptureActions
+                compact
+                live={capture.live}
+                busy={capture.busy}
+                recording={capture.recording}
+                onScreenshot={() => void media.screenshot()}
+                onRecord={() => void media.startRecording()}
+              />
+            )}
           </div>
+          <button
+            className={active ? "connection-stop" : "primary"}
+            disabled={!active && selected?.availability !== "ready"}
+            onClick={() =>
+              active ? void controller.stop() : void controller.start()
+            }
+          >
+            {active && <ToolbarIcon name="disconnect" />}
+            <span>{active ? "연결 종료" : "폰 화면 보기"}</span>
+          </button>
         </header>
+        {state.phase !== "live" && state.message && (
+          <p className="connection-message" role="status">
+            {state.message}
+          </p>
+        )}
         {view.message && (
           <p className="view-message" role="alert">
             {view.message}
@@ -597,7 +668,7 @@ export function PhoneMirrorApp({
         <RecordingStatus
           recording={capture.recording}
           elapsedSeconds={capture.elapsedSeconds}
-          busy={capture.busy}
+          busy={capture.busy && !capture.screenshotBusy}
           paused={capture.paused}
           pauseBusy={capture.pauseBusy}
           onPause={() => void media.pauseRecording()}
@@ -607,6 +678,24 @@ export function PhoneMirrorApp({
         <div className="video-stage">
           <canvas
             ref={canvas}
+            tabIndex={
+              state.phase === "live" &&
+              (capabilities.control || keyboardState.connected)
+                ? 0
+                : -1
+            }
+            onKeyDown={(event) => {
+              if (
+                (event.metaKey || event.ctrlKey) &&
+                !event.altKey &&
+                !event.shiftKey &&
+                event.key.toLowerCase() === "v" &&
+                !event.nativeEvent.isComposing
+              ) {
+                event.preventDefault();
+                if (!event.repeat) void textInput.pasteClipboard();
+              }
+            }}
             {...interaction}
             aria-label="폰 영상"
             className={state.phase === "live" ? "visible" : "hidden"}
@@ -631,6 +720,17 @@ export function PhoneMirrorApp({
             </div>
           )}
         </div>
+        {(capabilities.control || selected?.platform === "ios") && (
+          <TextInputPanel
+            controller={textInput}
+            enabled={
+              state.phase === "live" &&
+              (capabilities.control ||
+                !!keyboardInput.session(state.selectedDeviceId))
+            }
+            platform={selected?.platform}
+          />
+        )}
         <div className="viewer-toolbar">
           <div className="audio-controls">
             {state.audioPlayback !== "playing" && (
@@ -662,24 +762,16 @@ export function PhoneMirrorApp({
               {state.audioMuted ? "음소거 중" : state.audioMessage}
             </span>
           </div>
-          <div className="capture-controls">
-            <button
-              disabled={!capture.live || capture.busy || capture.recording}
-              onClick={() => void media.screenshot()}
-            >
-              <ToolbarIcon name="capture" />
-              스크린샷 저장
-            </button>
-            {!capture.recording && (
-              <button
-                disabled={capture.busy || !capture.live}
-                onClick={() => media.startRecording()}
-              >
-                <ToolbarIcon name="record" />
-                화면 녹화
-              </button>
-            )}
-          </div>
+          {view.mode === "normal" && (
+            <CaptureActions
+              compact={false}
+              live={capture.live}
+              busy={capture.busy}
+              recording={capture.recording}
+              onScreenshot={() => void media.screenshot()}
+              onRecord={() => void media.startRecording()}
+            />
+          )}
           <details className="performance-info">
             <summary>성능 정보</summary>
             <div>
@@ -709,11 +801,18 @@ export function PhoneMirrorApp({
             <p>PiP 창 닫기: 기본 보기로 돌아가기</p>
           </details>
         </div>
-        {capture.message && !capture.recording && (
+        {capture.screenshotMessage && (
           <p className="capture-message" role="status">
-            {capture.message}
+            {capture.screenshotMessage}
           </p>
         )}
+        {capture.message &&
+          !capture.recording &&
+          capture.message !== capture.screenshotMessage && (
+            <p className="capture-message" role="status">
+              {capture.message}
+            </p>
+          )}
         {state.inputMessage.includes("실패") && (
           <p className="view-message" role="alert">
             {state.inputMessage}

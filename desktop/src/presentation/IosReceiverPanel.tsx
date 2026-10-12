@@ -17,7 +17,7 @@ export function IosReceiverPanel({
   return (
     <details className="wireless-panel">
       <summary>
-        {transport === "usb" ? "iPhone Windows USB 송출" : "iPhone Wi-Fi 송출"}
+        {transport === "usb" ? "iPhone Windows USB 수신" : "iPhone Wi-Fi 수신"}
       </summary>
       <p className="hint">
         {transport === "usb"

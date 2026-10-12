@@ -5,6 +5,8 @@ on:
       [
         "desktop/**",
         "Vendor/**",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES.md",
         ".github/workflows/desktop.yml",
         ".github/workflows/desktop-release.yml",
       ]
@@ -13,10 +15,14 @@ on:
       [
         "desktop/**",
         "Vendor/**",
+        "LICENSE",
+        "THIRD_PARTY_NOTICES.md",
         ".github/workflows/desktop.yml",
         ".github/workflows/desktop-release.yml",
       ]
   workflow_dispatch:
+permissions:
+  contents: read
 jobs:
   verify-and-package:
     strategy:

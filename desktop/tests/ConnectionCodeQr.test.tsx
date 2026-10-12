@@ -53,7 +53,7 @@ it.each(["usb", "wifi"] as const)(
     );
     fireEvent.click(
       screen.getByText(
-        transport === "usb" ? "iPhone Windows USB 송출" : "iPhone Wi-Fi 송출",
+        transport === "usb" ? "iPhone Windows USB 수신" : "iPhone Wi-Fi 수신",
       ),
     );
     const startLabel =
@@ -92,7 +92,7 @@ it("keeps manual input available if QR validation fails", async () => {
     stop: async () => {},
   });
   render(<IosReceiverPanel controller={controller} />);
-  fireEvent.click(screen.getByText("iPhone Wi-Fi 송출"));
+  fireEvent.click(screen.getByText("iPhone Wi-Fi 수신"));
   fireEvent.click(screen.getByText("iPhone 수신 시작"));
   expect(await screen.findByLabelText("iPhone 연결 코드 1")).toHaveValue(
     "broken-code",

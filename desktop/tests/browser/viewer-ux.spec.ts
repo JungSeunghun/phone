@@ -4,7 +4,7 @@ test("connection controls stay visible with expanded Wi-Fi settings and the pane
 }) => {
   await page.setViewportSize({ width: 800, height: 600 });
   await page.goto("/tests/browser/layout.html");
-  await page.getByText("Wi-Fi 페어링 · 연결", { exact: true }).click();
+  await page.getByText("Android Wi-Fi 연결", { exact: true }).click();
   const button = page.getByRole("button", {
     name: "폰 화면 보기",
     exact: true,
@@ -98,3 +98,66 @@ test("performance details expose separate stages without replacing the canvas", 
   await expect(page.getByText(/표시 FPS는 세션 평균/)).toBeVisible();
   await expect(page.getByLabel("폰 영상")).toBeVisible();
 });
+
+for (const mode of ["전체 화면", "PiP"]) {
+  test(`capture menu works at minimum view size in ${mode}`, async ({
+    page,
+  }) => {
+    await page.goto("/tests/browser/layout.html");
+    await page.getByRole("button", { name: "폰 화면 보기" }).click();
+    await page.evaluate(() =>
+      (
+        window as unknown as { renderFixture: (w: number, h: number) => void }
+      ).renderFixture(320, 640),
+    );
+    await page.getByRole("button", { name: mode, exact: true }).click();
+    await page.setViewportSize({ width: 240, height: 180 });
+    const menu = page.getByLabel("캡처 및 녹화");
+    await expect(menu).toBeVisible();
+    await menu.click();
+    const screenshot = page.getByRole("button", { name: "스크린샷 저장" });
+    await expect(screenshot).toBeVisible();
+    const box = (await screenshot.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(240);
+    expect(box.y + box.height).toBeLessThanOrEqual(180);
+    await screenshot.click();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as unknown as { saved: Blob[] }).saved.length,
+        ),
+      )
+      .toBe(1);
+    await expect(menu).toBeFocused();
+    await menu.click();
+    await page.keyboard.press("Escape");
+    await expect(page.locator("main")).toHaveClass(
+      mode === "PiP" ? /view-pip/ : /view-fullscreen/,
+    );
+    await menu.click();
+    await page.getByRole("button", { name: "화면 녹화", exact: true }).click();
+    await expect(
+      page.getByRole("button", { name: "녹화 종료 및 저장" }),
+    ).toBeVisible();
+    await menu.click();
+    await expect(
+      page.getByRole("button", { name: "스크린샷 저장" }),
+    ).toBeEnabled();
+    await page.getByRole("button", { name: "스크린샷 저장" }).click();
+    await expect
+      .poll(() =>
+        page.evaluate(
+          () => (window as unknown as { saved: Blob[] }).saved.length,
+        ),
+      )
+      .toBe(2);
+    await expect(
+      page.getByRole("button", { name: "녹화 종료 및 저장" }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "녹화 종료 및 저장" }).click();
+    await expect(
+      page.getByRole("button", { name: "녹화 종료 및 저장" }),
+    ).not.toBeVisible();
+  });
+}

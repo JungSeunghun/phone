@@ -197,3 +197,120 @@ async fn audio_rejects_large_payload_before_reading_it_and_cancels_partial_packe
         assert_eq!(probe.packets.load(std::sync::atomic::Ordering::SeqCst), 0);
     }
 }
+
+#[test]
+fn unicode_clipboard_packet_preserves_utf8_and_protocol_boundaries() {
+    let text = "한국어 日本語 中文 العربية 👨‍👩‍👧‍👦\n e\u{301}";
+    let bytes = ControlInput::Paste { text: text.into() }.encode().unwrap();
+    assert_eq!(bytes[0], 9);
+    assert_eq!(&bytes[1..9], &1_u64.to_be_bytes()); // acknowledgement required
+    assert_eq!(bytes[9], 1);
+    assert_eq!(&bytes[10..14], &(text.len() as u32).to_be_bytes());
+    assert_eq!(&bytes[14..], text.as_bytes());
+    for text in ["a".to_string(), " ".to_string(), "a".repeat((1 << 18) - 14)] {
+        assert!(ControlInput::Paste { text }.encode().is_ok());
+    }
+    for text in [
+        String::new(),
+        "\0".into(),
+        "a".repeat((1 << 18) - 13),
+        "😀".repeat(65533),
+    ] {
+        assert!(ControlInput::Paste { text }.encode().is_err());
+    }
+}
+
+#[test]
+fn editing_keycodes_are_bounded_and_have_paired_down_up_events() {
+    for (key, code) in [
+        ("backspace", 67_u32),
+        ("delete", 112),
+        ("enter", 66),
+        ("left", 21),
+        ("right", 22),
+        ("up", 19),
+        ("down", 20),
+    ] {
+        let input: ControlInput =
+            serde_json::from_value(serde_json::json!({"kind":"key", "key":key})).unwrap();
+        let bytes = input.encode().unwrap();
+        assert_eq!(bytes.len(), 28);
+        assert_eq!(&bytes[..2], &[0, 0]);
+        assert_eq!(&bytes[2..6], &code.to_be_bytes());
+        assert_eq!(&bytes[14..16], &[0, 1]);
+        assert_eq!(&bytes[16..20], &code.to_be_bytes());
+    }
+    assert!(serde_json::from_value::<ControlInput>(
+        serde_json::json!({"kind":"key", "key":"power"})
+    )
+    .is_err());
+}
+
+#[tokio::test(start_paused = true)]
+async fn clipboard_writer_waits_for_acknowledgement_and_android_paste_dispatch() {
+    use phone_mirror_desktop::infrastructure::write_control;
+    use std::time::Duration;
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    let (writer, mut device) = tokio::io::duplex(1024);
+    let (sender, receiver) = tokio::sync::mpsc::channel(4);
+    let cancellation = tokio_util::sync::CancellationToken::new();
+    let token = cancellation.clone();
+    let worker = tokio::spawn(async move { write_control(writer, receiver, token).await });
+    let first = ControlInput::Paste { text: "日".into() }.encode().unwrap();
+    let second = ControlInput::Paste { text: "本".into() }.encode().unwrap();
+    sender.send(first.clone()).await.unwrap();
+    sender.send(second.clone()).await.unwrap();
+    let mut packet = vec![0; first.len()];
+    device.read_exact(&mut packet).await.unwrap();
+    assert_eq!(packet, first);
+    device
+        .write_all(&[1, 0, 0, 0, 0, 0, 0, 0, 1])
+        .await
+        .unwrap();
+    tokio::task::yield_now().await;
+    let read_next = tokio::spawn(async move {
+        let mut packet = vec![0; second.len()];
+        device.read_exact(&mut packet).await.unwrap();
+        assert_eq!(packet, second);
+        device
+    });
+    tokio::time::advance(Duration::from_millis(99)).await;
+    tokio::task::yield_now().await;
+    assert!(!read_next.is_finished());
+    tokio::time::advance(Duration::from_millis(1)).await;
+    tokio::task::yield_now().await;
+    let _device = read_next.await.unwrap();
+    cancellation.cancel();
+    worker.await.unwrap().unwrap();
+}
+#[tokio::test(start_paused = true)]
+async fn clipboard_acknowledgement_is_bounded_and_cancellation_discards_queued_text() {
+    use phone_mirror_desktop::infrastructure::write_control;
+    use std::time::Duration;
+    use tokio::io::AsyncReadExt;
+    for cancel in [false, true] {
+        let (writer, mut device) = tokio::io::duplex(1024);
+        let (sender, receiver) = tokio::sync::mpsc::channel(4);
+        let token = tokio_util::sync::CancellationToken::new();
+        let cancellation = token.clone();
+        let worker = tokio::spawn(async move { write_control(writer, receiver, token).await });
+        let packet = ControlInput::Paste {
+            text: "中文".into(),
+        }
+        .encode()
+        .unwrap();
+        sender.send(packet.clone()).await.unwrap();
+        sender.send(packet.clone()).await.unwrap();
+        device.read_exact(&mut vec![0; packet.len()]).await.unwrap();
+        if cancel {
+            cancellation.cancel();
+            assert!(worker.await.unwrap().is_ok());
+        } else {
+            tokio::time::advance(Duration::from_secs(2)).await;
+            assert!(worker.await.unwrap().is_err());
+        }
+        let mut remaining = Vec::new();
+        device.read_to_end(&mut remaining).await.unwrap();
+        assert!(remaining.is_empty());
+    }
+}

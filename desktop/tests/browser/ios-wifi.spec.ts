@@ -3,7 +3,7 @@ test("iPhone Wi-Fi receiver actions and app PCM playback retain readonly control
   page,
 }) => {
   await page.goto("/tests/browser/layout.html?ios=1&ioswifi=1");
-  await page.getByText("iPhone Wi-Fi 송출", { exact: true }).click();
+  await page.getByText("iPhone Wi-Fi 수신", { exact: true }).click();
   await page.getByRole("button", { name: "iPhone 수신 시작" }).click();
   await expect(page.getByLabel("iPhone 연결 코드 1")).toHaveValue(
     `PMW1|127.0.0.1:1234|${"ab".repeat(32)}`,

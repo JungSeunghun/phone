@@ -42,7 +42,7 @@ impl AudioTrack {
         size: &mut usize,
         count: &mut usize,
     ) -> Result<(), String> {
-        for p in bytes.chunks_exact(2) {
+        for p in bytes.as_chunks::<2>().0 {
             self.pending.push(i16::from_le_bytes([p[0], p[1]]));
             if self.pending.len() == 2048 {
                 let pcm = std::mem::take(&mut self.pending);

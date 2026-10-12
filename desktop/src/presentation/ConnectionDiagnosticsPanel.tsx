@@ -1,18 +1,64 @@
-import { useEffect, useState, useSyncExternalStore } from "react";
+import {
+  diagnosticSummary,
+  type DiagnosticSummaryStore,
+} from "../domain/DiagnosticSummary";
+import { TauriDiagnosticSummaryStore } from "../infrastructure/TauriDiagnosticSummaryStore";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type { ConnectionDiagnosticsController } from "../application/ConnectionDiagnosticsController";
 import type { PhoneDevice } from "../domain/PhoneMirror";
 import { validWirelessAddress } from "../domain/PhoneMirror";
 export function ConnectionDiagnosticsPanel({
   controller,
   selectedDevice,
+  summaryStore = new TauriDiagnosticSummaryStore(),
 }: {
   controller: ConnectionDiagnosticsController;
   selectedDevice?: PhoneDevice;
+  summaryStore?: DiagnosticSummaryStore;
 }) {
   const state = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
   );
+  const [exportMessage, setExportMessage] = useState("");
+  const [exportBusy, setExportBusy] = useState(false);
+  const saving = useRef(false),
+    mounted = useRef(true),
+    currentReport = useRef(state.report);
+  currentReport.current = state.report;
+  useEffect(() => {
+    setExportMessage("");
+  }, [state.report]);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
+  async function saveSummary() {
+    if (saving.current || !state.report || !state.reportTarget) return;
+    saving.current = true;
+    setExportBusy(true);
+    setExportMessage("");
+    const report = state.report;
+    try {
+      const saved = await summaryStore.save(
+        diagnosticSummary(report, state.reportTarget),
+      );
+      if (mounted.current && currentReport.current === report)
+        setExportMessage(
+          saved
+            ? "진단 요약을 저장했습니다."
+            : "진단 요약 저장을 취소했습니다.",
+        );
+    } catch {
+      if (mounted.current && currentReport.current === report)
+        setExportMessage("진단 요약을 저장하지 못했습니다. 다시 시도하세요.");
+    } finally {
+      saving.current = false;
+      if (mounted.current) setExportBusy(false);
+    }
+  }
   const [platform, setPlatform] = useState<"android" | "ios">(
     selectedDevice?.platform ?? "android",
   );
@@ -108,6 +154,18 @@ export function ConnectionDiagnosticsPanel({
         </button>
       )}
       <p role="status">{state.message}</p>
+      {state.report && (
+        <>
+          <button disabled={exportBusy} onClick={() => void saveSummary()}>
+            진단 요약 저장
+          </button>
+          <p className="hint">
+            점검 코드·결과·연결 종류만 저장합니다. 기기 식별자, IP 주소, 입력
+            내용, 화면과 원본 로그는 포함하지 않습니다.
+          </p>
+          <p role="status">{exportMessage}</p>
+        </>
+      )}
       {state.report && (
         <ul aria-label="연결 진단 결과">
           {state.report.checks.map((check) => (

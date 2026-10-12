@@ -53,7 +53,7 @@ test("adaptive Wi-Fi quality defers through recording and applies without changi
       .isVisible()
   )
     await page.getByRole("button", { name: "설정 열기", exact: true }).click();
-  await page.getByText("Wi-Fi 페어링 · 연결", { exact: true }).click();
+  await page.getByText("Android Wi-Fi 연결", { exact: true }).click();
   await expect(page.getByText(/자동 화질: 최대 1280px/)).toBeVisible();
 });
 test("USB is excluded from automatic quality changes", async ({ page }) => {
