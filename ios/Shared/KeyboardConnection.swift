@@ -3,11 +3,19 @@ import Network
 
 /// Runs on the main queue; commands are acknowledged only after insertion into the host document.
 public final class KeyboardConnection {
-  public init() {}
+  private let scheduleAuthenticationTimeout: (TimeInterval, @escaping () -> Void) -> Void
+  public init(
+    scheduleAuthenticationTimeout: @escaping (TimeInterval, @escaping () -> Void) -> Void = {
+      delay, callback in DispatchQueue.main.asyncAfter(deadline: .now() + delay, execute: callback)
+    }
+  ) {
+    self.scheduleAuthenticationTimeout = scheduleAuthenticationTimeout
+  }
   private var connection: NWConnection?
   private var generation: UInt64 = 0
   private var incoming: KeyboardPacketCipher?
   private var outgoing: KeyboardPacketCipher?
+  private var authenticated = false
   public var onStatus: ((String) -> Void)?
   public var onCommand: ((KeyboardInputCommand) throws -> Void)?
   public func start(_ code: KeyboardConnectionCode) {
@@ -27,8 +35,8 @@ public final class KeyboardConnection {
       }
     }
     connection.start(queue: .main)
-    DispatchQueue.main.asyncAfter(deadline: .now() + 8) { [weak self] in
-      guard let self, token == self.generation, self.incoming == nil else { return }
+    scheduleAuthenticationTimeout(8) { [weak self] in
+      guard let self, token == self.generation, !self.authenticated else { return }
       self.fail(token)
     }
   }
@@ -66,6 +74,7 @@ public final class KeyboardConnection {
             guard payload == Data("{\"kind\":\"ready\"}".utf8) else {
               throw SenderError.invalidPacket
             }
+            self.authenticated = true
             self.onStatus?("연결됨 · 컴퓨터에서 다국어 입력 가능")
             self.readCommand(token, ready: true)
           } else {
@@ -122,6 +131,7 @@ public final class KeyboardConnection {
     connection = nil
     incoming = nil
     outgoing = nil
+    authenticated = false
   }
   deinit { connection?.cancel() }
 }
