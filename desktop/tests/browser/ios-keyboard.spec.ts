@@ -1,3 +1,4 @@
+import { writeClipboardFixture } from "./clipboard";
 import { test, expect } from "@playwright/test";
 for (const mode of ["normal", "fullscreen", "pip"])
   test(`iPhone keyboard Unicode paste and direct input in ${mode}`, async ({
@@ -30,8 +31,10 @@ for (const mode of ["normal", "fullscreen", "pip"])
           exact: true,
         })
         .click();
-    const text = "한국어 日本語 中文 العربية 😀é\n";
-    await page.evaluate((value) => navigator.clipboard.writeText(value), text);
+    const text = await writeClipboardFixture(
+      page,
+      "한국어 日本語 中文 العربية 😀é\n",
+    );
     await page.getByRole("button", { name: "폰에 붙여넣기" }).click();
     const inputs = () =>
       page.evaluate(

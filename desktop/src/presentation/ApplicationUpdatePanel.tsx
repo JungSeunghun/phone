@@ -10,9 +10,9 @@ export function ApplicationUpdatePanel({
     controller.getSnapshot,
   );
   const [endpoint, setEndpoint] = useState("");
-  const working = ["checking", "downloading", "installing"].includes(
-    state.phase,
-  );
+  const working =
+    state.cancelBusy ||
+    ["checking", "downloading", "installing"].includes(state.phase);
   useEffect(() => {
     void controller.initialize();
     const timer = setInterval(() => {
@@ -44,7 +44,10 @@ export function ApplicationUpdatePanel({
         <>
           <p>새 버전 {state.nextVersion}</p>
           <p className="hint">{state.notes}</p>
-          <button onClick={() => void controller.install()}>
+          <button
+            disabled={state.cancelBusy}
+            onClick={() => void controller.install()}
+          >
             업데이트하고 다시 시작
           </button>
         </>
@@ -57,7 +60,12 @@ export function ApplicationUpdatePanel({
         />
       )}
       {["checking", "downloading"].includes(state.phase) && (
-        <button onClick={() => void controller.cancel()}>업데이트 취소</button>
+        <button
+          disabled={state.cancelBusy}
+          onClick={() => void controller.cancel()}
+        >
+          {state.cancelBusy ? "취소 중…" : "업데이트 취소"}
+        </button>
       )}
       <p role="status" className="hint">
         {state.message}

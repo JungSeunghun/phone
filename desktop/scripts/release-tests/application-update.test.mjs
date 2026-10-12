@@ -97,3 +97,35 @@ test("filesystem update staging is repeatable and refuses changed artifacts", as
     await rm(root, { recursive: true, force: true });
   }
 });
+test("refuses staging an archive signed for a different release version", async () => {
+  const { mkdtemp, writeFile, readFile, rm } = await import("node:fs/promises");
+  const { join } = await import("node:path");
+  const { tmpdir } = await import("node:os");
+  const { stageUpdate } = await import("../application-update-release.mjs");
+  const directory = await mkdtemp(join(tmpdir(), "mirror-signed-version-"));
+  try {
+    const archive = join(directory, "Mirror.app.tar.gz");
+    await writeFile(archive, "synthetic archive");
+    await writeFile(
+      archive + ".sig",
+      await readFile(
+        new URL(
+          "../../src-tauri/tests/fixtures-updater-payload.txt.sig",
+          import.meta.url,
+        ),
+      ),
+    );
+    await assert.rejects(
+      () =>
+        stageUpdate({
+          version: "0.4.0",
+          target: "macos-arm64",
+          sourceDirectory: directory,
+          outputDirectory: join(directory, "stage"),
+        }),
+      /signed version/i,
+    );
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});

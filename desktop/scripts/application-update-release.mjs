@@ -44,6 +44,30 @@ export function updateManifest(version, baseUrl, entries) {
   }
   return result;
 }
+function requireSignedVersion(signature, version) {
+  if (
+    typeof signature !== "string" ||
+    signature.length > 8192 ||
+    !/^[A-Za-z0-9+/]+={0,2}$/.test(signature)
+  )
+    throw Error("Invalid updater signature or signed version.");
+  const decoded = Buffer.from(signature, "base64");
+  if (
+    decoded.toString("base64").replace(/=+$/, "") !==
+    signature.replace(/=+$/, "")
+  )
+    throw Error("Invalid updater signature encoding or signed version.");
+  const comment = decoded
+    .toString("utf8")
+    .split("\n")
+    .find((line) => line.startsWith("trusted comment: "));
+  const versions = comment
+    ?.slice("trusted comment: ".length)
+    .split("\t")
+    .filter((field) => field.startsWith("version:"));
+  if (versions?.length !== 1 || versions[0] !== `version:${version}`)
+    throw Error("Updater signed version differs from the release version.");
+}
 async function writeIdentical(path, bytes) {
   try {
     if (sha256(await readFile(path)) !== sha256(bytes))
@@ -86,7 +110,7 @@ export async function stageUpdate({
     throw Error("Invalid updater archive size.");
   const bytes = await readFile(path),
     signature = (await readFile(path + ".sig", "utf8")).trim();
-  if (!signature) throw Error("Missing updater signature.");
+  requireSignedVersion(signature, version);
   const name = `Phone-Mirror-Desktop_${version}_${target}_update${extension}`;
   await mkdir(outputDirectory, { recursive: true });
   await writeIdentical(join(outputDirectory, name), bytes);
@@ -133,6 +157,7 @@ export async function prepareUpdates({
   const manifest = updateManifest(version, baseUrl, entries),
     artifacts = [];
   for (const entry of entries) {
+    requireSignedVersion(entry.signature, version);
     const candidates = paths.filter((path) => basename(path) === entry.name);
     if (candidates.length !== 1)
       throw Error("Missing or duplicate updater archive.");

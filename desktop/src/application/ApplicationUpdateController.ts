@@ -20,6 +20,7 @@ export class ApplicationUpdateController {
     notes: "",
     message: "",
     percent: 0,
+    cancelBusy: false,
     automatic: true,
     endpoint: "",
   };
@@ -28,6 +29,7 @@ export class ApplicationUpdateController {
   private configured = false;
   private lastCheck = 0;
   private initialized = false;
+  private cancellation?: Promise<void>;
   constructor(
     private backend: ApplicationUpdateBackend,
     private storage: Pick<Storage, "getItem" | "setItem">,
@@ -85,7 +87,10 @@ export class ApplicationUpdateController {
     this.persist("phone-mirror-auto-update", String(value));
   }
   async setEndpoint(value: string) {
-    if (["checking", "downloading", "installing"].includes(this.snapshot.phase))
+    if (
+      this.snapshot.cancelBusy ||
+      ["checking", "downloading", "installing"].includes(this.snapshot.phase)
+    )
       return;
     try {
       const url = new URL(value.trim());
@@ -116,7 +121,10 @@ export class ApplicationUpdateController {
       await this.check(time);
   }
   async check(time = this.now()) {
-    if (["checking", "downloading", "installing"].includes(this.snapshot.phase))
+    if (
+      this.snapshot.cancelBusy ||
+      ["checking", "downloading", "installing"].includes(this.snapshot.phase)
+    )
       return;
     if (!this.configured && !this.snapshot.endpoint) {
       this.update({ phase: "unconfigured" });
@@ -132,6 +140,7 @@ export class ApplicationUpdateController {
       const result = await this.backend.check(
         this.snapshot.endpoint || undefined,
       );
+      await this.cancellation;
       if (generation !== this.generation) return;
       this.update(
         result
@@ -149,6 +158,7 @@ export class ApplicationUpdateController {
             },
       );
     } catch (error) {
+      await this.cancellation;
       if (generation === this.generation)
         this.update({
           phase: "error",
@@ -157,7 +167,7 @@ export class ApplicationUpdateController {
     }
   }
   async install() {
-    if (this.snapshot.phase !== "available") return;
+    if (this.snapshot.cancelBusy || this.snapshot.phase !== "available") return;
     if (this.busy()) {
       this.update({
         message: "미러링을 중지하고 녹화·파일 저장이 끝난 뒤 설치하세요.",
@@ -183,6 +193,7 @@ export class ApplicationUpdateController {
           );
       });
     } catch (error) {
+      await this.cancellation;
       if (generation === this.generation)
         this.update({
           phase: "error",
@@ -190,16 +201,27 @@ export class ApplicationUpdateController {
         });
     }
   }
-  async cancel() {
-    if (this.snapshot.phase === "installing") return;
+  cancel(): Promise<void> {
+    if (this.cancellation) return this.cancellation;
+    if (this.snapshot.phase === "installing") return Promise.resolve();
+    this.update({ cancelBusy: true });
+    // Assign the shared task before calling a backend that may throw synchronously.
+    this.cancellation = Promise.resolve().then(() => this.cancelOperation());
+    return this.cancellation;
+  }
+  private async cancelOperation() {
+    const generation = this.generation;
     try {
       if ((await this.backend.cancel()) === false) {
-        this.update({
-          phase: "installing",
-          message: "설치가 시작되어 취소할 수 없습니다. 앱을 다시 시작합니다.",
-        });
+        if (generation === this.generation)
+          this.update({
+            phase: "installing",
+            message:
+              "설치가 시작되어 취소할 수 없습니다. 앱을 다시 시작합니다.",
+          });
         return;
       }
+      if (generation !== this.generation) return;
       ++this.generation;
       this.update({
         phase: "idle",
@@ -208,7 +230,11 @@ export class ApplicationUpdateController {
         message: "업데이트 작업을 취소했습니다.",
       });
     } catch (error) {
-      this.update({ message: `취소 요청 실패: ${String(error)}` });
+      if (generation === this.generation)
+        this.update({ message: `취소 요청 실패: ${String(error)}` });
+    } finally {
+      this.cancellation = undefined;
+      this.update({ cancelBusy: false });
     }
   }
 }

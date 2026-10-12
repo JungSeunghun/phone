@@ -40,3 +40,32 @@ it("explains an unconfigured server and rejects invalid addresses", async () => 
   fireEvent.submit(screen.getByText("주소 저장").closest("form")!);
   await screen.findByText(/HTTPS 주소를 입력/);
 });
+it("disables repeated cancellation and configuration changes while awaiting acknowledgement", async () => {
+  let resolveCheck!: (value: null) => void;
+  let resolveCancel!: () => void;
+  const backend = {
+    configuration: async () => ({ version: "0.1.0", configured: true }),
+    check: () => new Promise<null>((resolve) => (resolveCheck = resolve)),
+    install: vi.fn(),
+    cancel: vi.fn(
+      () => new Promise<void>((resolve) => (resolveCancel = resolve)),
+    ),
+  };
+  const controller = new ApplicationUpdateController(
+    backend,
+    { getItem: () => null, setItem: () => {} },
+    () => false,
+  );
+  render(<ApplicationUpdatePanel controller={controller} />);
+  const cancel = await screen.findByRole("button", { name: "업데이트 취소" });
+  fireEvent.click(cancel);
+  await screen.findByRole("button", { name: "취소 중…" });
+  expect(screen.getByRole("button", { name: "취소 중…" })).toBeDisabled();
+  expect(
+    screen.getByRole("button", { name: /^업데이트 확인$/ }),
+  ).toBeDisabled();
+  await waitFor(() => expect(backend.cancel).toHaveBeenCalledOnce());
+  resolveCheck(null);
+  resolveCancel();
+  await screen.findByText("업데이트 작업을 취소했습니다.");
+});

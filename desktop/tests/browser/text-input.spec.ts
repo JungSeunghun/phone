@@ -1,3 +1,4 @@
+import { writeClipboardFixture } from "./clipboard";
 import { test, expect } from "@playwright/test";
 test("Unicode paste button, both shortcuts, direct input and viewer scope", async ({
   page,
@@ -11,8 +12,10 @@ test("Unicode paste button, both shortcuts, direct input and viewer scope", asyn
       window as unknown as { renderFixture: (w: number, h: number) => void }
     ).renderFixture(100, 200),
   );
-  const text = "한국어 日本語 中文 العربية 👨‍👩‍👧‍👦\n café";
-  await page.evaluate((value) => navigator.clipboard.writeText(value), text);
+  const text = await writeClipboardFixture(
+    page,
+    "한국어 日本語 中文 العربية 👨‍👩‍👧‍👦\n café",
+  );
   await page.getByRole("button", { name: "폰에 붙여넣기" }).click();
   const controls = () =>
     page.evaluate(

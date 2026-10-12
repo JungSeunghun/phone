@@ -107,3 +107,49 @@ it("stops cancellation at the installation boundary and ignores invalid progress
   finish();
   await installation;
 });
+it("holds terminal check responses until cancellation is acknowledged", async () => {
+  const f = fixture();
+  let resolveCheck!: (value: typeof candidate) => void;
+  let resolveCancel!: () => void;
+  f.backend.check.mockImplementation(
+    () => new Promise((resolve) => (resolveCheck = resolve)),
+  );
+  f.backend.cancel.mockImplementation(
+    () => new Promise((resolve) => (resolveCancel = resolve)),
+  );
+  const checking = f.controller.initialize();
+  await vi.waitFor(() => expect(f.backend.check).toHaveBeenCalledOnce());
+  const cancelling = f.controller.cancel();
+  const repeated = f.controller.cancel();
+  resolveCheck(candidate);
+  await Promise.resolve();
+  await Promise.resolve();
+  expect(f.controller.getSnapshot().phase).toBe("checking");
+  expect(f.backend.cancel).toHaveBeenCalledOnce();
+  await f.controller.install();
+  expect(f.backend.install).not.toHaveBeenCalled();
+  resolveCancel();
+  await Promise.all([checking, cancelling, repeated]);
+  expect(f.controller.getSnapshot().phase).toBe("idle");
+});
+it("retains installation failure when cancellation arrives after install began", async () => {
+  const f = fixture();
+  await f.controller.initialize();
+  let rejectInstall!: (error: Error) => void;
+  let resolveCancel!: (value: never) => void;
+  f.backend.install.mockImplementation(
+    () => new Promise((_, reject) => (rejectInstall = reject)),
+  );
+  f.backend.cancel.mockImplementation(
+    () => new Promise((resolve) => (resolveCancel = resolve)),
+  );
+  const installing = f.controller.install();
+  const cancelling = f.controller.cancel();
+  rejectInstall(new Error("install failed"));
+  await Promise.resolve();
+  await Promise.resolve();
+  resolveCancel(false as never);
+  await Promise.all([installing, cancelling]);
+  expect(f.controller.getSnapshot().phase).toBe("error");
+  expect(f.controller.getSnapshot().message).toContain("install failed");
+});

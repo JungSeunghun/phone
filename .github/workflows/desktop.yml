@@ -4,6 +4,7 @@ on:
     paths:
       [
         "desktop/**",
+        ".gitattributes",
         "Vendor/**",
         "LICENSE",
         "THIRD_PARTY_NOTICES.md",
@@ -14,6 +15,7 @@ on:
     paths:
       [
         "desktop/**",
+        ".gitattributes",
         "Vendor/**",
         "LICENSE",
         "THIRD_PARTY_NOTICES.md",

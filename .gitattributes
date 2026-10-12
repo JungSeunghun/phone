@@ -1,0 +1,3 @@
+# Cryptographic fixtures must keep the bytes that were signed on every platform.
+/desktop/src-tauri/tests/fixtures-updater-payload.txt text eol=lf
+/desktop/src-tauri/tests/fixtures-updater-payload.txt.sig text eol=lf
