@@ -1,3 +1,4 @@
-# Cryptographic fixtures must keep the bytes that were signed on every platform.
+# Keep source formatting and cryptographic fixture bytes stable on every platform.
+* text=auto eol=lf
 /desktop/src-tauri/tests/fixtures-updater-payload.txt text eol=lf
 /desktop/src-tauri/tests/fixtures-updater-payload.txt.sig text eol=lf

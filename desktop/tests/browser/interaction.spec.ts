@@ -9,14 +9,18 @@ test("mouse letterboxing, drag, wheel, back and computer audio actions", async (
       window as unknown as { renderFixture: (w: number, h: number) => void }
     ).renderFixture(100, 200);
   });
-  const canvas = page.getByLabel("폰 영상"),
-    box = (await canvas.boundingBox())!;
+  const canvas = page.getByLabel("폰 영상");
+  await expect(
+    page.getByRole("button", { name: "화면 녹화", exact: true }),
+  ).toBeEnabled();
+  let box = (await canvas.boundingBox())!;
   await canvas.click({ position: { x: 1, y: box.height / 2 } });
   expect(
     await page.evaluate(
       () => (window as unknown as { controls: unknown[] }).controls.length,
     ),
   ).toBe(0);
+  box = (await canvas.boundingBox())!;
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2 + 10);

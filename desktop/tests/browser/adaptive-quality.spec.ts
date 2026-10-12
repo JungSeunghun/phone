@@ -10,6 +10,18 @@ test("adaptive Wi-Fi quality defers through recording and applies without changi
     ).renderFixture(320, 640),
   );
   await page.getByRole("button", { name: "화면 녹화", exact: true }).click();
+  // Capture a frame after MediaRecorder starts, including on slower CI codecs.
+  await page.evaluate(async () => {
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => resolve()),
+    );
+    (
+      window as unknown as { renderFixture: (w: number, h: number) => void }
+    ).renderFixture(320, 640);
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+  });
   await page.evaluate(async () => {
     const mock = window as unknown as {
       simulateAdaptiveNetwork: (now: number) => Promise<void>;
@@ -29,7 +41,7 @@ test("adaptive Wi-Fi quality defers through recording and applies without changi
     .click();
   await expect(
     page.getByRole("button", { name: "화면 녹화", exact: true }),
-  ).toBeEnabled();
+  ).toBeEnabled({ timeout: 15000 });
   await page.evaluate(async () =>
     (
       window as unknown as {
