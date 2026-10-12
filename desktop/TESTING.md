@@ -387,3 +387,14 @@ Windows GNU 타깃 `cargo check --target x86_64-pc-windows-gnu`는 업데이트 
 - Windows 네이티브 CI에서 `published_recording_preserves_existing_destination_and_cleans_temporary_files`가 실패했다. 녹화 저장의 임시 파일 동기화에 읽기 전용 핸들을 사용해 Windows 쓰기 권한 요구를 충족하지 못했다. 쓰기 권한으로 열어 동기화하도록 수정하고 같은 회귀 테스트를 다시 실행한다. Mac CI의 Rust 테스트·Clippy·앱 번들은 먼저 통과했다.
 
 재현 실패 및 최종 로그는 ignored `desktop/src-tauri/target/overall-review/`에 보관한다. 공식 바이너리 공개 전 제3자 라이선스 목록 수집, 업데이트 피드 제공, 코드 서명·공증 준비가 남아 있다.
+
+
+## 한국어·영어 UI — 2026-10-12
+
+- 데스크톱 설정의 `언어 / Language`는 `ko`·`en`만 허용한다. 누락·잘못된 저장값·읽기 실패는 한국어로 표시하고, 저장 실패는 현재 실행에 적용하면서 상태 메시지를 표시한다. Swift macOS 앱과 iPhone 송출 앱도 언어를 로컬에 저장하며 iPhone 키보드는 App Group 언어를 공유한다.
+- TDD: 언어 컨트롤러·Swift 언어 정책이 없는 상태의 테스트 실패를 먼저 확인했다. 지연된 진단 저장 중 언어를 바꾸면 이전 언어의 완료 문구가 남는 테스트 실패와 Swift 템플릿 값의 `{1}`이 다시 치환되는 실패를 재현하고 수정했다. 사용자 경로·기기 이름·입력·연결 코드는 번역 대상으로 취급하지 않는다.
+- 데스크톱 `npm test -- --maxWorkers=1`: 38개 파일, 183개 테스트 통과. 신규 언어·카탈로그 검증은 15개 테스트 통과. 전체 테스트 첫 실행은 동시 실행 부하로 시간 초과했으며 테스트 제한 시간을 늘리지 않고 작업자 수를 줄여 전체 재실행을 통과했다.
+- `npm run test:browser -- --workers=2`: 45개 통과. Chromium에서 영어 선택·리로드 복원·잘못된 언어 복원·영어 설정 패널 가로 넘침·연결과 녹화 유지 및 기존 화면/조작을 확인했다. `npm run format:check`, `npm run build` 통과.
+- `swift test --build-system native --scratch-path .build/localization-native`: 92개 통과. iPhone 코어 `swift test --package-path ios --build-system native --scratch-path .build/localization-ios-core`: 22개 통과. `xcodebuild ... -sdk iphoneos CODE_SIGNING_ALLOWED=NO build` 성공은 서명 없는 SDK 빌드이며 iPhone 실행 증거가 아니다.
+- 실제 macOS Swift 검증용 앱 창에서 한국어→영어 전환, 영어 Wi-Fi 설정 시트, 재실행 후 영어 복원을 확인했다. 검증용 앱과 빌드/테스트 로그는 ignored `.build/localization-*` 아래에만 보관했다.
+- `adb devices -l`에 연결된 Android 기기가 없었다. 이번 검증에는 Android/iPhone 실기기 연결, 물리적 케이블 분리, Windows 네이티브 실행이 포함되지 않는다. 기존 macOS·Windows CI는 프런트엔드 언어 테스트를 포함하며 iOS CI는 공용 `localization/**` 변경에도 실행되도록 수정했다. CI 설정 자체는 이번 Windows 실행 증거가 아니다.

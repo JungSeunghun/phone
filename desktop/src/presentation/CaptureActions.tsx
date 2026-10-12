@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { useRef } from "react";
 import { ToolbarIcon } from "./ToolbarIcon";
 
@@ -16,6 +17,8 @@ export function CaptureActions({
   onScreenshot: () => void;
   onRecord: () => void;
 }) {
+  const translate = useTranslation();
+
   const menu = useRef<HTMLDetailsElement>(null);
   const close = (action: () => void) => {
     if (menu.current) {
@@ -27,13 +30,11 @@ export function CaptureActions({
   const actions = (
     <div className="capture-actions">
       <button disabled={!live || busy} onClick={() => close(onScreenshot)}>
-        <ToolbarIcon name="capture" />
-        스크린샷 저장
+        <ToolbarIcon name="capture" /> {translate("스크린샷 저장")}{" "}
       </button>
       {!recording && (
         <button disabled={!live || busy} onClick={() => close(onRecord)}>
-          <ToolbarIcon name="record" />
-          화면 녹화
+          <ToolbarIcon name="record" /> {translate("화면 녹화")}{" "}
         </button>
       )}
     </div>
@@ -51,7 +52,10 @@ export function CaptureActions({
         }
       }}
     >
-      <summary aria-label="캡처 및 녹화" title="캡처 및 녹화">
+      <summary
+        aria-label={translate("캡처 및 녹화")}
+        title={translate("캡처 및 녹화")}
+      >
         <ToolbarIcon name="capture" />
       </summary>
       {actions}

@@ -112,7 +112,8 @@ final class SampleHandler: RPBroadcastSampleHandler {
     ended = true
     network?.stop()
     lock.unlock()
+    let language = ApplicationLanguagePreferences(defaults: UserDefaults(suiteName: SenderSharedContainer.identifier) ?? .standard).load()
     finishBroadcastWithError(
-      NSError(domain: "PhoneMirrorSender", code: 1, userInfo: [NSLocalizedDescriptionKey: message]))
+      NSError(domain: "PhoneMirrorSender", code: 1, userInfo: [NSLocalizedDescriptionKey: language.translate(message)]))
   }
 }

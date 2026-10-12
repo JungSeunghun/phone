@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import {
   diagnosticSummary,
   type DiagnosticSummaryStore,
@@ -16,6 +17,8 @@ export function ConnectionDiagnosticsPanel({
   selectedDevice?: PhoneDevice;
   summaryStore?: DiagnosticSummaryStore;
 }) {
+  const translate = useTranslation();
+
   const state = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
@@ -79,15 +82,18 @@ export function ConnectionDiagnosticsPanel({
   const running = state.phase === "running";
   return (
     <details className="connection-diagnostics">
-      <summary>연결 문제 진단</summary>
+      <summary>{translate("연결 문제 진단")}</summary>
       <p className="hint">
-        연결 종료·재페어링 없이 점검합니다. 진단 결과에 연결 키나 원본 로그를
-        포함하지 않습니다.
+        {" "}
+        {translate(
+          "연결 종료·재페어링 없이 점검합니다. 진단 결과에 연결 키나 원본 로그를 포함하지 않습니다.",
+        )}{" "}
       </p>
       <label>
-        진단할 폰
+        {" "}
+        {translate("진단할 폰")}{" "}
         <select
-          aria-label="진단할 폰"
+          aria-label={translate("진단할 폰")}
           disabled={running}
           value={platform}
           onChange={(e) => setPlatform(e.target.value as "android" | "ios")}
@@ -97,9 +103,10 @@ export function ConnectionDiagnosticsPanel({
         </select>
       </label>
       <label>
-        진단 연결 방식
+        {" "}
+        {translate("진단 연결 방식")}{" "}
         <select
-          aria-label="진단 연결 방식"
+          aria-label={translate("진단 연결 방식")}
           disabled={running}
           value={transport}
           onChange={(e) => setTransport(e.target.value as "usb" | "wifi")}
@@ -110,9 +117,10 @@ export function ConnectionDiagnosticsPanel({
       </label>
       {platform === "android" && transport === "wifi" && (
         <label>
-          연결 주소 (선택)
+          {" "}
+          {translate("연결 주소 (선택)")}{" "}
           <input
-            aria-label="진단 연결 주소"
+            aria-label={translate("진단 연결 주소")}
             value={address}
             maxLength={128}
             disabled={running}
@@ -142,44 +150,48 @@ export function ConnectionDiagnosticsPanel({
         }}
       >
         {state.phase === "done" || state.phase === "error"
-          ? "다시 진단"
-          : "연결 진단 시작"}
+          ? translate("다시 진단")
+          : translate("연결 진단 시작")}
       </button>
       {running && (
         <button
           disabled={state.cancelBusy}
           onClick={() => void controller.cancel()}
         >
-          진단 취소
+          {" "}
+          {translate("진단 취소")}{" "}
         </button>
       )}
-      <p role="status">{state.message}</p>
+      <p role="status">{translate(state.message)}</p>
       {state.report && (
         <>
           <button disabled={exportBusy} onClick={() => void saveSummary()}>
-            진단 요약 저장
+            {" "}
+            {translate("진단 요약 저장")}{" "}
           </button>
           <p className="hint">
-            점검 코드·결과·연결 종류만 저장합니다. 기기 식별자, IP 주소, 입력
-            내용, 화면과 원본 로그는 포함하지 않습니다.
+            {" "}
+            {translate(
+              "점검 코드·결과·연결 종류만 저장합니다. 기기 식별자, IP 주소, 입력 내용, 화면과 원본 로그는 포함하지 않습니다.",
+            )}{" "}
           </p>
-          <p role="status">{exportMessage}</p>
+          <p role="status">{translate(exportMessage)}</p>
         </>
       )}
       {state.report && (
-        <ul aria-label="연결 진단 결과">
+        <ul aria-label={translate("연결 진단 결과")}>
           {state.report.checks.map((check) => (
             <li key={check.code} data-status={check.status}>
-              <strong>{check.title}</strong>
+              <strong>{translate(check.title)}</strong>
               <span>
                 {check.status === "passed"
-                  ? "점검 통과"
+                  ? translate("점검 통과")
                   : check.status === "failed"
-                    ? "문제 확인"
-                    : "확인 필요"}
+                    ? translate("문제 확인")
+                    : translate("확인 필요")}
               </span>
-              <p>{check.message}</p>
-              {check.action && <p>{check.action}</p>}
+              <p>{translate(check.message)}</p>
+              {check.action && <p>{translate(check.action)}</p>}
             </li>
           ))}
         </ul>

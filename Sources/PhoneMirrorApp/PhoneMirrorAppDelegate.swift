@@ -1,3 +1,4 @@
+import PhoneMirrorLocalization
 import SwiftUI
 import AppKit
 import PhoneMirrorCore
@@ -21,14 +22,18 @@ final class PhoneMirrorAppDelegate: NSObject, NSApplicationDelegate, NSWindowDel
         }
         window.level = model.settings.alwaysOnTop ? .floating : .normal
         window.delegate = self; window.makeKeyAndOrderFront(nil)
-        let menu = NSMenu(), appItem = NSMenuItem(), appMenu = NSMenu()
-        appMenu.addItem(withTitle: "Phone Mirror 종료", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
-        appItem.submenu = appMenu; menu.addItem(appItem)
-        let edit = NSMenuItem(), editMenu = NSMenu(title: "편집")
-        editMenu.addItem(withTitle: "복사", action: #selector(NSText.copy(_:)), keyEquivalent: "c")
-        editMenu.addItem(withTitle: "모두 선택", action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
-        edit.submenu = editMenu; menu.addItem(edit); NSApp.mainMenu = menu
+        updateLanguageMenus()
         NSApp.activate(ignoringOtherApps: true)
+    }
+    func updateLanguageMenus() {
+        let language = ApplicationLanguagePreferences().load()
+        let menu = NSMenu(), appItem = NSMenuItem(), appMenu = NSMenu()
+        appMenu.addItem(withTitle: language.translate("Phone Mirror 종료"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q")
+        appItem.submenu = appMenu; menu.addItem(appItem)
+        let edit = NSMenuItem(), editMenu = NSMenu(title: language.translate("편집"))
+        editMenu.addItem(withTitle: language.translate("복사"), action: #selector(NSText.copy(_:)), keyEquivalent: "c")
+        editMenu.addItem(withTitle: language.translate("모두 선택"), action: #selector(NSText.selectAll(_:)), keyEquivalent: "a")
+        edit.submenu = editMenu; menu.addItem(edit); NSApp.mainMenu = menu
     }
     func windowDidMove(_ notification: Notification) { persistSavedWindowPlacement() }
     func windowDidResize(_ notification: Notification) { persistSavedWindowPlacement() }

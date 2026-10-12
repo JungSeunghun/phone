@@ -15,7 +15,7 @@ The main cross-platform app is **Rust + Tauri + React** in `desktop/`, for macOS
 - In-app update checks, signed downloads and user-requested installation. An official published update feed has not been connected yet.
 - Connection diagnostics. Diagnostic summaries contain allowlisted check codes and outcomes rather than raw logs, device identifiers or screen contents.
 
-See [the support matrix](docs/SUPPORT.md) for platform differences and evidence. Implemented support is not a claim of hardware validation. The desktop UI currently uses Korean; complete English UI localization is on the [roadmap](docs/ROADMAP.md).
+See [the support matrix](docs/SUPPORT.md) for platform differences and evidence. Implemented support is not a claim of hardware validation. The desktop, native Swift macOS, and iPhone sender UIs support Korean and English. Choose **한국어** or **English** under **언어 / Language** in settings; the choice takes effect immediately and is saved locally.
 
 ## Build and run
 

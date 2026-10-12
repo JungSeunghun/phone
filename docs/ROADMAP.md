@@ -16,7 +16,6 @@
 
 ## Product follow-up
 
-- Full English desktop UI with consistent locale catalogs and localized service messages.
 - Guided connection flow that can highlight the next action and recover from common setup failures.
 - iPhone hardware validation for USB/Wi-Fi broadcasting, keyboard input, capture and recording.
 - Native Windows + Android/iPhone hardware validation.

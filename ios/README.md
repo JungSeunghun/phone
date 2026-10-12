@@ -2,6 +2,10 @@
 
 독립적인 iPhone/iPad 송출 앱과 ReplayKit Broadcast Upload Extension입니다. 기존 macOS Swift 앱은 수정하지 않습니다. 수신기는 Rust/Tauri Phone Mirror Desktop이며 Mac과 Windows에서 같은 수신 프로토콜을 사용합니다. iOS 16 이상, 컴퓨터와 같은 로컬 네트워크가 필요합니다.
 
+## UI 언어
+
+앱 상단 **언어 설정 → 언어 / Language**에서 **한국어** 또는 **English**를 선택하세요. 선택은 App Group에 저장되고 송출 앱과 Phone Mirror 키보드 확장이 공유합니다. 열려 있던 키보드는 다시 열면 변경된 언어를 표시합니다. 송출 설정·연결 코드는 유지합니다. 시스템 권한·화면 방송 창은 운영체제의 언어 설정을 따릅니다.
+
 ## 빌드와 사용
 
 1. `PhoneMirrorSender.xcodeproj`를 Xcode에서 열고 `PhoneMirrorSender` scheme을 선택합니다.

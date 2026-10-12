@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { useSyncExternalStore } from "react";
 import type { PhoneMirrorController } from "../application/PhoneMirrorController";
 import type { AndroidQrPairingController } from "../application/AndroidQrPairingController";
@@ -11,29 +12,34 @@ export function AndroidWirelessConnectionPanel({
   pairingController: AndroidQrPairingController;
   pairingBusy: boolean;
 }) {
+  const translate = useTranslation();
+
   const state = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
   );
   return (
     <details className="wireless-panel">
-      <summary>Android Wi-Fi 연결</summary>
+      <summary>{translate("Android Wi-Fi 연결")}</summary>
       <AndroidQrPairingPanel
         controller={pairingController}
         disabled={state.wirelessBusy || pairingBusy}
       />
       <details className="manual-connection">
-        <summary>코드·주소로 연결</summary>
+        <summary>{translate("코드·주소로 연결")}</summary>
         <p className="hint">
-          Android 개발자 옵션 → 무선 디버깅 → 페어링 코드로 기기 페어링을
-          여세요.
+          {" "}
+          {translate(
+            "Android 개발자 옵션 → 무선 디버깅 → 페어링 코드로 기기 페어링을 여세요.",
+          )}{" "}
         </p>
         <button
           className="secondary"
           disabled={state.wirelessBusy || pairingBusy}
           onClick={() => void controller.refreshServices()}
         >
-          무선 기기 검색
+          {" "}
+          {translate("무선 기기 검색")}{" "}
         </button>
         <div className="service-list">
           {state.services.map((service) => (
@@ -44,17 +50,20 @@ export function AndroidWirelessConnectionPanel({
               onClick={() => controller.selectService(service)}
             >
               <span>
-                {service.kind === "pairing" ? "페어링" : "연결"} ·{" "}
-                {service.name}
+                {service.kind === "pairing"
+                  ? translate("페어링")
+                  : translate("연결")}{" "}
+                · {service.name}
               </span>
               <small>{service.address}</small>
             </button>
           ))}
         </div>
         <label>
-          페어링 주소
+          {" "}
+          {translate("페어링 주소")}{" "}
           <input
-            aria-label="페어링 주소"
+            aria-label={translate("페어링 주소")}
             value={state.pairingAddress}
             placeholder="192.168.0.12:37123"
             maxLength={128}
@@ -65,9 +74,10 @@ export function AndroidWirelessConnectionPanel({
           />
         </label>
         <label>
-          6자리 페어링 코드
+          {" "}
+          {translate("6자리 페어링 코드")}{" "}
           <input
-            aria-label="6자리 페어링 코드"
+            aria-label={translate("6자리 페어링 코드")}
             type="password"
             inputMode="numeric"
             autoComplete="off"
@@ -82,14 +92,16 @@ export function AndroidWirelessConnectionPanel({
           disabled={!state.canPair || pairingBusy}
           onClick={() => void controller.pair()}
         >
-          페어링
+          {" "}
+          {translate("페어링")}{" "}
         </button>
         <label>
-          연결 주소
+          {" "}
+          {translate("연결 주소")}{" "}
           <input
-            aria-label="연결 주소"
+            aria-label={translate("연결 주소")}
             value={state.connectionAddress}
-            placeholder="폰의 무선 디버깅 연결 IP:포트"
+            placeholder={translate("폰의 무선 디버깅 연결 IP:포트")}
             maxLength={128}
             disabled={state.wirelessBusy || pairingBusy}
             onChange={(event) =>
@@ -102,10 +114,11 @@ export function AndroidWirelessConnectionPanel({
           disabled={!state.canConnect || pairingBusy}
           onClick={() => void controller.connect()}
         >
-          Wi-Fi 연결
+          {" "}
+          {translate("Wi-Fi 연결")}{" "}
         </button>
         <p role="status" className="hint">
-          {state.wirelessMessage}
+          {translate(state.wirelessMessage)}
         </p>
       </details>
     </details>

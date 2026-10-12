@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { formatRecordingTime } from "../domain/RecordingTime";
 import { ToolbarIcon } from "./ToolbarIcon";
 export function RecordingStatus({
@@ -19,24 +20,28 @@ export function RecordingStatus({
   onPause?: () => void;
   onResume?: () => void;
 }) {
+  const translate = useTranslation();
+
   if (!recording) return null;
   return (
     <div
       className="recording-status"
       data-paused={paused}
       role="group"
-      aria-label="녹화 조작"
+      aria-label={translate("녹화 조작")}
     >
       <span className="recording-dot" aria-hidden="true" />
-      <span>{paused ? "녹화 일시 정지" : "녹화 중"}</span>
-      <time aria-label="녹화 경과 시간">
+      <span>{paused ? translate("녹화 일시 정지") : translate("녹화 중")}</span>
+      <time aria-label={translate("녹화 경과 시간")}>
         {formatRecordingTime(elapsedSeconds)}
       </time>
       {onPause && onResume && (
         <button
           className="recording-pause"
-          aria-label={paused ? "녹화 재개" : "녹화 일시 정지"}
-          title={paused ? "녹화 재개" : "녹화 일시 정지"}
+          aria-label={
+            paused ? translate("녹화 재개") : translate("녹화 일시 정지")
+          }
+          title={paused ? translate("녹화 재개") : translate("녹화 일시 정지")}
           disabled={busy || pauseBusy}
           onClick={paused ? onResume : onPause}
         >
@@ -45,13 +50,13 @@ export function RecordingStatus({
       )}
       <button
         className="recording-stop"
-        aria-label="녹화 종료 및 저장"
-        title="녹화 종료 및 저장"
+        aria-label={translate("녹화 종료 및 저장")}
+        title={translate("녹화 종료 및 저장")}
         disabled={busy}
         onClick={onStop}
       >
         <ToolbarIcon name="stop" />
-        <span>종료</span>
+        <span>{translate("종료")}</span>
       </button>
     </div>
   );

@@ -90,6 +90,7 @@ struct ConnectionCodeScannerView: UIViewControllerRepresentable {
   ) { controller.cancel() }
 }
 final class ConnectionCodeScannerController: UIViewController {
+  private func localizedText(_ text: String) -> String { ApplicationLanguagePreferences(defaults: UserDefaults(suiteName: SenderSharedContainer.identifier) ?? .standard).load().translate(text) }
   private let camera: ConnectionCodeCameraPort
   private let onCode: (String) -> Void
   private var scan = SenderConnectionScanState()
@@ -132,18 +133,18 @@ final class ConnectionCodeScannerController: UIViewController {
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
     let token = scan.begin()
-    status.text = scan.message
+    status.text = localizedText(scan.message)
     camera.requestPermission { [weak self] granted in
       DispatchQueue.main.async {
         guard let self else { return }
         let start = self.scan.completePermission(token: token, granted: granted)
-        self.status.text = self.scan.message
+        self.status.text = self.localizedText(self.scan.message)
         guard start else { return }
         self.camera.start(
           onPayload: { [weak self] payload in
             guard let self else { return }
             let code = self.scan.receive(token: token, payload: payload)
-            self.status.text = self.scan.message
+            self.status.text = self.localizedText(self.scan.message)
             if let code {
               self.camera.stop()
               self.onCode(code)
@@ -152,7 +153,7 @@ final class ConnectionCodeScannerController: UIViewController {
           onFailure: { [weak self] in
             guard let self else { return }
             self.scan.fail(token: token)
-            self.status.text = self.scan.message
+            self.status.text = self.localizedText(self.scan.message)
           })
       }
     }

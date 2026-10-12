@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { useState } from "react";
 const paths = {
   "android-usb": [
@@ -22,14 +23,17 @@ const paths = {
   ],
 } as const;
 export function FirstConnectionGuide() {
+  const translate = useTranslation();
+
   const [path, setPath] = useState<keyof typeof paths>("android-usb");
   return (
     <details className="first-connection-guide">
-      <summary>처음 연결하기</summary>
+      <summary>{translate("처음 연결하기")}</summary>
       <label>
-        처음 연결할 방식
+        {" "}
+        {translate("처음 연결할 방식")}{" "}
         <select
-          aria-label="처음 연결할 방식"
+          aria-label={translate("처음 연결할 방식")}
           value={path}
           onChange={(event) => {
             if (event.target.value in paths)
@@ -44,15 +48,19 @@ export function FirstConnectionGuide() {
       </label>
       <ol>
         {paths[path].map((step) => (
-          <li key={step}>{step}</li>
+          <li key={translate(step)}>{translate(step)}</li>
         ))}
       </ol>
       {path.startsWith("ios-") && (
-        <p className="hint">iPhone 실기기 검증은 아직 완료하지 않았습니다.</p>
+        <p className="hint">
+          {translate("iPhone 실기기 검증은 아직 완료하지 않았습니다.")}
+        </p>
       )}
       <p className="hint">
-        연결되지 않으면 연결 문제 진단을 실행하세요. 이 안내를 열거나 방식을
-        선택해도 자동으로 연결하거나 권한을 요청하지 않습니다.
+        {" "}
+        {translate(
+          "연결되지 않으면 연결 문제 진단을 실행하세요. 이 안내를 열거나 방식을 선택해도 자동으로 연결하거나 권한을 요청하지 않습니다.",
+        )}{" "}
       </p>
     </details>
   );

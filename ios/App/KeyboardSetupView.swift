@@ -2,33 +2,30 @@ import Network
 import SwiftUI
 
 struct KeyboardSetupView: View {
+    @AppStorage(ApplicationLanguagePreferences.storageKey, store: UserDefaults(suiteName: SenderSharedContainer.identifier)!) private var languageCode = "ko"
+    private func localizedText(_ text: String) -> String { (ApplicationLanguage(rawValue: languageCode) ?? .korean).translate(text) }
+
   @State private var code = ""
   @State private var message = ""
   @State private var probe: NWConnection?
   @State private var setup = KeyboardSetupState()
   private let defaults = UserDefaults(suiteName: SenderSharedContainer.identifier)!
   var body: some View {
-    Section("컴퓨터 키보드 입력") {
-      Text(
-        "컴퓨터에서 iPhone 키보드 연결을 시작하고 아래에 PMK1 코드를 붙여 넣으세요. USB 영상 연결과도 함께 사용할 수 있으며 입력은 같은 로컬 네트워크로 전달합니다."
-      )
-      TextField("PMK1 키보드 연결 코드", text: $code, axis: .vertical).textInputAutocapitalization(.never)
+    Section(localizedText("컴퓨터 키보드 입력")) {
+      Text(localizedText("컴퓨터에서 iPhone 키보드 연결을 시작하고 아래에 PMK1 코드를 붙여 넣으세요. USB 영상 연결과도 함께 사용할 수 있으며 입력은 같은 로컬 네트워크로 전달합니다."))
+      TextField(localizedText("PMK1 키보드 연결 코드"), text: $code, axis: .vertical).textInputAutocapitalization(.never)
         .autocorrectionDisabled().privacySensitive().onChange(of: code) { _ in cancel() }
-      Button("키보드 연결 코드 저장") { save() }.disabled(
+      Button(localizedText("키보드 연결 코드 저장")) { save() }.disabled(
         setup.checking || (try? KeyboardConnectionCode(code)) == nil)
-      Button("키보드 연결 코드 삭제") {
+      Button(localizedText("키보드 연결 코드 삭제")) {
         cancel()
         defaults.removeObject(forKey: "keyboardConnectionCode.v1")
         code = ""
         message = "키보드 연결 코드를 삭제했습니다. 열려 있는 키보드도 다른 키보드로 전환하세요."
       }
-      Text(
-        "설정 → 일반 → 키보드 → 키보드 → 새로운 키보드 추가에서 Phone Mirror를 추가하고 ‘전체 접근 허용’을 켜세요. 입력할 앱의 텍스트 칸을 누르고 지구본 버튼으로 Phone Mirror 키보드를 선택하면 컴퓨터에서 붙여넣기와 다국어 직접 입력을 사용할 수 있습니다."
-      )
-      Text(
-        "선택한 입력칸에만 입력합니다. 비밀번호·전화번호 칸과 외부 키보드를 차단한 앱은 지원하지 않습니다. 키보드를 닫으면 연결을 종료합니다. 기존 연결이 끊겼다면 키보드의 ‘연결’ 버튼을 누르세요."
-      )
-      if !message.isEmpty { Text(message).accessibilityIdentifier("keyboardSetupStatus") }
+      Text(localizedText("설정 → 일반 → 키보드 → 키보드 → 새로운 키보드 추가에서 Phone Mirror를 추가하고 ‘전체 접근 허용’을 켜세요. 입력할 앱의 텍스트 칸을 누르고 지구본 버튼으로 Phone Mirror 키보드를 선택하면 컴퓨터에서 붙여넣기와 다국어 직접 입력을 사용할 수 있습니다."))
+      Text(localizedText("선택한 입력칸에만 입력합니다. 비밀번호·전화번호 칸과 외부 키보드를 차단한 앱은 지원하지 않습니다. 키보드를 닫으면 연결을 종료합니다. 기존 연결이 끊겼다면 키보드의 ‘연결’ 버튼을 누르세요."))
+      if !message.isEmpty { Text(localizedText(message)).accessibilityIdentifier("keyboardSetupStatus") }
     }.onAppear { code = (try? KeyboardConnectionCode.load(defaults))?.rawValue ?? "" }
       .onDisappear { cancel() }
   }

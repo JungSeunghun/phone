@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { useSyncExternalStore, useMemo } from "react";
 import type { AndroidQrPairingController } from "../application/AndroidQrPairingController";
 import { createAndroidPairingQr } from "../infrastructure/AndroidPairingQr";
@@ -8,6 +9,8 @@ export function AndroidQrPairingPanel({
   controller: AndroidQrPairingController;
   disabled?: boolean;
 }) {
+  const translate = useTranslation();
+
   const state = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
@@ -20,10 +23,12 @@ export function AndroidQrPairingPanel({
     }
   }, [state.payload]);
   return (
-    <section aria-label="Android QR 페어링">
+    <section aria-label={translate("Android QR 페어링")}>
       <p className="hint">
-        Android 11 이상: 같은 Wi-Fi에서 개발자 옵션 → 무선 디버깅 → QR 코드로
-        기기 페어링을 여세요. 기본 카메라 앱 대신 이 스캐너를 사용하세요.
+        {" "}
+        {translate(
+          "Android 11 이상: 같은 Wi-Fi에서 개발자 옵션 → 무선 디버깅 → QR 코드로 기기 페어링을 여세요. 기본 카메라 앱 대신 이 스캐너를 사용하세요.",
+        )}{" "}
       </p>
       {["starting", "waiting", "cancelling", "cancelError"].includes(
         state.phase,
@@ -32,11 +37,13 @@ export function AndroidQrPairingPanel({
           disabled={state.phase === "cancelling"}
           onClick={() => void controller.cancel()}
         >
-          Android QR 페어링 취소
+          {" "}
+          {translate("Android QR 페어링 취소")}{" "}
         </button>
       ) : (
         <button disabled={disabled} onClick={() => void controller.start()}>
-          Android QR 페어링 시작
+          {" "}
+          {translate("Android QR 페어링 시작")}{" "}
         </button>
       )}
       {image && (
@@ -45,20 +52,26 @@ export function AndroidQrPairingPanel({
             src={image}
             width={256}
             height={256}
-            alt="Android Wi-Fi 페어링 QR 코드"
+            alt={translate("Android Wi-Fi 페어링 QR 코드")}
           />
           <figcaption>
-            스캔하면 해당 기기를 자동으로 페어링하고 연결합니다.
+            {" "}
+            {translate(
+              "스캔하면 해당 기기를 자동으로 페어링하고 연결합니다.",
+            )}{" "}
           </figcaption>
         </figure>
       )}
       {state.payload && !image && (
         <p>
-          QR 표시 실패: 취소 후 새 QR을 만들거나 아래 페어링 코드를 사용하세요.
+          {" "}
+          {translate(
+            "QR 표시 실패: 취소 후 새 QR을 만들거나 아래 페어링 코드를 사용하세요.",
+          )}{" "}
         </p>
       )}
       <p role="status" aria-live="polite">
-        {state.message}
+        {translate(state.message)}
       </p>
     </section>
   );

@@ -1,6 +1,6 @@
 # Phone Mirror
 
-Android는 USB 또는 Wi-Fi로, iPhone / iPad는 USB로 연결해 화면을 앱 안에서 보는 한국어 macOS 앱입니다. macOS 14 이상이 필요합니다.
+Android는 USB 또는 Wi-Fi로, iPhone / iPad는 USB로 연결해 화면을 앱 안에서 보는 한국어·영어 macOS 앱입니다. macOS 14 이상이 필요합니다. 설정의 **언어 / Language**에서 표시 언어를 선택하면 즉시 적용되고 재실행 후에도 유지됩니다.
 
 기존 Swift 앱을 유지하면서 Windows/macOS 공통 **Rust + Tauri 앱**을 `desktop`에 추가했습니다. Android USB·Wi-Fi 영상과 캡처·녹화·전체 화면·PiP를 지원하며, Mac USB iPhone 화면 수신도 구현했습니다. iPhone은 보기 전용이며 실기기 없이 모의 검증까지만 완료했습니다. [새 앱 실행·빌드 방법](../desktop/README.md)과 [검증 기록](../desktop/TESTING.md)을 참고하세요. 이 문서의 아래 내용은 기존 Swift 앱 기준입니다.
 

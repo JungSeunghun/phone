@@ -1,3 +1,10 @@
+import { ApplicationLanguageController } from "../application/ApplicationLanguageController";
+import { BrowserApplicationLanguageStorage } from "../infrastructure/BrowserApplicationLanguageStorage";
+import {
+  ApplicationLanguageProvider,
+  ApplicationLanguageSetting,
+  useTranslation,
+} from "./ApplicationLanguage";
 import { FirstConnectionGuide } from "./FirstConnectionGuide";
 import { ApplicationUpdateController } from "../application/ApplicationUpdateController";
 import { TauriApplicationUpdateBackend } from "../infrastructure/TauriApplicationUpdateBackend";
@@ -60,10 +67,12 @@ export function PhoneMirrorApp({
   iosUsbReceiverController,
   androidQrPairingController,
   connectionDiagnosticsController,
+  languageController,
   textClipboard,
   iosKeyboardInputController,
 }: {
   controller: PhoneMirrorController;
+  languageController?: ApplicationLanguageController;
   textClipboard?: TextClipboard;
   iosKeyboardInputController?: IosKeyboardInputController;
   mediaController?: MediaCaptureController;
@@ -73,6 +82,57 @@ export function PhoneMirrorApp({
   androidQrPairingController?: AndroidQrPairingController;
   connectionDiagnosticsController?: ConnectionDiagnosticsController;
 }) {
+  const language = useMemo(
+    () =>
+      languageController ??
+      new ApplicationLanguageController(
+        new BrowserApplicationLanguageStorage(),
+      ),
+    [languageController],
+  );
+  return (
+    <ApplicationLanguageProvider controller={language}>
+      <PhoneMirrorContent
+        controller={controller}
+        mediaController={mediaController}
+        windowPresentationController={windowPresentationController}
+        iosWifiReceiverController={iosWifiReceiverController}
+        iosUsbReceiverController={iosUsbReceiverController}
+        androidQrPairingController={androidQrPairingController}
+        connectionDiagnosticsController={connectionDiagnosticsController}
+        textClipboard={textClipboard}
+        iosKeyboardInputController={iosKeyboardInputController}
+        languageController={language}
+      />
+    </ApplicationLanguageProvider>
+  );
+}
+
+function PhoneMirrorContent({
+  controller,
+  mediaController,
+  windowPresentationController,
+  iosWifiReceiverController,
+  iosUsbReceiverController,
+  androidQrPairingController,
+  connectionDiagnosticsController,
+  languageController,
+  textClipboard,
+  iosKeyboardInputController,
+}: {
+  controller: PhoneMirrorController;
+  languageController: ApplicationLanguageController;
+  textClipboard?: TextClipboard;
+  iosKeyboardInputController?: IosKeyboardInputController;
+  mediaController?: MediaCaptureController;
+  windowPresentationController?: WindowPresentationController;
+  iosWifiReceiverController?: IosWifiReceiverController;
+  iosUsbReceiverController?: IosReceiverController;
+  androidQrPairingController?: AndroidQrPairingController;
+  connectionDiagnosticsController?: ConnectionDiagnosticsController;
+}) {
+  const translate = useTranslation();
+
   const state = useSyncExternalStore(
       controller.subscribe,
       controller.getSnapshot,
@@ -326,12 +386,12 @@ export function PhoneMirrorApp({
     };
   }, [controller, media]);
   const phaseLabel = {
-    idle: "기기 연결 대기",
-    ready: "화면 보기 준비",
-    connecting: "영상 연결 중",
-    live: "화면 수신 중",
-    reconnecting: "자동 재연결 대기",
-    error: "연결 확인 필요",
+    idle: translate("기기 연결 대기"),
+    ready: translate("화면 보기 준비"),
+    connecting: translate("영상 연결 중"),
+    live: translate("화면 수신 중"),
+    reconnecting: translate("자동 재연결 대기"),
+    error: translate("연결 확인 필요"),
   }[state.phase];
   return (
     <main
@@ -344,7 +404,7 @@ export function PhoneMirrorApp({
       <aside
         className="sidebar"
         id="mirror-settings"
-        aria-label="기기 및 화면 설정"
+        aria-label={translate("기기 및 화면 설정")}
       >
         <div className="sidebar-device">
           <header className="brand">
@@ -354,19 +414,21 @@ export function PhoneMirrorApp({
               <p>Android · iPhone</p>
             </div>
           </header>
-          <section aria-label="기기 선택">
+          <section aria-label={translate("기기 선택")}>
             <div className="section-title">
-              <h2>연결된 기기</h2>
+              <h2>{translate("연결된 기기")}</h2>
               <button
                 className="quiet"
                 onClick={() => void controller.refreshDevices()}
                 disabled={state.refreshing}
               >
-                새로 고침
+                {" "}
+                {translate("새로 고침")}{" "}
               </button>
             </div>
             <label className="sr-only" htmlFor="device">
-              연결된 기기
+              {" "}
+              {translate("연결된 기기")}{" "}
             </label>
             <select
               id="device"
@@ -375,12 +437,13 @@ export function PhoneMirrorApp({
               disabled={active}
             >
               {!state.devices.length && (
-                <option value="">연결된 기기가 없습니다</option>
+                <option value="">{translate("연결된 기기가 없습니다")}</option>
               )}
               {!state.devices.some((d) => d.id === state.selectedDeviceId) &&
                 state.selectedDeviceId && (
                   <option value={state.selectedDeviceId}>
-                    선택한 폰 재연결 대기
+                    {" "}
+                    {translate("선택한 폰 재연결 대기")}{" "}
                   </option>
                 )}
               {state.devices.map((device) => (
@@ -388,28 +451,37 @@ export function PhoneMirrorApp({
                   {device.name} ·{" "}
                   {device.endpoint.transport === "usb" ? "USB" : "Wi-Fi"} ·{" "}
                   {device.availability === "ready"
-                    ? "사용 가능"
+                    ? translate("사용 가능")
                     : device.availability === "unauthorized"
-                      ? "승인 필요"
-                      : "오프라인"}
+                      ? translate("승인 필요")
+                      : translate("오프라인")}
                 </option>
               ))}
             </select>
             <p className="hint">
               {selected?.platform === "ios"
                 ? selected.endpoint.transport === "wifi"
-                  ? "iPhone 송출 앱에서 방송을 시작하세요. 연결 코드가 바뀌면 앱에 다시 입력하세요."
+                  ? translate(
+                      "iPhone 송출 앱에서 방송을 시작하세요. 연결 코드가 바뀌면 앱에 다시 입력하세요.",
+                    )
                   : selected.identity.startsWith("ios-usb:")
-                    ? "USB 송출 앱에서 화면 방송을 시작하세요. USB 신뢰와 연결 코드를 확인하세요."
-                    : "iPhone 잠금을 해제하고 ‘이 컴퓨터를 신뢰’를 승인하세요. Mac의 카메라 권한도 필요합니다."
-                : "Android USB는 디버깅을 허용하고, Wi-Fi는 같은 네트워크에서 연결하세요."}
+                    ? translate(
+                        "USB 송출 앱에서 화면 방송을 시작하세요. USB 신뢰와 연결 코드를 확인하세요.",
+                      )
+                    : translate(
+                        "iPhone 잠금을 해제하고 ‘이 컴퓨터를 신뢰’를 승인하세요. Mac의 카메라 권한도 필요합니다.",
+                      )
+                : translate(
+                    "Android USB는 디버깅을 허용하고, Wi-Fi는 같은 네트워크에서 연결하세요.",
+                  )}
             </p>
           </section>
         </div>
         <div className="sidebar-content">
-          <section aria-label="기기 연결">
+          <ApplicationLanguageSetting controller={languageController} />
+          <section aria-label={translate("기기 연결")}>
             {!active && <FirstConnectionGuide />}
-            <h2>기기 연결</h2>
+            <h2>{translate("기기 연결")}</h2>
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -417,8 +489,8 @@ export function PhoneMirrorApp({
                 onChange={(event) =>
                   controller.setAutoReconnect(event.target.checked)
                 }
-              />
-              연결이 끊기면 자동 재연결
+              />{" "}
+              {translate("연결이 끊기면 자동 재연결")}{" "}
             </label>
             <AndroidWirelessConnectionPanel
               controller={controller}
@@ -438,8 +510,8 @@ export function PhoneMirrorApp({
               />
             )}
           </section>
-          <section aria-label="화면 설정">
-            <h2>화면 설정</h2>
+          <section aria-label={translate("화면 설정")}>
+            <h2>{translate("화면 설정")}</h2>
             {active &&
               !(
                 selected?.platform === "ios" &&
@@ -447,21 +519,27 @@ export function PhoneMirrorApp({
                   selected.identity.startsWith("ios-usb:"))
               ) && (
                 <p id="video-settings-guidance" className="hint">
-                  연결을 종료하면 화질과 프레임을 변경할 수 있습니다. 다음
-                  연결부터 적용됩니다.
+                  {" "}
+                  {translate(
+                    "연결을 종료하면 화질과 프레임을 변경할 수 있습니다. 다음 연결부터 적용됩니다.",
+                  )}{" "}
                 </p>
               )}
             {selected?.platform === "ios" &&
               (selected.endpoint.transport === "wifi" ||
                 selected.identity.startsWith("ios-usb:")) && (
                 <p className="hint" id="video-settings-guidance">
-                  화질과 프레임은 iPhone 송출 앱에서 설정합니다.
+                  {" "}
+                  {translate(
+                    "화질과 프레임은 iPhone 송출 앱에서 설정합니다.",
+                  )}{" "}
                 </p>
               )}
             <label className="setting">
-              화질
+              {" "}
+              {translate("화질")}{" "}
               <select
-                aria-label="화질"
+                aria-label={translate("화질")}
                 aria-describedby="video-settings-guidance"
                 value={state.settings.videoMaxDimension}
                 disabled={
@@ -485,9 +563,10 @@ export function PhoneMirrorApp({
               </select>
             </label>
             <label className="setting">
-              프레임
+              {" "}
+              {translate("프레임")}{" "}
               <select
-                aria-label="프레임"
+                aria-label={translate("프레임")}
                 aria-describedby="video-settings-guidance"
                 value={state.settings.videoMaxFrameRate}
                 disabled={
@@ -517,10 +596,10 @@ export function PhoneMirrorApp({
                 onChange={(event) =>
                   controller.setAdaptiveQuality(event.target.checked)
                 }
-              />
-              Android Wi-Fi 자동 화질
+              />{" "}
+              {translate("Android Wi-Fi 자동 화질")}{" "}
             </label>
-            <p role="status">{state.qualityMessage}</p>
+            <p role="status">{translate(state.qualityMessage)}</p>
             <label className="checkbox">
               <input
                 type="checkbox"
@@ -534,12 +613,12 @@ export function PhoneMirrorApp({
                     keepScreenAwake: event.target.checked,
                   })
                 }
-              />
-              연결 중 폰 화면 켜두기
+              />{" "}
+              {translate("연결 중 폰 화면 켜두기")}{" "}
             </label>
           </section>
           {selected?.platform === "ios" && (
-            <section aria-label="iPhone 키보드 설정">
+            <section aria-label={translate("iPhone 키보드 설정")}>
               <IosKeyboardInputPanel
                 controller={keyboardInput}
                 targetId={state.selectedDeviceId}
@@ -547,7 +626,7 @@ export function PhoneMirrorApp({
             </section>
           )}
           <ApplicationUpdatePanel controller={applicationUpdate} />
-          <section aria-label="연결 진단">
+          <section aria-label={translate("연결 진단")}>
             <ConnectionDiagnosticsPanel
               controller={diagnostics}
               selectedDevice={selected}
@@ -560,7 +639,7 @@ export function PhoneMirrorApp({
           <div
             className="connection-summary"
             role="group"
-            aria-label="연결 정보"
+            aria-label={translate("연결 정보")}
           >
             {selected && (
               <span className="connection-device" title={selected.name}>
@@ -574,13 +653,13 @@ export function PhoneMirrorApp({
             )}
             <span className={"connection-state " + state.phase} role="status">
               <span className="status-dot" />
-              {phaseLabel}
+              {translate(phaseLabel)}
             </span>
             {selected?.platform === "ios" && (
               <span className="transport-badge">
                 {keyboardInput.session(state.selectedDeviceId)
-                  ? "iPhone · 키보드 입력 연결됨"
-                  : "iPhone · 보기 전용"}
+                  ? translate("iPhone · 키보드 입력 연결됨")
+                  : translate("iPhone · 보기 전용")}
               </span>
             )}
             {state.dimensions && (
@@ -594,20 +673,25 @@ export function PhoneMirrorApp({
               <>
                 <button
                   className="settings-toggle"
-                  aria-label={settingsOpen ? "설정 닫기" : "설정 열기"}
+                  aria-label={
+                    settingsOpen
+                      ? translate("설정 닫기")
+                      : translate("설정 열기")
+                  }
                   aria-expanded={settingsOpen}
                   aria-controls="mirror-settings"
-                  title="기기 및 화면 설정"
+                  title={translate("기기 및 화면 설정")}
                   onClick={() => setSettingsOpen(!settingsOpen)}
                 >
                   <ToolbarIcon name="settings" />
-                  <span>설정</span>
+                  <span>{translate("설정")}</span>
                 </button>
                 <button
                   disabled={!view.live || view.busy}
                   onClick={() => void presentation.setMode("fullscreen")}
                 >
-                  전체 화면
+                  {" "}
+                  {translate("전체 화면")}{" "}
                 </button>
                 <button
                   disabled={!view.live || view.busy}
@@ -622,10 +706,15 @@ export function PhoneMirrorApp({
                   disabled={view.busy}
                   onClick={() => void presentation.setMode("normal")}
                 >
-                  기본 보기
+                  {" "}
+                  {translate("기본 보기")}{" "}
                 </button>
                 <button
-                  aria-label={state.audioMuted ? "음소거 해제" : "소리 끄기"}
+                  aria-label={
+                    state.audioMuted
+                      ? translate("음소거 해제")
+                      : translate("소리 끄기")
+                  }
                   disabled={!capabilities.audio}
                   onClick={() => controller.setAudioMuted(!state.audioMuted)}
                 >
@@ -652,17 +741,19 @@ export function PhoneMirrorApp({
             }
           >
             {active && <ToolbarIcon name="disconnect" />}
-            <span>{active ? "연결 종료" : "폰 화면 보기"}</span>
+            <span>
+              {active ? translate("연결 종료") : translate("폰 화면 보기")}
+            </span>
           </button>
         </header>
         {state.phase !== "live" && state.message && (
           <p className="connection-message" role="status">
-            {state.message}
+            {translate(state.message)}
           </p>
         )}
         {view.message && (
           <p className="view-message" role="alert">
-            {view.message}
+            {translate(view.message)}
           </p>
         )}
         <RecordingStatus
@@ -697,7 +788,7 @@ export function PhoneMirrorApp({
               }
             }}
             {...interaction}
-            aria-label="폰 영상"
+            aria-label={translate("폰 영상")}
             className={state.phase === "live" ? "visible" : "hidden"}
             width={1}
             height={1}
@@ -709,13 +800,15 @@ export function PhoneMirrorApp({
               </span>
               <h2>
                 {active
-                  ? "폰 화면을 연결하고 있어요."
-                  : "작은 화면을, 더 넓게."}
+                  ? translate("폰 화면을 연결하고 있어요.")
+                  : translate("작은 화면을, 더 넓게.")}
               </h2>
               <p>
                 {active
-                  ? state.message
-                  : "Android USB·Wi-Fi 또는 iPhone USB·Wi-Fi 화면을 볼 수 있습니다."}
+                  ? translate(state.message)
+                  : translate(
+                      "Android USB·Wi-Fi 또는 iPhone USB·Wi-Fi 화면을 볼 수 있습니다.",
+                    )}
               </p>
             </div>
           )}
@@ -738,11 +831,10 @@ export function PhoneMirrorApp({
                 disabled={!active || !capabilities.audio}
                 onClick={() => void controller.enableAudio()}
               >
-                <ToolbarIcon name="sound" />
-                소리 재생
+                <ToolbarIcon name="sound" /> {translate("소리 재생")}{" "}
               </button>
             )}
-            <label title={state.audioMessage}>
+            <label title={translate(state.audioMessage)}>
               <input
                 type="checkbox"
                 disabled={!capabilities.audio}
@@ -751,15 +843,17 @@ export function PhoneMirrorApp({
                   controller.setAudioMuted(event.target.checked)
                 }
               />
-              <ToolbarIcon name={state.audioMuted ? "muted" : "sound"} />
-              음소거
+              <ToolbarIcon name={state.audioMuted ? "muted" : "sound"} />{" "}
+              {translate("음소거")}{" "}
             </label>
             <span
               className="audio-status"
               role="status"
-              title={state.audioMessage}
+              title={translate(state.audioMessage)}
             >
-              {state.audioMuted ? "음소거 중" : state.audioMessage}
+              {state.audioMuted
+                ? translate("음소거 중")
+                : translate(state.audioMessage)}
             </span>
           </div>
           {view.mode === "normal" && (
@@ -773,49 +867,54 @@ export function PhoneMirrorApp({
             />
           )}
           <details className="performance-info">
-            <summary>성능 정보</summary>
+            <summary>{translate("성능 정보")}</summary>
             <div>
-              표시 {performanceReport?.fps.toFixed(1) ?? "0"} fps · 수신{" "}
-              {performanceReport?.received ?? 0} · 표시{" "}
-              {performanceReport?.presented ?? 0} · 최신 교체{" "}
+              {" "}
+              {translate("표시")} {performanceReport?.fps.toFixed(1) ?? "0"}{" "}
+              {translate("fps · 수신")}
+              {performanceReport?.received ?? 0} {translate("· 표시")}
+              {performanceReport?.presented ?? 0} {translate("· 최신 교체")}
               {performanceReport?.replaced ?? 0}
-              <br />
-              수신 간격 p95{" "}
-              {performanceReport?.receiveGapP95Ms.toFixed(1) ?? "0"} ms · 디코딩
-              p95 {performanceReport?.decodeP95Ms.toFixed(1) ?? "0"} ms · 그리기
-              p95 {performanceReport?.paintP95Ms.toFixed(1) ?? "0"} ms
-              <br />
-              표시 간격 p95{" "}
-              {performanceReport?.displayGapP95Ms.toFixed(1) ?? "0"} ms / 최대{" "}
-              {performanceReport?.displayGapMaxMs.toFixed(1) ?? "0"} ms · 디코더
-              큐 최대 {performanceReport?.maxDecodeQueue ?? 0}
-              <br />
-              표시 FPS는 세션 평균이며 정지 화면에서는 낮아질 수 있습니다. 최근
-              최대 256개 표본, 캔버스 그리기 기준입니다.
+              <br /> {translate("수신 간격 p95")}
+              {performanceReport?.receiveGapP95Ms.toFixed(1) ?? "0"}{" "}
+              {translate("ms · 디코딩 p95")}{" "}
+              {performanceReport?.decodeP95Ms.toFixed(1) ?? "0"}{" "}
+              {translate("ms · 그리기 p95")}{" "}
+              {performanceReport?.paintP95Ms.toFixed(1) ?? "0"} ms
+              <br /> {translate("표시 간격 p95")}
+              {performanceReport?.displayGapP95Ms.toFixed(1) ?? "0"}{" "}
+              {translate("ms / 최대")}
+              {performanceReport?.displayGapMaxMs.toFixed(1) ?? "0"}{" "}
+              {translate("ms · 디코더 큐 최대")}{" "}
+              {performanceReport?.maxDecodeQueue ?? 0}
+              <br />{" "}
+              {translate(
+                "표시 FPS는 세션 평균이며 정지 화면에서는 낮아질 수 있습니다. 최근 최대 256개 표본, 캔버스 그리기 기준입니다.",
+              )}{" "}
             </div>
           </details>
           <details className="interaction-help">
-            <summary aria-label="마우스 조작 안내">?</summary>
-            <p>{state.inputMessage}</p>
-            <p>Esc: 기본 보기로 돌아가기</p>
-            <p>PiP 창 닫기: 기본 보기로 돌아가기</p>
+            <summary aria-label={translate("마우스 조작 안내")}>?</summary>
+            <p>{translate(state.inputMessage)}</p>
+            <p>{translate("Esc: 기본 보기로 돌아가기")}</p>
+            <p>{translate("PiP 창 닫기: 기본 보기로 돌아가기")}</p>
           </details>
         </div>
         {capture.screenshotMessage && (
           <p className="capture-message" role="status">
-            {capture.screenshotMessage}
+            {translate(capture.screenshotMessage)}
           </p>
         )}
         {capture.message &&
           !capture.recording &&
           capture.message !== capture.screenshotMessage && (
             <p className="capture-message" role="status">
-              {capture.message}
+              {translate(capture.message)}
             </p>
           )}
         {state.inputMessage.includes("실패") && (
           <p className="view-message" role="alert">
-            {state.inputMessage}
+            {translate(state.inputMessage)}
           </p>
         )}
       </section>

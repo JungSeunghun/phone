@@ -1,3 +1,4 @@
+import { useTranslation } from "./ApplicationLanguage";
 import { useRef, useSyncExternalStore, useEffect } from "react";
 import { TextInputController } from "../application/TextInputController";
 import type { ControlInput } from "../domain/PhoneInput";
@@ -22,6 +23,8 @@ export function TextInputPanel({
   enabled: boolean;
   platform?: "android" | "ios";
 }) {
+  const translate = useTranslation();
+
   const state = useSyncExternalStore(
     controller.subscribe,
     controller.getSnapshot,
@@ -84,16 +87,17 @@ export function TextInputPanel({
         type="button"
         disabled={!enabled || state.clipboardBusy}
         onClick={() => void controller.pasteClipboard()}
-        title="폰 영상에 포커스가 있을 때 ⌘V / Ctrl+V"
+        title={translate("폰 영상에 포커스가 있을 때 ⌘V / Ctrl+V")}
       >
-        폰에 붙여넣기
+        {" "}
+        {translate("폰에 붙여넣기")}{" "}
       </button>
       <textarea
         ref={field}
-        aria-label="다국어 직접 입력"
+        aria-label={translate("다국어 직접 입력")}
         rows={1}
         disabled={!enabled}
-        placeholder="폰 입력칸을 선택한 뒤 여기서 입력"
+        placeholder={translate("폰 입력칸을 선택한 뒤 여기서 입력")}
         autoComplete="off"
         autoCorrect="off"
         autoCapitalize="off"
@@ -165,13 +169,15 @@ export function TextInputPanel({
       />
       {state.message && (
         <span role="status" className="text-input-status">
-          {state.message}
+          {translate(state.message)}
         </span>
       )}
       <span className="text-input-help">
         {platform === "ios"
-          ? "Phone Mirror 키보드 선택 시 전송 · 조합 확정 시 전송 · 위·아래 이동 제외"
-          : "Android 7 이상 · 조합 확정 시 전송 · 폰 클립보드 변경"}
+          ? translate(
+              "Phone Mirror 키보드 선택 시 전송 · 조합 확정 시 전송 · 위·아래 이동 제외",
+            )
+          : translate("Android 7 이상 · 조합 확정 시 전송 · 폰 클립보드 변경")}
       </span>
     </div>
   );

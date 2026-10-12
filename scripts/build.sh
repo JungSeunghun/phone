@@ -6,6 +6,9 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 swift build --build-system native -c release
 BINARY_DIRECTORY="$(swift build --build-system native -c release --show-bin-path)"
 cp "$BINARY_DIRECTORY/PhoneMirror" "$APP/Contents/MacOS/PhoneMirror"
+for RESOURCE_BUNDLE in "$BINARY_DIRECTORY"/PhoneMirrorLocalization_*.bundle; do
+    if [ -d "$RESOURCE_BUNDLE" ]; then cp -R "$RESOURCE_BUNDLE" "$APP/Contents/Resources/"; fi
+done
 cp Vendor/scrcpy-server-v5.0 "$APP/Contents/Resources/scrcpy-server-v5.0"
 cp Vendor/scrcpy-LICENSE "$APP/Contents/Resources/scrcpy-LICENSE"
 cat > "$APP/Contents/Info.plist" <<'PLIST'

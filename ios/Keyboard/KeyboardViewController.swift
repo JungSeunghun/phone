@@ -1,8 +1,10 @@
 import UIKit
 
 final class KeyboardViewController: UIInputViewController, KeyboardTextDocument {
+  private func localizedText(_ text: String) -> String { ApplicationLanguagePreferences(defaults: UserDefaults(suiteName: SenderSharedContainer.identifier) ?? .standard).load().translate(text) }
   private let network = KeyboardConnection()
   private let status = UILabel()
+  private var keyButtons: [(UIButton, String)] = []
   private var connectedCode: String?
   override func viewDidLoad() {
     super.viewDidLoad()
@@ -30,7 +32,8 @@ final class KeyboardViewController: UIInputViewController, KeyboardTextDocument 
       row.spacing = 4
       for key in keys {
         let button = UIButton(type: .system)
-        button.setTitle(key, for: .normal)
+        button.setTitle(localizedText(key), for: .normal)
+        keyButtons.append((button, key))
         button.backgroundColor = .secondarySystemBackground
         button.layer.cornerRadius = 5
         button.heightAnchor.constraint(equalToConstant: 38).isActive = true
@@ -39,7 +42,7 @@ final class KeyboardViewController: UIInputViewController, KeyboardTextDocument 
       }
       stack.addArrangedSubview(row)
     }
-    network.onStatus = { [weak self] value in self?.status.text = value }
+    network.onStatus = { [weak self] value in self?.status.text = self?.localizedText(value) }
     network.onCommand = { [weak self] command in
       guard let self, self.hasFullAccess, self.view.window != nil else {
         throw SenderError.inactive
@@ -52,6 +55,7 @@ final class KeyboardViewController: UIInputViewController, KeyboardTextDocument 
   }
   override func viewDidAppear(_ animated: Bool) {
     super.viewDidAppear(animated)
+    for (button, key) in keyButtons { button.setTitle(localizedText(key), for: .normal) }
     connect()
   }
   override func viewWillDisappear(_ animated: Bool) {
@@ -61,13 +65,13 @@ final class KeyboardViewController: UIInputViewController, KeyboardTextDocument 
   private func connect() {
     network.stop()
     guard hasFullAccess else {
-      status.text = "컴퓨터 입력: 설정에서 이 키보드의 전체 접근 허용을 켜세요"
+      status.text = localizedText("컴퓨터 입력: 설정에서 이 키보드의 전체 접근 허용을 켜세요")
       return
     }
     guard let defaults = UserDefaults(suiteName: SenderSharedContainer.identifier),
       let code = try? KeyboardConnectionCode.load(defaults)
     else {
-      status.text = "Phone Mirror Sender 앱에서 키보드 연결 코드를 저장하세요"
+      status.text = localizedText("Phone Mirror Sender 앱에서 키보드 연결 코드를 저장하세요")
       return
     }
     network.start(code)

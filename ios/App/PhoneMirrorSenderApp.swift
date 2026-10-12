@@ -6,6 +6,9 @@ import UIKit
 @main
 struct PhoneMirrorSenderApp: App { var body: some Scene { WindowGroup { SenderView() } } }
 struct SenderView: View {
+    @AppStorage(ApplicationLanguagePreferences.storageKey, store: UserDefaults(suiteName: SenderSharedContainer.identifier)!) private var languageCode = "ko"
+    private func localizedText(_ text: String) -> String { (ApplicationLanguage(rawValue: languageCode) ?? .korean).translate(text) }
+
   @State private var scanningCode = false
   @State private var probe: NWConnection?
   @State private var setup = SenderSetupState()
@@ -19,37 +22,34 @@ struct SenderView: View {
   var body: some View {
     NavigationStack {
       Form {
-        Section("1. 컴퓨터에서 수신 대기 켜기") {
-          Text(
-            "Mac 또는 Windows의 Phone Mirror에서 ‘iPhone 수신 시작’을 켜세요. Wi-Fi 연결은 같은 네트워크를 사용하세요. Windows USB 연결은 ‘iPhone USB 수신 시작’을 켜고 USB 케이블과 컴퓨터 신뢰를 확인하세요."
-          )
+        Section(localizedText("언어 설정")) { Picker("언어 / Language", selection: Binding(get: { (ApplicationLanguage(rawValue: languageCode) ?? .korean).rawValue }, set: { languageCode = $0 })) { ForEach(ApplicationLanguage.allCases, id: \.rawValue) { Text($0.displayName).tag($0.rawValue) } } }
+        Section(localizedText("1. 컴퓨터에서 수신 대기 켜기")) {
+          Text(localizedText("Mac 또는 Windows의 Phone Mirror에서 ‘iPhone 수신 시작’을 켜세요. Wi-Fi 연결은 같은 네트워크를 사용하세요. Windows USB 연결은 ‘iPhone USB 수신 시작’을 켜고 USB 케이블과 컴퓨터 신뢰를 확인하세요."))
         }
-        Section("2. 연결 코드 저장") {
-          Button("QR 코드 스캔") { scanningCode = true }
+        Section(localizedText("2. 연결 코드 저장")) {
+          Button(localizedText("QR 코드 스캔")) { scanningCode = true }
             .accessibilityIdentifier("scanConnectionCode")
-          TextField("PMW1 또는 PMU1 연결 코드", text: $code, axis: .vertical).textInputAutocapitalization(
+          TextField(localizedText("PMW1 또는 PMU1 연결 코드"), text: $code, axis: .vertical).textInputAutocapitalization(
             .never
           ).autocorrectionDisabled().privacySensitive().onChange(of: code) { _ in invalidateProbe()
           }
-          Picker("최대 해상도", selection: $dimension) {
+          Picker(localizedText("최대 해상도"), selection: $dimension) {
             ForEach([720, 1280, 1920], id: \.self) { Text("\($0)px").tag($0) }
           }.onChange(of: dimension) { _ in invalidateProbe() }
-          Picker("프레임", selection: $frameRate) {
+          Picker(localizedText("프레임"), selection: $frameRate) {
             ForEach([15, 30, 60], id: \.self) { Text("\($0) fps").tag($0) }
           }.onChange(of: frameRate) { _ in invalidateProbe() }
-          Toggle("Wi-Fi 자동 화질", isOn: $adaptiveQuality).onChange(of: adaptiveQuality) { _ in
+          Toggle(localizedText("Wi-Fi 자동 화질"), isOn: $adaptiveQuality).onChange(of: adaptiveQuality) { _ in
             invalidateProbe()
           }
-          Text("Wi-Fi 전송이 느려지면 영상 비트레이트를 낮추고 안정되면 회복합니다. 해상도와 소리는 유지합니다.")
-          Toggle("앱 소리 송출", isOn: $audio).onChange(of: audio) { _ in invalidateProbe() }
-          Button("연결 코드 저장") { save() }.disabled((try? SenderConnectionCode(code)) == nil)
-          Text(message).accessibilityIdentifier("senderStatus")
+          Text(localizedText("Wi-Fi 전송이 느려지면 영상 비트레이트를 낮추고 안정되면 회복합니다. 해상도와 소리는 유지합니다."))
+          Toggle(localizedText("앱 소리 송출"), isOn: $audio).onChange(of: audio) { _ in invalidateProbe() }
+          Button(localizedText("연결 코드 저장")) { save() }.disabled((try? SenderConnectionCode(code)) == nil)
+          Text(localizedText(message)).accessibilityIdentifier("senderStatus")
         }
-        Section("3. 화면 송출 시작") {
+        Section(localizedText("3. 화면 송출 시작")) {
           BroadcastPicker(enabled: setup.canBroadcast).frame(height: 60)
-          Text(
-            "시스템 화면 방송 창에서 송출을 시작하세요. 종료는 iPhone의 화면 방송 표시에서 할 수 있습니다. 마이크는 사용하지 않습니다. 콘텐츠에 따라 화면·앱 소리 송출이 제한될 수 있습니다."
-          )
+          Text(localizedText("시스템 화면 방송 창에서 송출을 시작하세요. 종료는 iPhone의 화면 방송 표시에서 할 수 있습니다. 마이크는 사용하지 않습니다. 콘텐츠에 따라 화면·앱 소리 송출이 제한될 수 있습니다."))
         }
         KeyboardSetupView()
       }
@@ -61,10 +61,10 @@ struct SenderView: View {
             code = scannedCode
             message = "QR 코드를 읽었습니다. 연결 코드 저장을 누른 뒤 화면 방송을 시작하세요."
             scanningCode = false
-          }.navigationTitle("연결 QR 코드 스캔")
+          }.navigationTitle(localizedText("연결 QR 코드 스캔"))
             .toolbar {
               ToolbarItem(placement: .cancellationAction) {
-                Button("취소") { scanningCode = false }
+                Button(localizedText("취소")) { scanningCode = false }
               }
             }
         }
@@ -146,10 +146,11 @@ struct BroadcastPicker: UIViewRepresentable {
     let view = RPSystemBroadcastPickerView(frame: .zero)
     view.preferredExtension = (Bundle.main.bundleIdentifier ?? "local.phone.sender") + ".Broadcast"
     view.showsMicrophoneButton = false
-    view.accessibilityLabel = "화면 송출 시작"
+    view.accessibilityLabel = ApplicationLanguagePreferences(defaults: UserDefaults(suiteName: SenderSharedContainer.identifier) ?? .standard).load().translate("화면 송출 시작")
     return view
   }
   func updateUIView(_ view: RPSystemBroadcastPickerView, context: Context) {
+    view.accessibilityLabel = ApplicationLanguagePreferences(defaults: UserDefaults(suiteName: SenderSharedContainer.identifier) ?? .standard).load().translate("화면 송출 시작")
     view.isUserInteractionEnabled = enabled
     view.alpha = enabled ? 1 : 0.35
   }
