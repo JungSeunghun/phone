@@ -24,14 +24,30 @@ export function IosReceiverPanel({
           ? translate("iPhone Windows USB 수신")
           : translate("iPhone Wi-Fi 수신")}
       </summary>
+      <ol className="connection-steps">
+        {(transport === "usb"
+          ? [
+              "Windows에 Apple 기기 드라이버를 설치하세요.",
+              "iPhone 한 대를 USB로 연결하고 ‘이 컴퓨터를 신뢰’를 승인하세요.",
+              "수신을 시작하고 Phone Mirror Sender에 USB 코드를 저장하세요.",
+              "Phone Mirror Sender에서 화면 방송을 시작하세요.",
+            ]
+          : [
+              "iPhone과 컴퓨터를 같은 Wi-Fi에 연결하세요.",
+              "수신을 시작하고 Phone Mirror Sender에 연결 QR 또는 코드를 저장하세요.",
+              "Phone Mirror Sender에서 화면 방송을 시작하세요.",
+            ]
+        ).map((step) => (
+          <li key={step}>{translate(step)}</li>
+        ))}
+      </ol>
       <p className="hint">
-        {transport === "usb"
-          ? translate(
-              "Windows에 Apple 기기 드라이버를 설치하고 iPhone 한 대를 USB로 연결해 신뢰를 승인하세요. Phone Mirror Sender에서 USB 코드를 저장하고 화면 방송을 시작하세요. Wi-Fi는 필요하지 않습니다.",
-            )
-          : translate(
-              "같은 Wi-Fi에서 Phone Mirror Sender로 화면과 앱 소리를 송출하세요. 화질·프레임은 iPhone 앱에서 설정합니다.",
-            )}
+        {transport === "usb" && (
+          <>{translate("USB 수신에는 Wi-Fi가 필요하지 않습니다.")} </>
+        )}
+        {translate(
+          "화면과 앱 소리를 받습니다. 화질과 프레임은 iPhone 송출 앱에서 설정하세요.",
+        )}
       </p>
       {state.phase === "listening" ? (
         <>

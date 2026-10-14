@@ -60,7 +60,38 @@ export class TextInputController {
   key(key: Extract<ControlInput, { kind: "key" }>["key"]) {
     return this.enqueue({ kind: "key", key });
   }
-  private enqueue(input: ControlInput) {
+  physicalKey(input: Extract<ControlInput, { kind: "keyboard" }>) {
+    return this.enqueue(input);
+  }
+  openKeyboardSettings() {
+    return this.enqueue({ kind: "keyboardsettings" });
+  }
+  replaceComposingText(previous: string, text: string) {
+    const error =
+      (previous && validatePhoneText(previous)) ||
+      (text && validatePhoneText(text));
+    if (error) {
+      this.update({ message: error });
+      return Promise.resolve();
+    }
+    const segmenter = new Intl.Segmenter(undefined, {
+      granularity: "grapheme",
+    });
+    const before = Array.from(
+      segmenter.segment(previous),
+      (part) => part.segment,
+    );
+    const after = Array.from(segmenter.segment(text), (part) => part.segment);
+    let common = 0;
+    while (common < before.length && before[common] === after[common]) common++;
+    const inputs: ControlInput[] = before
+      .slice(common)
+      .map(() => ({ kind: "key", key: "backspace" }));
+    const suffix = after.slice(common).join("");
+    if (suffix) inputs.push({ kind: "paste", text: suffix });
+    return inputs.length ? this.enqueue(inputs) : Promise.resolve();
+  }
+  private enqueue(input: ControlInput | ControlInput[]) {
     const session = this.session(),
       generation = this.generation;
     if (!session) return Promise.resolve();
@@ -76,7 +107,11 @@ export class TextInputController {
       try {
         if (generation !== this.generation || session !== this.session())
           return;
-        await this.send(input, session);
+        for (const action of Array.isArray(input) ? input : [input]) {
+          if (generation !== this.generation || session !== this.session())
+            return;
+          await this.send(action, session);
+        }
         if (generation === this.generation && session === this.session())
           this.update({ message: "폰에 입력을 전달했습니다." });
       } catch {

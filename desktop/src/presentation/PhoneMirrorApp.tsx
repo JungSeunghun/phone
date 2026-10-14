@@ -42,6 +42,7 @@ import { listen } from "@tauri-apps/api/event";
 import { WindowPresentationController } from "../application/WindowPresentationController";
 import { TauriWindowPresentationBackend } from "../infrastructure/TauriWindowPresentationBackend";
 
+import { VideoPerformanceInfo } from "./VideoPerformanceInfo";
 import type { VideoPerformanceSnapshot } from "../domain/VideoPerformance";
 import { RecordingStatus } from "./RecordingStatus";
 import { ToolbarIcon } from "./ToolbarIcon";
@@ -52,7 +53,8 @@ import {
   type TextClipboard,
 } from "../application/TextInputController";
 import { SystemTextClipboard } from "../infrastructure/SystemTextClipboard";
-import { TextInputPanel } from "./TextInputPanel";
+import { ScreenTextInput } from "./ScreenTextInput";
+import { mapPhonePosition } from "../application/MouseInputController";
 import { IosKeyboardInputController } from "../application/IosKeyboardInputController";
 import { TauriIosKeyboardInputBackend } from "../infrastructure/TauriIosKeyboardInputBackend";
 import { IosKeyboardInputPanel } from "./IosKeyboardInputPanel";
@@ -138,6 +140,7 @@ function PhoneMirrorContent({
       controller.getSnapshot,
     ),
     canvas = useRef<HTMLCanvasElement>(null);
+  const phoneTextField = useRef<HTMLTextAreaElement>(null);
   const keyboardInput = useMemo(
     () =>
       iosKeyboardInputController ??
@@ -342,6 +345,9 @@ function PhoneMirrorContent({
     useState<VideoPerformanceSnapshot>();
   const interaction = usePhoneInteraction(controller);
   const capabilities = controller.getCapabilities();
+  const textInputEnabled =
+    state.phase === "live" &&
+    (capabilities.control || !!keyboardInput.session(state.selectedDeviceId));
   const active = ["connecting", "live", "reconnecting"].includes(state.phase);
   const applicationUpdate = useMemo(
     () =>
@@ -563,7 +569,7 @@ function PhoneMirrorContent({
               >
                 {[720, 1280, 1920, 2560, 3840].map((size) => (
                   <option key={size} value={size}>
-                    {size}px
+                    {size} px
                   </option>
                 ))}
               </select>
@@ -620,7 +626,7 @@ function PhoneMirrorContent({
                   })
                 }
               />{" "}
-              {translate("연결 중 폰 화면 켜두기")}{" "}
+              {translate("연결 중 폰 화면 켜 두기")}{" "}
             </label>
           </section>
           {selected?.platform === "ios" && (
@@ -782,23 +788,53 @@ function PhoneMirrorContent({
                 ? 0
                 : -1
             }
-            onKeyDown={(event) => {
-              if (
-                (event.metaKey || event.ctrlKey) &&
-                !event.altKey &&
-                !event.shiftKey &&
-                event.key.toLowerCase() === "v" &&
-                !event.nativeEvent.isComposing
-              ) {
+            {...interaction}
+            onFocus={() => {
+              if (textInputEnabled)
+                phoneTextField.current?.focus({ preventScroll: true });
+            }}
+            onPointerDown={(event) => {
+              const rectangle = event.currentTarget.getBoundingClientRect();
+              const point =
+                state.dimensions &&
+                mapPhonePosition(
+                  event.clientX,
+                  event.clientY,
+                  rectangle,
+                  state.dimensions.width,
+                  state.dimensions.height,
+                );
+              if (event.button === 0 && !point) {
                 event.preventDefault();
-                if (!event.repeat) void textInput.pasteClipboard();
+                phoneTextField.current?.blur();
+                return;
+              }
+              if (
+                textInputEnabled &&
+                event.button === 0 &&
+                point &&
+                phoneTextField.current
+              ) {
+                phoneTextField.current.style.left = `${event.clientX - rectangle.left + event.currentTarget.offsetLeft}px`;
+                phoneTextField.current.style.top = `${event.clientY - rectangle.top + event.currentTarget.offsetTop}px`;
+              }
+              interaction.onPointerDown(event);
+              if (textInputEnabled && event.button === 0 && point) {
+                event.preventDefault();
+                phoneTextField.current?.focus({ preventScroll: true });
               }
             }}
-            {...interaction}
+            aria-describedby="phone-text-input-help"
             aria-label={translate("폰 영상")}
             className={state.phase === "live" ? "visible" : "hidden"}
             width={1}
             height={1}
+          />
+          <ScreenTextInput
+            controller={textInput}
+            inputRef={phoneTextField}
+            enabled={textInputEnabled}
+            platform={selected?.platform}
           />
           {state.phase !== "live" && (
             <div className="empty-state">
@@ -820,17 +856,6 @@ function PhoneMirrorContent({
             </div>
           )}
         </div>
-        {(capabilities.control || selected?.platform === "ios") && (
-          <TextInputPanel
-            controller={textInput}
-            enabled={
-              state.phase === "live" &&
-              (capabilities.control ||
-                !!keyboardInput.session(state.selectedDeviceId))
-            }
-            platform={selected?.platform}
-          />
-        )}
         <div className="viewer-toolbar">
           <div className="audio-controls">
             {state.audioPlayback !== "playing" && (
@@ -874,38 +899,32 @@ function PhoneMirrorContent({
               onRecord={() => void media.startRecording()}
             />
           )}
-          <details className="performance-info">
-            <summary>{translate("성능 정보")}</summary>
-            <div>
-              {" "}
-              {translate("표시")} {performanceReport?.fps.toFixed(1) ?? "0"}{" "}
-              {translate("fps · 수신")}
-              {performanceReport?.received ?? 0} {translate("· 표시")}
-              {performanceReport?.presented ?? 0} {translate("· 최신 교체")}
-              {performanceReport?.replaced ?? 0}
-              <br /> {translate("수신 간격 p95")}
-              {performanceReport?.receiveGapP95Ms.toFixed(1) ?? "0"}{" "}
-              {translate("ms · 디코딩 p95")}{" "}
-              {performanceReport?.decodeP95Ms.toFixed(1) ?? "0"}{" "}
-              {translate("ms · 그리기 p95")}{" "}
-              {performanceReport?.paintP95Ms.toFixed(1) ?? "0"} ms
-              <br /> {translate("표시 간격 p95")}
-              {performanceReport?.displayGapP95Ms.toFixed(1) ?? "0"}{" "}
-              {translate("ms / 최대")}
-              {performanceReport?.displayGapMaxMs.toFixed(1) ?? "0"}{" "}
-              {translate("ms · 디코더 큐 최대")}{" "}
-              {performanceReport?.maxDecodeQueue ?? 0}
-              <br />{" "}
-              {translate(
-                "표시 FPS는 세션 평균이며 정지 화면에서는 낮아질 수 있습니다. 최근 최대 256개 표본, 캔버스 그리기 기준입니다.",
-              )}{" "}
-            </div>
-          </details>
-          <details className="interaction-help">
+          <VideoPerformanceInfo
+            report={performanceReport}
+            dimensions={state.dimensions}
+          />
+          <details className="interaction-help" name="viewer-help">
             <summary aria-label={translate("마우스 조작 안내")}>?</summary>
-            <p>{translate(state.inputMessage)}</p>
-            <p>{translate("Esc: 기본 보기로 돌아가기")}</p>
-            <p>{translate("PiP 창 닫기: 기본 보기로 돌아가기")}</p>
+            <div className="interaction-help-content">
+              <p>{translate(state.inputMessage)}</p>
+              <p>
+                {translate(
+                  selected?.platform === "ios"
+                    ? "폰에서 입력칸을 선택한 뒤 화면을 클릭해 입력하세요. ⌘V / Ctrl+V로 붙여넣을 수 있습니다."
+                    : "폰 화면의 입력칸을 클릭해 입력하세요. 한·영 전환은 Caps Lock / Ctrl+Space를 사용하세요. ⌘V / Ctrl+V로 붙여넣을 수 있습니다.",
+                )}
+              </p>
+              {selected?.platform === "android" && (
+                <button
+                  disabled={!textInputEnabled}
+                  onClick={() => void textInput.openKeyboardSettings()}
+                >
+                  {translate("폰 키보드 설정")}
+                </button>
+              )}
+              <p>{translate("Esc: 기본 보기로 돌아가기")}</p>
+              <p>{translate("PiP 창 닫기: 기본 보기로 돌아가기")}</p>
+            </div>
           </details>
         </div>
         {capture.screenshotMessage && (

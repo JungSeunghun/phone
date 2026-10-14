@@ -7,9 +7,7 @@ for (const mode of ["normal", "fullscreen", "pip"])
   }) => {
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
     await page.goto("/tests/browser/layout.html?ios=1&ioskeyboard=1");
-    await expect(
-      page.getByRole("button", { name: "폰에 붙여넣기" }),
-    ).toBeDisabled();
+    await expect(page.getByLabel("다국어 직접 입력")).toBeDisabled();
     await page.getByText("iPhone 다국어 입력 연결", { exact: true }).click();
     await page.getByRole("button", { name: "iPhone 키보드 연결 시작" }).click();
     await expect(page.getByLabel("키보드 연결 코드 1")).toHaveValue(/PMK1/);
@@ -21,9 +19,7 @@ for (const mode of ["normal", "fullscreen", "pip"])
         window as unknown as { renderFixture: (w: number, h: number) => void }
       ).renderFixture(320, 640),
     );
-    await expect(
-      page.getByRole("button", { name: "폰에 붙여넣기" }),
-    ).toBeEnabled();
+    await expect(page.getByLabel("다국어 직접 입력")).toBeEnabled();
     if (mode !== "normal")
       await page
         .getByRole("button", {
@@ -35,7 +31,12 @@ for (const mode of ["normal", "fullscreen", "pip"])
       page,
       "한국어 日本語 中文 العربية 😀é\n",
     );
-    await page.getByRole("button", { name: "폰에 붙여넣기" }).click();
+    await expect(
+      page.getByRole("button", { name: "폰에 붙여넣기" }),
+    ).toHaveCount(0);
+    const canvas = page.getByLabel("폰 영상");
+    await canvas.click();
+    await page.keyboard.press("Meta+v");
     const inputs = () =>
       page.evaluate(
         () =>
@@ -43,7 +44,6 @@ for (const mode of ["normal", "fullscreen", "pip"])
             .keyboardControls,
       );
     await expect.poll(inputs).toEqual([{ kind: "paste", text }]);
-    const canvas = page.getByLabel("폰 영상");
     let expectedCount = 1;
     for (const key of ["Meta+v", "Control+v"]) {
       await canvas.focus();
@@ -54,7 +54,8 @@ for (const mode of ["normal", "fullscreen", "pip"])
     }
     await expect.poll(async () => (await inputs()).length).toBe(3);
     const field = page.getByLabel("다국어 직접 입력");
-    await field.focus();
+    await canvas.focus();
+    await expect(field).toBeFocused();
     await page.keyboard.insertText("你好 😀");
     await expect
       .poll(async () => (await inputs()).at(-1))
@@ -69,7 +70,5 @@ for (const mode of ["normal", "fullscreen", "pip"])
       ),
     ).toEqual([]);
     await page.getByRole("button", { name: "연결 종료", exact: true }).click();
-    await expect(
-      page.getByRole("button", { name: "폰에 붙여넣기" }),
-    ).toBeDisabled();
+    await expect(page.getByLabel("다국어 직접 입력")).toBeDisabled();
   });

@@ -101,7 +101,8 @@ export function AndroidWirelessConnectionPanel({
           <input
             aria-label={translate("연결 주소")}
             value={state.connectionAddress}
-            placeholder={translate("폰의 무선 디버깅 연결 IP:포트")}
+            placeholder="192.168.0.12:37123"
+            aria-describedby="android-connection-address-help"
             maxLength={128}
             disabled={state.wirelessBusy || pairingBusy}
             onChange={(event) =>
@@ -109,6 +110,11 @@ export function AndroidWirelessConnectionPanel({
             }
           />
         </label>
+        <p className="hint" id="android-connection-address-help">
+          {translate(
+            "무선 디버깅 화면의 연결 IP 주소와 포트를 입력하세요. 페어링 포트와는 다릅니다.",
+          )}
+        </p>
         <button
           className="secondary"
           disabled={!state.canConnect || pairingBusy}

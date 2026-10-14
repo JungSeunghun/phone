@@ -29,6 +29,11 @@ pub enum ControlInput {
     Paste {
         text: String,
     },
+    Keyboard {
+        usage: u8,
+        modifiers: u8,
+    },
+    KeyboardSettings,
     Key {
         key: EditingKey,
     },
@@ -137,6 +142,16 @@ impl ControlInput {
             }
             Self::Back => Ok(vec![4, 0, 4, 1]),
             Self::Paste { .. } => unreachable!(),
+            Self::Keyboard { usage, modifiers } => {
+                if !(4..=0x63).contains(&usage) || modifiers > 15 {
+                    return Err("잘못된 키보드 입력입니다.".into());
+                }
+                let mut bytes = vec![13, 0, 1, 0, 8, modifiers, 0, usage, 0, 0, 0, 0, 0];
+                // Every key press includes its release, including modifier keys.
+                bytes.extend([13, 0, 1, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0]);
+                Ok(bytes)
+            }
+            Self::KeyboardSettings => Ok(vec![15]),
             Self::Key { key } => {
                 let code: u32 = match key {
                     EditingKey::Backspace => 67,
@@ -157,6 +172,21 @@ impl ControlInput {
             }
         }
     }
+}
+
+pub fn keyboard_create_packet() -> Vec<u8> {
+    // Standard USB boot keyboard: modifier byte, reserved byte and six usages.
+    const DESCRIPTOR: &[u8] = &[
+        0x05, 0x01, 0x09, 0x06, 0xa1, 0x01, 0x05, 0x07, 0x19, 0xe0, 0x29, 0xe7, 0x15, 0x00, 0x25,
+        0x01, 0x75, 0x01, 0x95, 0x08, 0x81, 0x02, 0x95, 0x01, 0x75, 0x08, 0x81, 0x01, 0x95, 0x06,
+        0x75, 0x08, 0x15, 0x00, 0x25, 0x65, 0x05, 0x07, 0x19, 0x00, 0x29, 0x65, 0x81, 0x00, 0xc0,
+    ];
+    let name = b"Phone Mirror Keyboard";
+    let mut bytes = vec![12, 0, 1, 0, 0, 0, 0, name.len() as u8];
+    bytes.extend(name);
+    bytes.extend((DESCRIPTOR.len() as u16).to_be_bytes());
+    bytes.extend(DESCRIPTOR);
+    bytes
 }
 pub fn validate_audio_packet(packet: &[u8]) -> Result<(), String> {
     if packet.len() < 12 {

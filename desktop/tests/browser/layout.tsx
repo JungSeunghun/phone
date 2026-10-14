@@ -30,7 +30,11 @@ const device: PhoneDevice = {
     : iosFixture
       ? "ios:fixture"
       : "fixture",
-  name: iosFixture ? "Mock iPhone" : "Layout fixture",
+  name: new URLSearchParams(location.search).has("longname")
+    ? "Layout fixture with a very long device name · 줄바꿈 확인용 기기 이름"
+    : iosFixture
+      ? "Mock iPhone"
+      : "Layout fixture",
   availability: "ready",
   capabilities:
     iosWifiFixture || iosAudioFixture || iosUsbFixture

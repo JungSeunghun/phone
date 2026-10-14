@@ -24,11 +24,18 @@ export function AndroidQrPairingPanel({
   }, [state.payload]);
   return (
     <section aria-label={translate("Android QR 페어링")}>
+      <ol className="connection-steps">
+        <li>{translate("폰과 컴퓨터를 같은 Wi-Fi에 연결하세요.")}</li>
+        <li>
+          {translate(
+            "개발자 옵션 → 무선 디버깅에서 ‘QR 코드로 기기 페어링’을 여세요.",
+          )}
+        </li>
+      </ol>
       <p className="hint">
-        {" "}
         {translate(
-          "Android 11 이상: 같은 Wi-Fi에서 개발자 옵션 → 무선 디버깅 → QR 코드로 기기 페어링을 여세요. 기본 카메라 앱 대신 이 스캐너를 사용하세요.",
-        )}{" "}
+          "Android 11 이상에서 지원합니다. 기본 카메라 앱으로는 페어링할 수 없습니다.",
+        )}
       </p>
       {["starting", "waiting", "cancelling", "cancelError"].includes(
         state.phase,

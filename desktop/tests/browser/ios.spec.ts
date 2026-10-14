@@ -9,7 +9,7 @@ test("native synthetic iPhone packets display and share capture, recording and v
   await page.goto("/tests/browser/layout.html?ios=1&native=1");
   await expect(page.getByText(/이 컴퓨터를 신뢰/)).toBeVisible();
   await expect(
-    page.getByRole("checkbox", { name: "연결 중 폰 화면 켜두기" }),
+    page.getByRole("checkbox", { name: "연결 중 폰 화면 켜 두기" }),
   ).toBeDisabled();
   await page.getByRole("button", { name: "폰 화면 보기", exact: true }).click();
   await expect(page.getByText("화면 수신 중", { exact: true })).toBeVisible();

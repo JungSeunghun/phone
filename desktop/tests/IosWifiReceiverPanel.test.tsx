@@ -1,8 +1,29 @@
 import { it, expect, vi } from "vitest";
-import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import {
+  render,
+  screen,
+  fireEvent,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import { IosWifiReceiverPanel } from "../src/presentation/IosWifiReceiverPanel";
 import { IosWifiReceiverController } from "../src/application/IosWifiReceiverController";
 import { deviceCapabilities } from "../src/domain/PhoneMirror";
+it("separates Wi-Fi receiver setup into ordered actions without starting a receiver", () => {
+  const start = vi.fn();
+  render(
+    <IosWifiReceiverPanel
+      controller={new IosWifiReceiverController({ start, stop: vi.fn() })}
+    />,
+  );
+  fireEvent.click(screen.getByText("iPhone Wi-Fi 수신"));
+  const steps = within(screen.getByRole("list")).getAllByRole("listitem");
+  expect(steps).toHaveLength(3);
+  expect(steps[0]).toHaveTextContent("같은 Wi-Fi");
+  expect(steps[1]).toHaveTextContent("연결 QR 또는 코드");
+  expect(steps[2]).toHaveTextContent("화면 방송");
+  expect(start).not.toHaveBeenCalled();
+});
 it("starts listening, exposes code only while active, and stops", async () => {
   const backend = {
     start: vi.fn(async () => ({

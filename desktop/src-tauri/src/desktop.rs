@@ -918,6 +918,9 @@ pub fn run() {
             }
         })
         .setup(|app| {
+            app.manage(crate::phone_keyboard_shortcuts_adapter::install(
+                app.handle(),
+            ));
             let services = (|| -> Result<Arc<DesktopServices>, String> {
                 let executor: Arc<dyn AdbCommandExecutor> =
                     match ProcessAdbCommandExecutor::locate() {
@@ -998,6 +1001,8 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            crate::phone_keyboard_shortcuts_adapter::phone_keyboard_shortcuts_available,
+            crate::phone_keyboard_shortcuts_adapter::set_phone_keyboard_shortcut_focus,
             crate::application_update_adapter::application_update_configuration,
             crate::application_update_adapter::check_application_update,
             crate::application_update_adapter::install_application_update,

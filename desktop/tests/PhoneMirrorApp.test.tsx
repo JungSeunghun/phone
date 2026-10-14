@@ -1,5 +1,5 @@
 import { it, expect } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { PhoneMirrorApp } from "../src/presentation/PhoneMirrorApp";
 import { PhoneMirrorController } from "../src/application/PhoneMirrorController";
@@ -126,7 +126,7 @@ it("presents iPhone USB trust instructions and disables unsupported controls whi
   render(<PhoneMirrorApp controller={controller} />);
   expect(screen.getByText(/이 컴퓨터를 신뢰/)).toBeInTheDocument();
   expect(
-    screen.getByRole("checkbox", { name: "연결 중 폰 화면 켜두기" }),
+    screen.getByRole("checkbox", { name: "연결 중 폰 화면 켜 두기" }),
   ).toBeDisabled();
   await userEvent.click(screen.getByRole("button", { name: "폰 화면 보기" }));
   act(() => controller.frameRendered(320, 640));
@@ -161,7 +161,9 @@ it("presents Windows USB sender instructions and leaves sender video settings on
   expect(screen.getByLabelText("화질")).toBeDisabled();
   expect(screen.getByLabelText("프레임")).toBeDisabled();
   expect(
-    screen.getByText(/화질과 프레임은 iPhone 송출 앱에서 설정/),
+    within(screen.getByRole("region", { name: "화면 설정" })).getByText(
+      /화질과 프레임은 iPhone 송출 앱에서 설정/,
+    ),
   ).toBeInTheDocument();
 });
 

@@ -129,3 +129,63 @@ it("bounds queued commits and drops waiting text after a send failure", async ()
   await f.controller.commitText("new");
   expect(f.send).toHaveBeenCalledTimes(2);
 });
+
+it("replaces only the changed composing suffix and orders edits before later text", async () => {
+  const f = fixture();
+  await f.controller.replaceComposingText("", "ㅎ");
+  await f.controller.replaceComposingText("ㅎ", "한");
+  await f.controller.replaceComposingText("한", "한글");
+  await f.controller.replaceComposingText("한글", "한글");
+  await f.controller.replaceComposingText("한글", "한");
+  await f.controller.commitText(" ");
+  expect(f.send.mock.calls.map(([input]) => input)).toEqual([
+    { kind: "paste", text: "ㅎ" },
+    { kind: "key", key: "backspace" },
+    { kind: "paste", text: "한" },
+    { kind: "paste", text: "글" },
+    { kind: "key", key: "backspace" },
+    { kind: "paste", text: " " },
+  ]);
+  expect(f.readText).not.toHaveBeenCalled();
+});
+
+it("replaces a composing grapheme with one deletion and rejects invalid replacements", async () => {
+  const f = fixture();
+  await f.controller.replaceComposingText("👨‍👩‍👧‍👦", "한");
+  await f.controller.replaceComposingText("한", "");
+  await f.controller.replaceComposingText("", "\0");
+  expect(f.send.mock.calls.map(([input]) => input)).toEqual([
+    { kind: "key", key: "backspace" },
+    { kind: "paste", text: "한" },
+    { kind: "key", key: "backspace" },
+  ]);
+});
+
+it("stops the rest of a composition replacement after failure or session replacement", async () => {
+  for (const failure of [true, false]) {
+    const f = fixture();
+    let finish!: () => void;
+    f.send.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          finish = () =>
+            failure ? reject(Error("device failure")) : resolve();
+        }),
+    );
+    const operation = f.controller.replaceComposingText("하", "한");
+    if (!failure) f.change("B");
+    finish();
+    await operation;
+    expect(f.send).toHaveBeenCalledTimes(1);
+  }
+});
+
+it("opens phone keyboard settings through the active session and reports device errors", async () => {
+  const f = fixture();
+  await f.controller.openKeyboardSettings();
+  expect(f.send).toHaveBeenCalledWith({ kind: "keyboardsettings" }, "A");
+  f.send.mockRejectedValueOnce(Error("private device details"));
+  await f.controller.openKeyboardSettings();
+  expect(f.controller.getSnapshot().message).toContain("실패");
+  expect(f.controller.getSnapshot().message).not.toContain("private");
+});

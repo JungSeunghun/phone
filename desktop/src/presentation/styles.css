@@ -5,6 +5,14 @@
   font-synthesis: none;
   font-size: 14px;
   color-scheme: dark;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --muted: #a8b8cd;
+  --border: #344155;
+  --surface: #202b3a;
 }
 * {
   box-sizing: border-box;
@@ -14,7 +22,8 @@ body {
 }
 button,
 input,
-select {
+select,
+textarea {
   font: inherit;
 }
 button {
@@ -28,6 +37,7 @@ button:disabled {
 button:focus-visible,
 input:focus-visible,
 select:focus-visible,
+textarea:focus-visible,
 summary:focus-visible {
   outline: 2px solid #2dd4bf;
   outline-offset: 3px;
@@ -67,21 +77,30 @@ h2 {
 p {
   line-height: 1.6;
 }
+button {
+  white-space: nowrap;
+}
+html[lang="ko"] .sidebar,
+html[lang="ko"] .viewer p {
+  word-break: keep-all;
+}
 .app-shell {
   display: grid;
-  grid-template-columns: 310px 1fr;
+  grid-template-columns: 280px minmax(0, 1fr);
   grid-template-rows: minmax(0, 1fr);
   height: 100vh;
   min-height: 540px;
 }
 .sidebar {
-  padding: 26px 22px;
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 23px;
+  gap: 0;
   background: #18212d;
   border-right: 1px solid #2d394b;
-  overflow-y: auto;
+  overflow: hidden;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .brand {
   display: flex;
@@ -111,25 +130,27 @@ p {
   font-size: 12px;
 }
 .hint {
-  color: #91a2b9;
+  color: var(--muted);
   font-size: 12px;
-  margin-top: 10px;
+  margin-top: var(--space-2);
 }
 .setting {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 13px;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
   color: #b5c2d4;
 }
 .setting select {
-  width: 155px;
+  width: 144px;
+  flex-shrink: 0;
 }
 .checkbox {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin-top: 15px;
+  margin-top: var(--space-3);
   font-size: 13px;
   color: #c5d1df;
 }
@@ -148,7 +169,7 @@ p {
 }
 .wireless-panel label {
   display: block;
-  margin-top: 13px;
+  margin-top: var(--space-3);
   font-size: 12px;
   color: #b5c2d4;
 }
@@ -223,6 +244,7 @@ p {
   background: #50e1cf;
 }
 .viewer {
+  container-type: inline-size;
   min-width: 0;
   min-height: 0;
   overflow: hidden;
@@ -313,15 +335,6 @@ p {
     opacity: 0.35;
   }
 }
-@media (max-width: 850px) {
-  .app-shell {
-    grid-template-columns: 270px 1fr;
-  }
-  .sidebar {
-    padding: 20px 16px;
-  }
-}
-
 .capture-controls {
   display: flex;
   align-items: center;
@@ -429,22 +442,14 @@ p {
 }
 
 /* Viewer workspace: scrolling configuration is independent of session actions. */
-.app-shell {
-  grid-template-columns: 280px minmax(0, 1fr);
-}
-.sidebar {
-  padding: 0;
-  gap: 0;
-  overflow: hidden;
-}
 .sidebar-content {
-  padding: 22px 18px;
+  padding: var(--space-4) 18px;
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  gap: var(--space-5);
   overflow-y: auto;
   min-height: 0;
-  height: 100%;
+  flex: 1;
 }
 .settings-collapsed {
   grid-template-columns: minmax(0, 1fr);
@@ -497,6 +502,7 @@ p {
   min-height: 28px;
 }
 .viewer-toolbar {
+  position: relative;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -574,7 +580,7 @@ p {
   font-size: 12px;
 }
 .interaction-help {
-  position: relative;
+  position: static;
 }
 .interaction-help summary {
   border: 1px solid #344155;
@@ -584,9 +590,23 @@ p {
   text-align: center;
   cursor: pointer;
   list-style: none;
+  display: grid;
+  place-items: center;
 }
-.interaction-help[open] {
-  padding: 8px;
+.interaction-help-content {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 12px;
+  width: min(320px, calc(100cqw - 24px));
+  padding: var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #18212d;
+  box-shadow: 0 8px 24px #0008;
+  z-index: 4;
+}
+.interaction-help-content p + p {
+  margin-top: var(--space-2);
 }
 .interaction-help p {
   font-size: 12px;
@@ -667,7 +687,7 @@ p {
 }
 
 .performance-info {
-  position: relative;
+  position: static;
   font-size: 12px;
   color: var(--muted, #94a3b8);
 }
@@ -675,17 +695,39 @@ p {
   cursor: pointer;
   padding: 6px;
 }
-.performance-info div {
+.performance-info-content {
   position: absolute;
-  bottom: 32px;
-  right: 0;
-  width: min(420px, 65vw);
-  padding: 12px;
+  bottom: calc(100% + 12px);
+  right: 12px;
+  width: min(360px, calc(100cqw - 24px));
+  max-height: min(420px, calc(100vh - 240px));
+  overflow-y: auto;
+  padding: var(--space-3);
   background: #101827;
   border: 1px solid #334155;
   border-radius: 8px;
   line-height: 1.7;
   z-index: 3;
+}
+.performance-info dl {
+  margin: 0 0 var(--space-3);
+  font-variant-numeric: tabular-nums;
+}
+.performance-info dl > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid #273244;
+}
+.performance-info dd {
+  margin: 0;
+  text-align: right;
+  color: #e7edf7;
+  white-space: nowrap;
+}
+.performance-info-content p {
+  line-height: 1.6;
 }
 
 .recording-pause {
@@ -733,9 +775,8 @@ p {
 }
 
 .connection-diagnostics {
-  margin-top: 14px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border, #dfe4e8);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--border);
 }
 .connection-diagnostics summary {
   cursor: pointer;
@@ -753,7 +794,7 @@ p {
 .connection-diagnostics li {
   margin-top: 10px;
   padding: 10px;
-  border: 1px solid #b9c3ce;
+  border: 1px solid var(--border);
   border-radius: 8px;
   overflow-wrap: anywhere;
 }
@@ -950,12 +991,6 @@ p {
   margin-top: 8px;
   margin-bottom: 0;
 }
-.sidebar-content {
-  height: auto;
-  flex: 1;
-  padding-top: 14px;
-  gap: 18px;
-}
 .sidebar-content > section {
   flex-shrink: 0;
 }
@@ -982,43 +1017,40 @@ p {
   margin-top: 3px;
 }
 .sidebar .hint {
-  word-break: keep-all;
   overflow-wrap: anywhere;
 }
 .sidebar-content section > h2 {
   margin-bottom: 12px;
 }
 
-.text-input-panel {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 8px 12px;
-  flex-shrink: 0;
-}
-.text-input-panel textarea {
-  flex: 1;
-  min-width: 120px;
-  min-height: 34px;
+/* Keep a real editable element for IME, without a visible form or tab stop. */
+.screen-text-input {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  opacity: 0;
   resize: none;
-  color: inherit;
-  background: var(--surface, #20232b);
-  border: 1px solid #505665;
+  overflow: hidden;
+  pointer-events: none;
+}
+.screen-text-status {
+  position: absolute;
+  bottom: 12px;
+  left: 12px;
+  right: 12px;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 7px 10px;
-  font: inherit;
-}
-.text-input-help,
-.text-input-status {
-  font-size: 11px;
-  color: #aeb6c5;
-}
-.text-input-status {
-  width: 100%;
-}
-.view-pip .text-input-help {
-  display: none;
+  background: #18212d;
+  color: var(--muted);
+  font-size: 12px;
+  z-index: 2;
 }
 .ios-keyboard-input summary {
   cursor: pointer;
@@ -1033,4 +1065,138 @@ p {
   resize: vertical;
   overflow-wrap: anywhere;
   font-size: 11px;
+}
+
+/* Shared rhythm for connection instructions, forms and local status messages. */
+.sidebar-content > section:first-child .setting {
+  margin-top: 0;
+}
+.first-connection-guide {
+  margin-bottom: var(--space-4);
+}
+.first-connection-guide summary,
+.sidebar details > summary {
+  cursor: pointer;
+  line-height: 1.5;
+}
+.first-connection-guide label,
+.application-update form label {
+  display: grid;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  font-size: 12px;
+  color: #b5c2d4;
+}
+.first-connection-guide ol,
+.connection-steps {
+  padding-left: 20px;
+  margin: var(--space-3) 0;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.first-connection-guide li + li,
+.connection-steps li + li {
+  margin-top: var(--space-2);
+}
+.sidebar .wireless-panel {
+  padding-top: var(--space-4);
+}
+.sidebar .wireless-panel button,
+.application-update button {
+  margin-top: var(--space-3);
+}
+.application-update .checkbox {
+  margin-bottom: var(--space-3);
+}
+.application-update .checkbox + button {
+  margin-top: 0;
+}
+.application-update details {
+  margin-top: var(--space-3);
+}
+.sidebar p[role="status"] {
+  margin-top: var(--space-2);
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.sidebar p[role="status"]:empty {
+  display: none;
+}
+.interaction-help summary::-webkit-details-marker {
+  display: none;
+}
+
+/* The viewer can be narrow even when the application window is wide. */
+@container (max-width: 640px) {
+  .view-normal .viewer-header.connection-panel {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+  }
+  .view-normal .connection-summary {
+    grid-column: 1 / -1;
+    flex-wrap: nowrap;
+    min-height: 24px;
+  }
+  .view-normal .connection-device {
+    flex: 0 1 auto;
+    max-width: 140px;
+    min-width: 0;
+  }
+  .view-normal .connection-summary .metrics {
+    display: none;
+  }
+  .view-normal .connection-state,
+  .view-normal .transport-badge {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+  .view-normal
+    .connection-summary
+    > .transport-badge:last-child:not(:nth-child(2)) {
+    flex-shrink: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .view-normal .view-controls {
+    margin-left: 0;
+  }
+  .view-normal .viewer-header.connection-panel > button {
+    margin: 0;
+    min-height: 32px;
+  }
+  .view-normal .viewer-toolbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+  }
+  .view-normal .audio-controls {
+    min-width: 0;
+    flex-wrap: nowrap;
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .view-normal .audio-status {
+    min-width: 0;
+    flex: 1;
+  }
+  .view-normal .interaction-help {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+  }
+  .view-normal .capture-controls {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .view-normal .performance-info {
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .view-normal .audio-controls button,
+  .view-normal .capture-controls button {
+    min-height: 32px;
+  }
 }

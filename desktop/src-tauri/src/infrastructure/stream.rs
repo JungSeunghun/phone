@@ -281,23 +281,36 @@ pub async fn write_control(
     cancellation: CancellationToken,
 ) -> Result<(), String> {
     let mut pressed: Option<Vec<u8>> = None;
+    let mut keyboard_created = false;
     let result = async {
         loop {
             let packet = tokio::select! {biased;_=cancellation.cancelled()=>return Ok(()),packet=receiver.recv()=>packet};
             let Some(packet) = packet else { cancellation.cancelled().await; return Ok(()); };
+            if matches!(packet.first(), Some(13 | 15)) && !keyboard_created {
+                let create = crate::interaction::keyboard_create_packet();
+                tokio::time::timeout(Duration::from_secs(2), writer.write_all(&create)).await
+                    .map_err(|_| "폰 키보드 연결 시간이 초과됐습니다.")?.map_err(|_| "폰 키보드를 연결할 수 없습니다.")?;
+                keyboard_created = true;
+                // Android's input reader discovers the new device asynchronously.
+                // Do not lose the first key while it is registering the keyboard.
+                tokio::select! { biased;
+                    _ = cancellation.cancelled() => return Ok(()),
+                    _ = tokio::time::sleep(Duration::from_millis(250)) => {}
+                }
+            }
             // Complete each small message to preserve framing even on Stop.
             tokio::time::timeout(Duration::from_secs(2),writer.write_all(&packet)).await
                 .map_err(|_|"폰 입력 응답 시간이 초과됐습니다.")?.map_err(|_|"폰 입력 연결이 종료됐습니다.")?;
             if packet.first() == Some(&9) {
                 // Android handles PASTE asynchronously. Await server processing, then give
                 // its key event time to consume this clipboard before replacing it again.
-                let mut acknowledgement = [0; 9];
-                let read = tokio::time::timeout(Duration::from_secs(2), writer.read_exact(&mut acknowledgement));
+                let read = tokio::time::timeout(Duration::from_secs(2), read_clipboard_acknowledgement(&mut writer));
+                let acknowledgement;
                 tokio::select! { biased;
                     _ = cancellation.cancelled() => return Ok(()),
-                    result = read => { result.map_err(|_| "폰 붙여넣기 확인 시간이 초과됐습니다.")?.map_err(|_| "폰 입력 연결이 종료됐습니다.")?; }
+                    result = read => { acknowledgement = result.map_err(|_| "폰 붙여넣기 확인 시간이 초과됐습니다.")??; }
                 }
-                if acknowledgement[0] != 1 || packet.get(1..9) != Some(&acknowledgement[1..]) { return Err("폰 붙여넣기 확인이 올바르지 않습니다.".into()); }
+                if packet.get(1..9) != Some(&acknowledgement[..]) { return Err("폰 붙여넣기 확인이 올바르지 않습니다.".into()); }
                 tokio::select! { biased;
                     _ = cancellation.cancelled() => return Ok(()),
                     _ = tokio::time::sleep(Duration::from_millis(100)) => {}
@@ -312,7 +325,49 @@ pub async fn write_control(
         packet[23] = 0;
         let _ = tokio::time::timeout(Duration::from_millis(200), writer.write_all(&packet)).await;
     }
+    if keyboard_created {
+        let _ =
+            tokio::time::timeout(Duration::from_millis(200), writer.write_all(&[14, 0, 1])).await;
+    }
     result
+}
+
+async fn read_clipboard_acknowledgement(
+    reader: &mut (impl tokio::io::AsyncRead + Unpin),
+) -> Result<[u8; 8], String> {
+    loop {
+        let kind = reader
+            .read_u8()
+            .await
+            .map_err(|_| "폰 입력 연결이 종료됐습니다.")?;
+        match kind {
+            1 => {
+                let mut sequence = [0; 8];
+                reader
+                    .read_exact(&mut sequence)
+                    .await
+                    .map_err(|_| "폰 입력 연결이 종료됐습니다.")?;
+                return Ok(sequence);
+            }
+            2 => {
+                // A keyboard output report may precede an explicit paste acknowledgement.
+                let mut header = [0; 4];
+                reader
+                    .read_exact(&mut header)
+                    .await
+                    .map_err(|_| "폰 입력 연결이 종료됐습니다.")?;
+                let size = u16::from_be_bytes([header[2], header[3]]) as usize;
+                if size > 4096 {
+                    return Err("잘못된 폰 키보드 응답입니다.".into());
+                }
+                reader
+                    .read_exact(&mut vec![0; size])
+                    .await
+                    .map_err(|_| "폰 입력 연결이 종료됐습니다.")?;
+            }
+            _ => return Err("폰 붙여넣기 확인이 올바르지 않습니다.".into()),
+        }
+    }
 }
 
 async fn drain_logs(reader: impl tokio::io::AsyncRead + Unpin) {

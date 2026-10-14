@@ -9,6 +9,9 @@ pub use desktop::run;
 pub mod media;
 
 pub mod interaction;
+pub mod phone_keyboard_shortcuts;
+#[cfg(feature = "desktop")]
+mod phone_keyboard_shortcuts_adapter;
 
 pub mod window_presentation;
 

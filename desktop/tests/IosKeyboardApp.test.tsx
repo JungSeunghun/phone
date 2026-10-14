@@ -10,7 +10,7 @@ import { PhoneMirrorApp } from "../src/presentation/PhoneMirrorApp";
 import { PhoneMirrorController } from "../src/application/PhoneMirrorController";
 import { IosKeyboardInputController } from "../src/application/IosKeyboardInputController";
 import { FakeBackend } from "./fixtures";
-it("pairs an iPhone keyboard and sends button, Cmd/Ctrl V and committed Unicode without enabling mouse control", async () => {
+it("pairs an iPhone keyboard and sends screen Cmd/Ctrl V and committed Unicode without enabling mouse control", async () => {
   const backend = new FakeBackend();
   backend.devices = [{ ...backend.devices[0], platform: "ios" }];
   const mirror = new PhoneMirrorController(backend);
@@ -37,7 +37,7 @@ it("pairs an iPhone keyboard and sends button, Cmd/Ctrl V and committed Unicode 
       textClipboard={clipboard}
     />,
   );
-  expect(screen.getByRole("button", { name: "폰에 붙여넣기" })).toBeDisabled();
+  expect(screen.getByLabelText("다국어 직접 입력")).toBeDisabled();
   fireEvent.click(screen.getByText("iPhone 다국어 입력 연결"));
   fireEvent.click(
     screen.getByRole("button", { name: "iPhone 키보드 연결 시작" }),
@@ -49,10 +49,14 @@ it("pairs an iPhone keyboard and sends button, Cmd/Ctrl V and committed Unicode 
     mirror.frameRendered(100, 200);
   });
   expect(mirror.getCapabilities().control).toBe(false);
-  fireEvent.click(screen.getByRole("button", { name: "폰에 붙여넣기" }));
+  act(() => screen.getByLabelText("폰 영상").focus());
+  fireEvent.keyDown(screen.getByLabelText("다국어 직접 입력"), {
+    key: "v",
+    metaKey: true,
+  });
   await waitFor(() => expect(inputBackend.send).toHaveBeenCalledTimes(1));
   for (const modifier of [{ metaKey: true }, { ctrlKey: true }]) {
-    fireEvent.keyDown(screen.getByLabelText("폰 영상"), {
+    fireEvent.keyDown(screen.getByLabelText("다국어 직접 입력"), {
       key: "v",
       ...modifier,
     });
@@ -72,5 +76,5 @@ it("pairs an iPhone keyboard and sends button, Cmd/Ctrl V and committed Unicode 
   await act(async () => {
     await mirror.stop();
   });
-  expect(screen.getByRole("button", { name: "폰에 붙여넣기" })).toBeDisabled();
+  expect(screen.getByLabelText("다국어 직접 입력")).toBeDisabled();
 });

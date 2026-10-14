@@ -26,7 +26,10 @@ export function ApplicationUpdatePanel({
     };
   }, [controller]);
   return (
-    <section aria-label={translate("앱 업데이트")}>
+    <section
+      className="application-update"
+      aria-label={translate("앱 업데이트")}
+    >
       <h2>{translate("앱 업데이트")}</h2>
       <p>
         {translate("현재 버전")} {state.version}
