@@ -216,6 +216,7 @@ struct RecordingJob {
     input: Option<SyncSender<RecordingInput>>,
     budget: Arc<PacketBudget>,
     failed: Arc<AtomicBool>,
+    ready: Arc<AtomicBool>,
     paused: bool,
     audio: bool,
     clock: Arc<dyn RecordingClock>,
@@ -236,10 +237,15 @@ struct SessionState {
     job: Option<RecordingJob>,
     closed: bool,
 }
+/// Enqueue a fresh key frame request; implementations must not deliver media synchronously.
+pub trait RecordingFrameRequester: Send + Sync {
+    fn request_key_frame(&self) -> Result<(), String>;
+}
 pub struct RecordingSession {
     state: Mutex<SessionState>,
     clock: Arc<dyn RecordingClock>,
     audio_factory: Arc<dyn crate::recording_audio::RecordingAudioEncoderFactory>,
+    frame_requester: Option<Arc<dyn RecordingFrameRequester>>,
 }
 impl Default for RecordingSession {
     fn default() -> Self {
@@ -247,6 +253,11 @@ impl Default for RecordingSession {
     }
 }
 impl RecordingSession {
+    pub fn with_frame_requester(requester: Arc<dyn RecordingFrameRequester>) -> Self {
+        let mut session = Self::with_clock(Arc::new(MonotonicRecordingClock));
+        session.frame_requester = Some(requester);
+        session
+    }
     pub fn with_clock(clock: Arc<dyn RecordingClock>) -> Self {
         Self::with_clock_and_audio_factory(
             clock,
@@ -261,6 +272,7 @@ impl RecordingSession {
             state: Mutex::new(SessionState::default()),
             clock,
             audio_factory,
+            frame_requester: None,
         }
     }
 
@@ -309,6 +321,8 @@ impl RecordingSession {
         let (input, receiver) = sync_channel::<RecordingInput>(64);
         let failed = Arc::new(AtomicBool::new(false));
         let worker_failed = failed.clone();
+        let ready = Arc::new(AtomicBool::new(false));
+        let worker_ready = ready.clone();
         let ended_at = Arc::new(Mutex::new(None));
         let worker_end = ended_at.clone();
         let encoder = if include_audio {
@@ -316,6 +330,9 @@ impl RecordingSession {
         } else {
             None
         };
+        if let Some(requester) = &self.frame_requester {
+            requester.request_key_frame()?;
+        }
         let clock = self.clock.clone();
         let worker = std::thread::spawn(move || {
             crate::recording_muxer::write_recording(
@@ -327,6 +344,7 @@ impl RecordingSession {
                     sps,
                     pps,
                     audio: include_audio,
+                    ready: worker_ready,
                 },
                 receiver,
                 worker_failed,
@@ -340,6 +358,7 @@ impl RecordingSession {
             input: Some(input),
             budget: Arc::new(PacketBudget::new(RECORDING_QUEUE_BYTES)),
             failed,
+            ready,
             paused: false,
             audio: include_audio,
             clock: self.clock.clone(),
@@ -448,6 +467,11 @@ impl RecordingSession {
         if job.paused == paused {
             return Ok(());
         }
+        if !paused {
+            if let Some(requester) = &self.frame_requester {
+                requester.request_key_frame()?;
+            }
+        }
         let marker = if paused {
             RecordingInput::Pause(self.clock.now())
         } else {
@@ -460,6 +484,39 @@ impl RecordingSession {
         }
         job.paused = paused;
         Ok(())
+    }
+    /// Initial startup succeeds only after the muxer accepts a fresh decodable video sample.
+    pub async fn wait_until_ready(&self, id: &str) -> Result<(), String> {
+        let result = tokio::time::timeout(Duration::from_secs(5), async {
+            loop {
+                {
+                    let state = self.state.lock().unwrap();
+                    let job = state
+                        .job
+                        .as_ref()
+                        .filter(|job| job.id == id)
+                        .ok_or("녹화 준비가 취소됐습니다.")?;
+                    // A frame received just before disconnect still belongs to a saveable recording.
+                    if job.ready.load(Ordering::Acquire) {
+                        return Ok(());
+                    }
+                    if state.closed
+                        || job.input.is_none()
+                        || job.failed.load(Ordering::Acquire)
+                        || job.worker.is_finished()
+                    {
+                        return Err("녹화 기준 프레임을 기다리는 중 연결이 종료됐습니다.".into());
+                    }
+                }
+                tokio::time::sleep(Duration::from_millis(10)).await;
+            }
+        })
+        .await
+        .unwrap_or_else(|_| Err("녹화 기준 프레임 준비 시간이 초과됐습니다.".into()));
+        if result.is_err() {
+            let _ = self.finish(id);
+        }
+        result
     }
     pub fn is_running(&self, id: &str) -> bool {
         self.state

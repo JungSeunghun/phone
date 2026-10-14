@@ -25,6 +25,7 @@ pub(crate) struct RecordingWriterConfig {
     pub sps: Vec<u8>,
     pub pps: Vec<u8>,
     pub audio: bool,
+    pub ready: Arc<AtomicBool>,
 }
 type Writer = mp4::Mp4Writer<BufWriter<File>>;
 struct AudioTrack {
@@ -294,11 +295,15 @@ pub(crate) fn write_recording(
                     }
                     continue;
                 }
+                let units = annex_b_units(&packet.bytes[12..])?;
+                if header.key_frame && !units.iter().any(|nal| nal[0] & 31 == 5) {
+                    return Err("녹화 기준 프레임에 IDR 영상이 없습니다.".into());
+                }
                 let Some(relative) = timeline.video(header.timestamp, header.key_frame)? else {
                     continue;
                 };
                 let mut bytes = Vec::new();
-                for nal in annex_b_units(&packet.bytes[12..])? {
+                for nal in units {
                     if [7, 8].contains(&(nal[0] & 31)) {
                         continue;
                     }
@@ -332,6 +337,7 @@ pub(crate) fn write_recording(
                     is_sync: header.key_frame,
                     bytes: bytes.into(),
                 });
+                config.ready.store(true, Ordering::Release);
                 if let Some(a) = audio.as_mut() {
                     while let Some(bytes) = buffered_audio.pop_front() {
                         a.packet(

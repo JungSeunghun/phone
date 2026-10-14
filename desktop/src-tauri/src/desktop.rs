@@ -449,6 +449,11 @@ fn start_session(
         sessions.start(&request.session_id)?
     };
     let (control_session, control_receiver) = ControlSession::new(cancellation.clone());
+    let recording = Arc::new(if crate::ios::is_ios_target(&request.target) {
+        crate::recording::RecordingSession::default()
+    } else {
+        crate::recording::RecordingSession::with_frame_requester(Arc::new(control_session.clone()))
+    });
     if !crate::ios::is_ios_target(&request.target) {
         services
             .controls
@@ -456,7 +461,6 @@ fn start_session(
             .unwrap()
             .insert(request.session_id.clone(), control_session);
     }
-    let recording = Arc::new(crate::recording::RecordingSession::default());
     services
         .recordings
         .lock()
@@ -652,7 +656,7 @@ async fn save_media_capture(
     .map_err(|_| "파일 저장 작업에 실패했습니다.".to_string())?
 }
 #[tauri::command]
-fn start_native_recording(
+async fn start_native_recording(
     app: tauri::AppHandle,
     state: State<'_, DesktopState>,
     session_id: String,
@@ -664,30 +668,35 @@ fn start_native_recording(
     if state.closing.load(Ordering::SeqCst) {
         return Err("앱을 종료하고 있습니다.".into());
     }
-    let services = state.services()?;
-    let _sessions = services.sessions.lock().unwrap();
-    if state.closing.load(Ordering::SeqCst) {
-        return Err("앱을 업데이트하고 있습니다.".into());
-    }
-    let recording = services
-        .recordings
-        .lock()
-        .unwrap()
-        .get(&session_id)
-        .cloned()
-        .ok_or("영상 세션이 없습니다.")?;
-    let directory = app
-        .path()
-        .app_cache_dir()
-        .map_err(|_| "캐시 경로가 없습니다.")?
-        .join("recordings");
-    recording.start_with_audio(
-        &directory,
-        width,
-        height,
-        fps,
-        include_audio.unwrap_or(false),
-    )
+    let (recording, id) = {
+        let services = state.services()?;
+        let _sessions = services.sessions.lock().unwrap();
+        if state.closing.load(Ordering::SeqCst) {
+            return Err("앱을 업데이트하고 있습니다.".into());
+        }
+        let recording = services
+            .recordings
+            .lock()
+            .unwrap()
+            .get(&session_id)
+            .cloned()
+            .ok_or("영상 세션이 없습니다.")?;
+        let directory = app
+            .path()
+            .app_cache_dir()
+            .map_err(|_| "캐시 경로가 없습니다.")?
+            .join("recordings");
+        let id = recording.start_with_audio(
+            &directory,
+            width,
+            height,
+            fps,
+            include_audio.unwrap_or(false),
+        )?;
+        (recording, id)
+    };
+    recording.wait_until_ready(&id).await?;
+    Ok(id)
 }
 #[tauri::command]
 fn set_native_recording_paused(

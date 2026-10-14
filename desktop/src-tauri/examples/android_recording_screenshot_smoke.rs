@@ -1,6 +1,9 @@
 //! Real Android recording + concurrent local PNG persistence. No media is printed or uploaded.
 use phone_mirror_desktop::{
-    domain::{parse_transports, DeviceAvailability, DeviceEndpoint, MirrorSettings},
+    application::ControlSession,
+    domain::{
+        parse_transports, DeviceAvailability, DeviceEndpoint, MirrorSettings, VideoPacketHeader,
+    },
     infrastructure::{
         AdbCommandExecutor, AndroidStreamService, AudioPacketSink, ProcessAdbCommandExecutor,
         StreamInteraction, VideoPacketSink,
@@ -23,6 +26,8 @@ struct Sink {
     raw: Mutex<File>,
     recording: Arc<RecordingSession>,
     packets: AtomicUsize,
+    key_frames: AtomicUsize,
+    configurations: AtomicUsize,
 }
 impl VideoPacketSink for Sink {
     fn send(&self, packet: Vec<u8>) -> Result<(), String> {
@@ -31,6 +36,13 @@ impl VideoPacketSink for Sink {
             .unwrap()
             .write_all(&packet[12..])
             .map_err(|_| "Cannot write local stream")?;
+        let header = VideoPacketHeader::parse(&packet[..12])?;
+        if header.configuration {
+            self.configurations.fetch_add(1, Ordering::SeqCst);
+        }
+        if header.key_frame {
+            self.key_frames.fetch_add(1, Ordering::SeqCst);
+        }
         self.recording.push(&packet);
         self.packets.fetch_add(1, Ordering::SeqCst);
         Ok(())
@@ -71,11 +83,17 @@ async fn main() -> Result<(), String> {
     std::fs::create_dir_all(&directory)
         .map_err(|_| "Cannot create local verification directory")?;
     let raw = directory.join("stream.h264");
-    let recording = Arc::new(RecordingSession::default());
+    let stop = CancellationToken::new();
+    let (control_session, receiver) = ControlSession::new(stop.clone());
+    let recording = Arc::new(RecordingSession::with_frame_requester(Arc::new(
+        control_session,
+    )));
     let sink = Arc::new(Sink {
         raw: Mutex::new(File::create(&raw).map_err(|_| "Cannot create local stream")?),
         recording: recording.clone(),
         packets: AtomicUsize::new(0),
+        key_frames: AtomicUsize::new(0),
+        configurations: AtomicUsize::new(0),
     });
     let executor: Arc<dyn AdbCommandExecutor> = Arc::new(ProcessAdbCommandExecutor::locate()?);
     let listing = executor
@@ -105,11 +123,9 @@ async fn main() -> Result<(), String> {
         address: identifier.clone(),
         identifier,
     };
-    let stop = CancellationToken::new();
     let cancellation = stop.clone();
     let video = sink.clone();
     let audio = recording.clone();
-    let (_sender, receiver) = tokio::sync::mpsc::channel(64);
     let worker = tokio::spawn(async move {
         service
             .run_interactive(
@@ -130,7 +146,11 @@ async fn main() -> Result<(), String> {
         let dimensions:serde_json::Value=serde_json::from_slice(&command(&["ffprobe","-v","error","-select_streams","v:0","-show_entries","stream=width,height","-of","json",clicked.to_str().unwrap()]).await?).map_err(|_|"Invalid dimensions")?;
         let width=dimensions["streams"][0]["width"].as_u64().ok_or("Missing width")? as u16;
         let height=dimensions["streams"][0]["height"].as_u64().ok_or("Missing height")? as u16;
+        let configurations_before = sink.configurations.load(Ordering::SeqCst);
+        let keys_before = sink.key_frames.load(Ordering::SeqCst);
+        let packets_before = sink.packets.load(Ordering::SeqCst);
         let id=recording.start(&directory,width,height,60)?;
+        recording.wait_until_ready(&id).await?;
         tokio::time::sleep(Duration::from_secs(2)).await;
         let encoded=directory.join("encoded.png");
         for (name,paused) in [("during-recording.png",false),("during-pause.png",true)]{
@@ -145,9 +165,18 @@ async fn main() -> Result<(), String> {
             if paused{recording.set_paused(&id,false)?;}
         }
         tokio::time::sleep(Duration::from_secs(2)).await;
+        eprintln!("Recording evidence: packets before/after start={}/{}, key frames before/after start={}/{}", packets_before, sink.packets.load(Ordering::SeqCst), keys_before, sink.key_frames.load(Ordering::SeqCst));
         let output=directory.join("recording.mp4");recording.finish(&id)?.publish(&output)?;
         command(&["ffmpeg","-v","error","-i",output.to_str().unwrap(),"-f","null","-"]).await?;
-        println!("PASS: real Android {transport:?} video {width}x{height}; PNG persistence during recording and pause (including duplicate-path failure); MP4 decoded fully; media retained only under ignored target output");
+        assert!(sink.configurations.load(Ordering::SeqCst) >= configurations_before + 2,
+            "start and resume must each refresh the encoder configuration");
+        let repeat = recording.start(&directory, width, height, 60)?;
+        recording.wait_until_ready(&repeat).await?;
+        tokio::time::sleep(Duration::from_millis(150)).await;
+        let short_output = directory.join("short-recording.mp4");
+        recording.finish(&repeat)?.publish(&short_output)?;
+        command(&["ffmpeg", "-v", "error", "-i", short_output.to_str().unwrap(), "-f", "null", "-"]).await?;
+        println!("PASS: real Android {transport:?} video {width}x{height}; PNG persistence during recording and pause (including duplicate-path failure); MP4 and repeated 150ms recording decoded fully; start/resume encoder refresh confirmed; media retained only under ignored target output");
         Ok::<(),String>(())
     }.await;
     stop.cancel();

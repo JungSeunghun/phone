@@ -231,3 +231,169 @@ fn completed_recording_survives_missing_directory_and_save_panic_until_explicit_
     assert!(!original.exists());
     assert!(!store.has_pending());
 }
+
+#[derive(Default)]
+struct FrameRequests {
+    count: std::sync::atomic::AtomicUsize,
+    fail: std::sync::atomic::AtomicBool,
+}
+impl phone_mirror_desktop::recording::RecordingFrameRequester for FrameRequests {
+    fn request_key_frame(&self) -> Result<(), String> {
+        use std::sync::atomic::Ordering;
+        self.count.fetch_add(1, Ordering::SeqCst);
+        if self.fail.load(Ordering::SeqCst) {
+            Err("frame request failed".into())
+        } else {
+            Ok(())
+        }
+    }
+}
+#[test]
+fn recording_requests_new_key_frames_at_start_and_each_resume_without_replaying_old_frames() {
+    use std::sync::{atomic::Ordering, Arc};
+    let directory = tempfile::tempdir().unwrap();
+    let requests = Arc::new(FrameRequests::default());
+    let session = RecordingSession::with_frame_requester(requests.clone());
+    session.push(&config());
+    session.push(&packet((1 << 61) | 1, &[0, 0, 1, 0x65, 1])); // Before the user starts.
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    assert_eq!(requests.count.load(Ordering::SeqCst), 1);
+    assert!(session.start(directory.path(), 320, 180, 60).is_err());
+    session.set_paused(&id, false).unwrap();
+    assert_eq!(requests.count.load(Ordering::SeqCst), 1);
+    session.push(&packet(100, &[0, 0, 1, 0x41, 1])); // Delta before the requested key frame.
+    session.push(&packet((1 << 61) | 200, &[0, 0, 1, 0x65, 2]));
+    session.set_paused(&id, true).unwrap();
+    session.set_paused(&id, true).unwrap();
+    session.push(&packet((1 << 61) | 300, &[0, 0, 1, 0x65, 3])); // Paused media is excluded.
+    session.set_paused(&id, false).unwrap();
+    session.set_paused(&id, false).unwrap();
+    assert_eq!(requests.count.load(Ordering::SeqCst), 2);
+    session.push(&packet(400, &[0, 0, 1, 0x41, 4]));
+    session.push(&packet((1 << 61) | 500, &[0, 0, 1, 0x65, 5]));
+    let file = session.finish(&id).unwrap();
+    let mut reader = mp4::Mp4Reader::read_header(
+        std::fs::File::open(file.path()).unwrap(),
+        std::fs::metadata(file.path()).unwrap().len(),
+    )
+    .unwrap();
+    assert_eq!(reader.sample_count(1).unwrap(), 2);
+    assert!(reader.read_sample(1, 1).unwrap().unwrap().is_sync);
+    assert!(reader.read_sample(1, 2).unwrap().unwrap().is_sync);
+    assert!(session.set_paused(&id, false).is_err());
+    session.close();
+    assert!(session.start(directory.path(), 320, 180, 60).is_err());
+    assert_eq!(requests.count.load(Ordering::SeqCst), 2);
+}
+#[test]
+fn failed_frame_requests_do_not_start_recordings_or_resume_paused_recordings() {
+    use std::sync::{atomic::Ordering, Arc};
+    let directory = tempfile::tempdir().unwrap();
+    let requests = Arc::new(FrameRequests::default());
+    let session = RecordingSession::with_frame_requester(requests.clone());
+    assert!(session.start(directory.path(), 320, 180, 60).is_err());
+    assert_eq!(requests.count.load(Ordering::SeqCst), 0);
+    session.push(&config());
+    requests.fail.store(true, Ordering::SeqCst);
+    assert!(session.start(directory.path(), 320, 180, 60).is_err());
+    assert!(!session.has_job());
+    requests.fail.store(false, Ordering::SeqCst);
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x65, 1]));
+    session.set_paused(&id, true).unwrap();
+    requests.fail.store(true, Ordering::SeqCst);
+    assert!(session.set_paused(&id, false).is_err());
+    session.push(&packet((1 << 61) | 100, &[0, 0, 1, 0x65, 2]));
+    let file = session.finish(&id).unwrap();
+    let reader = mp4::Mp4Reader::read_header(
+        std::fs::File::open(file.path()).unwrap(),
+        std::fs::metadata(file.path()).unwrap().len(),
+    )
+    .unwrap();
+    assert_eq!(reader.sample_count(1).unwrap(), 1);
+}
+
+#[tokio::test]
+async fn readiness_waits_for_valid_new_video_and_cancels_when_session_closes() {
+    use std::sync::Arc;
+    let directory = tempfile::tempdir().unwrap();
+    let session = Arc::new(RecordingSession::default());
+    session.push(&config());
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x65, 1]));
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    let waiter = {
+        let session = session.clone();
+        let id = id.clone();
+        tokio::spawn(async move { session.wait_until_ready(&id).await })
+    };
+    tokio::task::yield_now().await;
+    assert!(
+        !waiter.is_finished(),
+        "start readiness returned before a new key frame"
+    );
+    session.push(&packet(100, &[0, 0, 1, 0x41, 1]));
+    tokio::task::yield_now().await;
+    assert!(!waiter.is_finished());
+    session.push(&packet((1 << 61) | 200, &[0, 0, 1, 0x65, 2]));
+    tokio::time::timeout(std::time::Duration::from_secs(1), waiter)
+        .await
+        .unwrap()
+        .unwrap()
+        .unwrap();
+    assert!(session.finish(&id).is_ok());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.close();
+    assert!(session.wait_until_ready(&id).await.is_err());
+    assert!(!session.has_job());
+    assert_eq!(std::fs::read_dir(directory.path()).unwrap().count(), 0);
+}
+#[tokio::test(start_paused = true)]
+async fn readiness_times_out_at_five_seconds_and_removes_partial_output() {
+    use std::{sync::Arc, time::Duration};
+    let directory = tempfile::tempdir().unwrap();
+    let session = Arc::new(RecordingSession::default());
+    session.push(&config());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    let waiter = {
+        let session = session.clone();
+        let id = id.clone();
+        tokio::spawn(async move { session.wait_until_ready(&id).await })
+    };
+    tokio::task::yield_now().await;
+    tokio::time::advance(Duration::from_millis(4999)).await;
+    assert!(!waiter.is_finished());
+    tokio::time::advance(Duration::from_millis(1)).await;
+    assert!(waiter.await.unwrap().is_err());
+    assert!(!session.has_job());
+    session.push(&packet((1 << 61) | 999, &[0, 0, 1, 0x65, 2]));
+    assert!(
+        !session.has_job(),
+        "late frames must not revive timed-out startup"
+    );
+    assert_eq!(std::fs::read_dir(directory.path()).unwrap().count(), 0);
+}
+
+#[tokio::test]
+async fn readiness_rejects_a_key_frame_flag_without_an_idr_sample() {
+    let directory = tempfile::tempdir().unwrap();
+    let session = RecordingSession::default();
+    session.push(&config());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x41, 1]));
+    assert!(session.wait_until_ready(&id).await.is_err());
+    assert!(!session.has_job());
+    assert_eq!(std::fs::read_dir(directory.path()).unwrap().count(), 0);
+}
+
+#[tokio::test]
+async fn readiness_preserves_a_received_frame_when_disconnect_finishes_startup() {
+    let directory = tempfile::tempdir().unwrap();
+    let session = RecordingSession::default();
+    session.push(&config());
+    let id = session.start(directory.path(), 320, 180, 60).unwrap();
+    session.push(&packet(1 << 61, &[0, 0, 1, 0x65, 1]));
+    session.wait_until_ready(&id).await.unwrap();
+    session.close();
+    session.wait_until_ready(&id).await.unwrap();
+    assert!(session.finish(&id).is_ok());
+}

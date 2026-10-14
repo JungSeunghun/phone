@@ -447,3 +447,23 @@ async fn cancelling_keyboard_registration_discards_the_first_and_queued_keys() {
     device.read_to_end(&mut remaining).await.unwrap();
     assert_eq!(remaining, [14, 0, 1]);
 }
+
+#[tokio::test]
+async fn recording_frame_request_uses_the_owned_bounded_control_channel() {
+    use phone_mirror_desktop::{application::ControlSession, recording::RecordingFrameRequester};
+    let cancellation = tokio_util::sync::CancellationToken::new();
+    let (session, mut receiver) = ControlSession::new(cancellation.clone());
+    session.request_key_frame().unwrap();
+    assert_eq!(receiver.recv().await.unwrap(), vec![17]);
+    for _ in 0..64 {
+        session.request_key_frame().unwrap();
+    }
+    assert!(session.request_key_frame().is_err());
+    receiver.recv().await.unwrap();
+    session.request_key_frame().unwrap();
+    cancellation.cancel();
+    assert!(session.request_key_frame().is_err());
+    let (session, receiver) = ControlSession::new(tokio_util::sync::CancellationToken::new());
+    drop(receiver);
+    assert!(session.request_key_frame().is_err());
+}

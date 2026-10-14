@@ -103,3 +103,28 @@ macOS에서 기존 Swift 앱 53개, iOS 코어 26개, 데스크톱 프런트엔�
 Android USB 실기기(SM-S901N)에서 기존 녹화·캡처 통합 예제를 두 번 실행했다. 두 실행 모두 녹화 완료 시 “녹화할 기준 프레임을 받지 못했습니다.” 오류로 종료했으므로 전체 통합 성공으로 보고하지 않는다. 그 전에 생성된 녹화 중/일시정지 중 PNG 총 네 파일은 실제 화면의 PNG 시그니처와 `0600` 권한을 확인했다. 이 검증은 캡처 저장에 한정하며 물리적 케이블 분리 시험은 아니다. 실제 화면 미디어는 외부로 공유하지 않고 무시된 `desktop/src-tauri/target/verification/recording-screenshot`에만 보관한다.
 
 실제 iPhone이 연결되어 있지 않아 서명된 앱과 확장 간 Keychain 공유, ReplayKit·실제 iPhone 키보드 검증은 수행하지 않았다. Windows 네이티브 ACL 적용·읽기 검증도 이 macOS 환경에서는 수행하지 않았다. 로컬 검사 로그는 무시된 `.build/security-*.log`에 보관한다.
+
+## Android 녹화 기준 프레임 준비 검증 (2026-10-14)
+
+이전 녹화 검사 오류는 MP4 writer의 영상 샘플 수가 0인 상태에서 종료할 때 발생하는 경로다. 녹화 시작 전 수신한 키 프레임은 저장하지 않고 다음 키 프레임을 기다리는 기존 정책은 적절하지만, 작업 생성 직후 시작 성공을 반환해 아직 새 기준 프레임이 없는 녹화를 종료할 수 있었다. 최초 진단에서는 이전 검사와 같은 USB 기기로 수정 전 긴 녹화가 통과했다(시작 전/후 키 프레임 1/7). 당시 실패 로그에는 패킷 통계가 없어 과거 기기 상태나 프레임 중단 이유까지 단정하지 않는다. 추가한 같은 연결의 150ms 재녹화 검사는 새 키 프레임 요청만 적용한 상태에서도 동일 오류로 실패해 시작 준비 경합을 실제 기기에서 재현했다.
+
+### 수정
+
+- Android 녹화 시작과 실제 일시정지→재개 전환마다 해당 세션의 제한된 제어 큐에 scrcpy 5.0 `TYPE_RESET_VIDEO`(17)를 보낸다. [상류 메시지 정의](https://github.com/Genymobile/scrcpy/blob/v5.0/server/src/main/java/com/genymobile/scrcpy/control/ControlMessage.java)와 [인코더 재생성 경로](https://github.com/Genymobile/scrcpy/blob/v5.0/server/src/main/java/com/genymobile/scrcpy/video/SurfaceEncoder.java)를 확인했다. 요청은 `RecordingFrameRequester`로 주입하므로 녹화 정책은 USB·Tauri·OS 인코더 API에 의존하지 않는다. iOS에는 Android 제어 메시지를 보내지 않는다.
+- 네이티브 시작 IPC는 muxer가 첫 IDR 영상 샘플을 수용한 후 성공한다. 준비 대기는 최대 5초이며 세션 lock을 잡은 채 기다리지 않는다. 프레임이 없을 때 시간 초과·연결 종료·잘못된 샘플은 실패하고 임시 작업을 정리한다. 종료 직전에 이미 받은 샘플은 저장할 수 있도록 유지한다.
+- 키 프레임 플래그가 있어도 IDR NAL이 없는 샘플은 거부한다. 시작 전·일시정지 중 영상이나 기준 프레임 전의 delta를 파일에 재사용하지 않는다. 반복 시작·반복 재개·취소된 세션·혼잡하거나 닫힌 제어 큐를 검사하며, 재개 요청 실패 시 일시정지 상태를 유지한다.
+- 실기기 예제는 시작 준비를 기다리고, 시작/재개의 인코더 configuration 갱신, 같은 연결의 150ms 재녹화까지 검사한다. 테스트 시간을 늘려 실패를 숨기거나 녹화 이전 영상으로 파일을 채우지 않는다.
+
+### TDD와 자동 검사
+
+프레임 요청 누락 및 실패 무시 테스트 두 개의 assertion 실패를 확인한 뒤 구현했다. 이후 첫 프레임 이전 준비 성공과 5초 경계 테스트 두 개의 실패를 확인하고 준비 대기를 구현했다. 마지막으로 IDR이 없는 키 프레임 플래그가 성공하는 테스트 실패를 확인하고 샘플 검증을 보완했다. 로그는 무시된 `.build/recording-frame-requests-red.log`, `.build/recording-readiness-red.log`, `.build/recording-invalid-key-red.log`에 보관한다.
+
+최종 `cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked`: **151개 통과**. 준비 완료·시간 경계·임시 파일 정리·늦은 프레임·연결 종료 직전 받은 영상의 저장·반복 행동·오디오 및 일시정지 타임라인을 포함한다. `npm test`: **199개 통과**(대기 중 네이티브 시작 뒤 종료, 재개 실패 안내와 일시정지 유지 등 기존 프런트엔드 행동 포함). Clippy `--all-targets --locked -- -D warnings`, Rust 형식 검사, `git diff --check`, 데스크톱 빌드도 통과했다. Windows `x86_64-pc-windows-gnu`는 `--no-default-features --tests --locked` 크로스 컴파일이 통과했으며 Windows 네이티브 실행 결과가 아니다. 기존 Swift macOS 앱 소스는 변경하지 않았다.
+
+### 실제 Android USB 결과
+
+SM-S901N, 886×1920 실제 영상으로 최종 수정본의 녹화·일시정지·재개, 녹화 중/일시정지 중 PNG 저장, 중복 저장 실패 후 녹화 유지, 같은 연결의 150ms 재녹화가 통과했다. 화면이 켜진 상태와 꺼진 상태에서 검사했으며 마지막 검사 후 화면을 깨웠다. 시작과 재개가 각기 새 인코더 configuration을 수신하는 것을 확인했다. 두 MP4를 FFmpeg로 끝까지 디코딩했다. 마지막 실행의 일반 녹화는 53프레임/4.667736초, 짧은 재녹화는 2프레임/0.201314초였고, 두 MP4와 두 PNG의 `0600` 권한도 확인했다.
+
+실제 미디어는 무시된 `desktop/src-tauri/target/verification/recording-screenshot` 아래에만 보관하고 외부로 공유하지 않았다. 이 결과는 Android USB 녹화 검증이며, 물리적 케이블 분리·Android Wi-Fi·실제 iPhone·Windows 네이티브 검증을 의미하지 않는다. 최종 로그는 `.build/recording-physical-final.log`, `.build/recording-all-tests.log`, `.build/recording-clippy.log`, `.build/recording-windows-check.log`에 보관한다.
+
+최종 커밋 전 재검토에서는 `cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked` 151개, `swift test --build-system native` 92개, `swift test --package-path ios` 26개를 다시 실행해 모두 통과했다. 이 재검토 결과는 무시된 `.build/final-review-*-tests.log`에 보관한다.

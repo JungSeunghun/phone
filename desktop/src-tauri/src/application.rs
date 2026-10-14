@@ -47,6 +47,7 @@ impl SessionRegistry {
 }
 
 /// The local input mailbox is independent of Tauri and tied to one session.
+#[derive(Clone)]
 pub struct ControlSession {
     sender: tokio::sync::mpsc::Sender<Vec<u8>>,
     cancellation: CancellationToken,
@@ -63,12 +64,22 @@ impl ControlSession {
         )
     }
     pub fn send(&self, input: &crate::interaction::ControlInput) -> Result<(), String> {
-        let packet = input.encode()?;
+        self.send_packet(input.encode()?)
+    }
+    fn send_packet(&self, packet: Vec<u8>) -> Result<(), String> {
         if self.cancellation.is_cancelled() {
             return Err("폰 입력 세션이 종료됐습니다.".into());
         }
         self.sender
             .try_send(packet)
             .map_err(|_| "폰 입력 채널이 혼잡하거나 닫혔습니다.".into())
+    }
+}
+
+impl crate::recording::RecordingFrameRequester for ControlSession {
+    fn request_key_frame(&self) -> Result<(), String> {
+        // scrcpy 5.0 TYPE_RESET_VIDEO recreates the encoder and emits a fresh configuration/IDR.
+        // This internal recording request is not exposed as arbitrary bytes through IPC.
+        self.send_packet(vec![17])
     }
 }
