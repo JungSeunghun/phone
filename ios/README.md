@@ -26,7 +26,7 @@
 - `Shared/SenderProtocol.swift`: 입력 검증, HKDF/AES-GCM, 패킷·해상도·대기열 규칙.
 - `Shared/SenderMediaPipeline.swift`: VideoToolbox H.264와 AVAudioConverter PCM 어댑터. 원본 프레임 대기 한도 2개, 최대 해상도 1920, 기준 프레임 간격 1초입니다.
 - `Shared/SenderNetwork.swift`: Network.framework 전송, heartbeat, 연결 세대·재시도·최대 4MiB 대기열. 압축 데이터 혼잡 시 방송을 종료해 참조 프레임을 임의로 버리지 않습니다.
-- `Shared/SenderPreferences.swift`: 검증 후 App Group 저장/복원.
+- `Shared/SenderPreferences.swift`: 검증 후 App Group Keychain 저장/복원.
 - `Tests`: 입력·저장·행동·암호화·네이티브 합성 미디어 테스트.
 - `Verification/SenderMock.swift`: 실제 화면을 캡처하지 않는 짧은 Swift → Rust TCP 검증용 실행 파일.
 
@@ -86,3 +86,9 @@ USB `PMU1`과 Wi-Fi `PMW1` 코드를 모두 지원하며 기존 입력 검증을
 ## 프로젝트 라이선스
 
 프로젝트 자체 코드는 [MIT 라이선스](../LICENSE)를 따릅니다. 외부 코드와 라이브러리는 각각의 원래 라이선스를 따르며 [서드파티 고지](../THIRD_PARTY_NOTICES.md)를 유지합니다.
+
+## 연결 코드 보관
+
+송출 설정과 키보드 연결 코드는 비밀키를 포함하므로 UserDefaults 대신 App Group `group.local.phone.sender`의 Keychain에 저장합니다. 앱·방송 확장·키보드 확장은 기존 App Group entitlement를 통해 같은 항목에 접근합니다. 개발자 계정의 provisioning profile에도 이 App Group이 등록되어 있어야 합니다. 항목은 `AfterFirstUnlockThisDeviceOnly`로 보호하며 iCloud 동기화나 다른 기기로의 이관을 허용하지 않습니다. 이 접근성은 최초 잠금 해제 이후 방송과 키보드의 백그라운드 실행을 지원합니다.
+
+기존 UserDefaults 값은 읽을 때 검증하고 Keychain 저장이 성공한 뒤 삭제합니다. 저장 실패 시 원본을 유지해 재시도하며, 새 코드 저장 실패 시 UserDefaults로 되돌아가지 않습니다. 저장소는 주입할 수 있어 테스트에서 실제 비밀키나 사용자의 Keychain을 건드리지 않습니다. 실기기에서 서명된 앱과 두 확장 간 Keychain 공유는 별도 확인이 필요합니다.

@@ -10,14 +10,28 @@ public struct KeyboardConnectionCode {
     endpoint = try SenderConnectionCode("PMW1|" + value.dropFirst(5))
     rawValue = value
   }
-  public static func load(_ defaults: UserDefaults) throws -> Self {
-    guard let value = defaults.string(forKey: "keyboardConnectionCode.v1") else {
+  public static func load(
+    _ defaults: UserDefaults, secrets: ConnectionSecretStore = KeychainConnectionSecretStore()
+  ) throws -> Self {
+    let secured = try secrets.load(forKey: "keyboardConnectionCode.v1")
+    let legacy = defaults.string(forKey: "keyboardConnectionCode.v1")
+    let stored = secured ?? legacy.map { Data($0.utf8) }
+    guard let stored, let value = String(data: stored, encoding: .utf8) else {
       throw SenderError.invalidCode
     }
-    return try Self(value)
+    let validated = try Self(value)
+    if secured == nil {
+      try validated.save(defaults, secrets: secrets)
+    } else {
+      defaults.removeObject(forKey: "keyboardConnectionCode.v1")
+    }
+    return validated
   }
-  public func save(_ defaults: UserDefaults) throws {
-    defaults.set(rawValue, forKey: "keyboardConnectionCode.v1")
+  public func save(
+    _ defaults: UserDefaults, secrets: ConnectionSecretStore = KeychainConnectionSecretStore()
+  ) throws {
+    try secrets.save(Data(rawValue.utf8), forKey: "keyboardConnectionCode.v1")
+    defaults.removeObject(forKey: "keyboardConnectionCode.v1")
   }
 }
 public struct KeyboardSetupState {

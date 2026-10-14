@@ -25,6 +25,7 @@ final class ScanTests: XCTestCase {
   }
   func testValidationDuplicateScanAndPersistedCode() throws {
     let defaults = UserDefaults(suiteName: "scan-test-" + UUID().uuidString)!
+    let secrets = TestConnectionSecretStore()
     defer { defaults.removeObject(forKey: "senderPreferences.v1") }
     for code in ["PMU1|1|", "PMU1|65535|", "PMW1|192.168.0.44:43315|", "PMW1|[::1]:1|"] {
       let payload = code + String(repeating: "ab", count: 32)
@@ -49,11 +50,12 @@ final class ScanTests: XCTestCase {
       let preferences = try SenderPreferences(
         connectionCode: payload, deviceId: UUID().uuidString, deviceName: "Mock iPhone",
         dimension: 1920, frameRate: 30, audio: true)
-      try preferences.save(defaults)
-      XCTAssertEqual(try SenderPreferences.load(defaults).connectionCode, payload)
+      try preferences.save(defaults, secrets: secrets)
+      XCTAssertEqual(try SenderPreferences.load(defaults, secrets: secrets).connectionCode, payload)
       defaults.removeObject(forKey: "senderPreferences.v1")
+      secrets.values.removeValue(forKey: "senderPreferences.v1")
       defaults.set(Data("corrupt".utf8), forKey: "senderPreferences.v1")
-      XCTAssertThrowsError(try SenderPreferences.load(defaults))
+      XCTAssertThrowsError(try SenderPreferences.load(defaults, secrets: secrets))
       defaults.removeObject(forKey: "senderPreferences.v1")
     }
   }

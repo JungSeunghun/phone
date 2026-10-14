@@ -14,10 +14,12 @@ final class MediaTests: XCTestCase {
     }
     let name = "PhoneMirrorSender.test.\(UUID())"
     let defaults = UserDefaults(suiteName: name)!
+    let secrets = TestConnectionSecretStore()
     defer { defaults.removePersistentDomain(forName: name) }
-    XCTAssertThrowsError(try SenderPreferences.load(defaults))
+    XCTAssertThrowsError(try SenderPreferences.load(defaults, secrets: secrets))
+    secrets.values.removeValue(forKey: "senderPreferences.v1")
     defaults.set(Data("{".utf8), forKey: "senderPreferences.v1")
-    XCTAssertThrowsError(try SenderPreferences.load(defaults))
+    XCTAssertThrowsError(try SenderPreferences.load(defaults, secrets: secrets))
     for name in ["", " iPhone", "iPhone ", "iPhone\n", String(repeating: "a", count: 81)] {
       XCTAssertThrowsError(
         try SenderPreferences(
@@ -27,12 +29,13 @@ final class MediaTests: XCTestCase {
     let p = try SenderPreferences(
       connectionCode: "PMW1|1.2.3.4:65535|\(secret)", deviceId: UUID().uuidString,
       deviceName: "iPhone", dimension: 720, frameRate: 60, audio: false)
-    try p.save(defaults)
-    XCTAssertEqual(try SenderPreferences.load(defaults).frameRate, 60)
+    try p.save(defaults, secrets: secrets)
+    XCTAssertEqual(try SenderPreferences.load(defaults, secrets: secrets).frameRate, 60)
     var json = try JSONSerialization.jsonObject(with: JSONEncoder().encode(p)) as! [String: Any]
     json["dimension"] = 0
+    secrets.values.removeValue(forKey: "senderPreferences.v1")
     defaults.set(try JSONSerialization.data(withJSONObject: json), forKey: "senderPreferences.v1")
-    XCTAssertThrowsError(try SenderPreferences.load(defaults))
+    XCTAssertThrowsError(try SenderPreferences.load(defaults, secrets: secrets))
   }
   func testEncryptionAuthenticationAndGoldenVector() throws {
     let secret = Data(repeating: 7, count: 32)

@@ -27,22 +27,25 @@ final class AdaptiveQualityTests: XCTestCase {
 extension AdaptiveQualityTests {
   func testLegacyPreferencesAndEncoderBounds() throws {
     let defaults = UserDefaults(suiteName: "adaptive-" + UUID().uuidString)!
+    let secrets = TestConnectionSecretStore()
     defer { defaults.removeObject(forKey: "senderPreferences.v1") }
     let preferences = try SenderPreferences(
       connectionCode: "PMW1|127.0.0.1:1|" + String(repeating: "ab", count: 32),
       deviceId: UUID().uuidString, deviceName: "Mock iPhone", dimension: 1920, frameRate: 30,
       audio: true, adaptiveQuality: false)
-    try preferences.save(defaults)
-    XCTAssertEqual(try SenderPreferences.load(defaults).adaptiveQuality, false)
+    try preferences.save(defaults, secrets: secrets)
+    XCTAssertEqual(try SenderPreferences.load(defaults, secrets: secrets).adaptiveQuality, false)
     var old =
-      try JSONSerialization.jsonObject(with: defaults.data(forKey: "senderPreferences.v1")!)
+      try JSONSerialization.jsonObject(with: try secrets.load(forKey: "senderPreferences.v1")!)
       as! [String: Any]
     old.removeValue(forKey: "adaptiveQuality")
+    secrets.values.removeValue(forKey: "senderPreferences.v1")
     defaults.set(try JSONSerialization.data(withJSONObject: old), forKey: "senderPreferences.v1")
-    XCTAssertEqual(try SenderPreferences.load(defaults).adaptiveQuality, true)
+    XCTAssertEqual(try SenderPreferences.load(defaults, secrets: secrets).adaptiveQuality, true)
     old["adaptiveQuality"] = "corrupt"
+    secrets.values.removeValue(forKey: "senderPreferences.v1")
     defaults.set(try JSONSerialization.data(withJSONObject: old), forKey: "senderPreferences.v1")
-    XCTAssertThrowsError(try SenderPreferences.load(defaults))
+    XCTAssertThrowsError(try SenderPreferences.load(defaults, secrets: secrets))
     let encoder = SenderVideoEncoder(
       settings: try SenderCaptureSettings(dimension: 1920, frameRate: 30), output: { _ in },
       failure: { XCTFail("encoding failed") })

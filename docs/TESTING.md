@@ -78,6 +78,8 @@ GUI 앱을 종료한 상태에서 Android USB 실기기로 검증한다. 첫 프
 
 ## 보안 회귀 검증 (2026-10-14)
 
-키보드 연결 개선은 변경 전 테스트 실패를 확인한 뒤 수정했다.
+키보드 연결과 연결 코드 저장 개선은 변경 전 테스트 실패를 확인한 뒤 수정했다.
 
 - `unauthenticated_idle_client_does_not_block_legitimate_keyboard`: 기존 구현에서 정상 키보드 인증이 1초 안에 진행되지 않아 실패했다. 수정 후 인증 전 연결을 최대 4개 병렬 처리하며, IP당 8초에 8회와 추적 주소 64개 제한을 적용한다. 전체 인증의 읽기·쓰기에는 8초 제한을 적용하며, 종료 시 대기 작업과 소켓을 취소한다. 연결 수 한계, 반복 잘못된 인증, 정확한 시도 제한 시간 경계, 연결 세대, ACK 시간 초과와 취소를 검사한다. 이는 자원 제한과 단일 미인증 연결의 지연을 줄이는 조치이며, 네트워크 전체의 서비스 거부 공격을 막는다는 보장은 아니다.
+- `testConnectionSecretsAreNotSavedInDefaults`: 기존 송출 설정과 키보드 코드가 UserDefaults에 남아 두 assertion이 실패했다. 수정 후 App Group Keychain에 저장하고 저장 성공 후 기존 값을 제거한다. 주입한 저장소로 누락·손상·읽기/쓰기 실패·반복 이관을 검사한다.
+- 추가 이관 회귀 테스트 `testLegacyValuesCannotReplaceExistingSecureCodesOrBypassReadFailure`에서 오래된 값이 이미 저장된 Keychain 코드를 덮어쓰고 읽기 실패를 우회하는 네 assertion의 실패를 확인했다. 수정 후 Keychain을 먼저 읽고, 기존 보안 항목이 없는 경우에만 검증된 값을 이관한다. 보안 저장값이 있으면 오래된 UserDefaults 값은 제거한다.

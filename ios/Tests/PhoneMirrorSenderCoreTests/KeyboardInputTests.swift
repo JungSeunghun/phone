@@ -30,11 +30,13 @@ final class KeyboardInputTests: XCTestCase {
       XCTAssertThrowsError(try KeyboardConnectionCode(invalid))
     }
     let defaults = UserDefaults(suiteName: UUID().uuidString)!
-    XCTAssertThrowsError(try KeyboardConnectionCode.load(defaults))
-    try KeyboardConnectionCode(code).save(defaults)
-    XCTAssertEqual(try KeyboardConnectionCode.load(defaults).rawValue, code)
+    let secrets = TestConnectionSecretStore()
+    XCTAssertThrowsError(try KeyboardConnectionCode.load(defaults, secrets: secrets))
+    try KeyboardConnectionCode(code).save(defaults, secrets: secrets)
+    XCTAssertEqual(try KeyboardConnectionCode.load(defaults, secrets: secrets).rawValue, code)
+    secrets.values.removeValue(forKey: "keyboardConnectionCode.v1")
     defaults.set("corrupt", forKey: "keyboardConnectionCode.v1")
-    XCTAssertThrowsError(try KeyboardConnectionCode.load(defaults))
+    XCTAssertThrowsError(try KeyboardConnectionCode.load(defaults, secrets: secrets))
   }
   func testEncryptedUnicodeAndReplayRejection() throws {
     let secret = Data(repeating: 1, count: 32)
