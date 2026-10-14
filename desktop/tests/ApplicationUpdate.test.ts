@@ -3,7 +3,11 @@ import { ApplicationUpdateController } from "../src/application/ApplicationUpdat
 const candidate = { version: "0.2.0", notes: "변경 사항" };
 function fixture(configured = true) {
   const backend = {
-    configuration: vi.fn(async () => ({ version: "0.1.0", configured })),
+    configuration: vi.fn(async () => ({
+      version: "0.1.0",
+      configured,
+      endpoint: undefined as string | undefined,
+    })),
     check: vi.fn(async () => candidate),
     install: vi.fn(async (_progress: (value: number) => void) => {}),
     cancel: vi.fn(async () => {}),
@@ -152,4 +156,31 @@ it("retains installation failure when cancellation arrives after install began",
   await Promise.all([installing, cancelling]);
   expect(f.controller.getSnapshot().phase).toBe("error");
   expect(f.controller.getSnapshot().message).toContain("install failed");
+});
+
+it("uses the official feed by default and preserves a saved override", async () => {
+  const endpoint =
+    "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json";
+  const f = fixture();
+  f.backend.configuration.mockResolvedValue({
+    version: "0.2.1",
+    configured: true,
+    endpoint,
+  });
+  await f.controller.initialize();
+  expect(f.controller.getSnapshot().endpoint).toBe(endpoint);
+  expect(f.backend.check).toHaveBeenCalledWith(endpoint);
+  const g = fixture();
+  const custom = "https://updates.example.org/latest.json";
+  g.storage.getItem.mockImplementation((key?: string) =>
+    key === "phone-mirror-update-endpoint" ? custom : null,
+  );
+  g.backend.configuration.mockResolvedValue({
+    version: "0.2.1",
+    configured: true,
+    endpoint,
+  });
+  await g.controller.initialize();
+  expect(g.controller.getSnapshot().endpoint).toBe(custom);
+  expect(g.backend.check).toHaveBeenCalledWith(custom);
 });

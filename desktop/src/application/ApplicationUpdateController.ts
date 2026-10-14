@@ -1,5 +1,9 @@
 export interface ApplicationUpdateBackend {
-  configuration(): Promise<{ version: string; configured: boolean }>;
+  configuration(): Promise<{
+    version: string;
+    configured: boolean;
+    endpoint?: string;
+  }>;
   check(endpoint?: string): Promise<{ version: string; notes: string } | null>;
   install(progress: (percent: number) => void): Promise<void>;
   cancel(): Promise<boolean | void>;
@@ -70,7 +74,10 @@ export class ApplicationUpdateController {
     try {
       const config = await this.backend.configuration();
       this.configured = config.configured;
-      this.update({ version: config.version });
+      this.update({
+        version: config.version,
+        endpoint: this.snapshot.endpoint || config.endpoint || "",
+      });
       if (!config.configured && !this.snapshot.endpoint)
         this.update({
           phase: "unconfigured",

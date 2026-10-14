@@ -45,3 +45,13 @@ impl UpdateActivity {
         Ok(())
     }
 }
+
+pub fn configured_endpoint(configuration: &serde_json::Value) -> Option<String> {
+    configuration
+        .get("endpoints")?
+        .as_array()?
+        .first()?
+        .as_str()
+        .and_then(|value| validate_endpoint(value).ok())
+        .map(|url| url.to_string())
+}

@@ -4,7 +4,7 @@ export class TauriApplicationUpdateBackend implements ApplicationUpdateBackend {
   private operationId = "";
   async configuration() {
     return isTauri()
-      ? invoke<{ version: string; configured: boolean }>(
+      ? invoke<{ version: string; configured: boolean; endpoint?: string }>(
           "application_update_configuration",
         )
       : { version: "개발 미리보기", configured: false };

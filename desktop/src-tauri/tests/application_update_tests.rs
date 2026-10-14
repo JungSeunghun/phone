@@ -88,3 +88,34 @@ fn installation_requires_idle_and_handles_activity_boundaries() {
         assert!(activity.validate_installation().is_err());
     }
 }
+
+#[test]
+fn release_configuration_connects_the_official_update_feed() {
+    let configuration: serde_json::Value =
+        serde_json::from_str(include_str!("../tauri.conf.json")).unwrap();
+    assert_eq!(
+        configuration["plugins"]["updater"]["endpoints"],
+        serde_json::json!([
+            "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json"
+        ])
+    );
+}
+
+#[test]
+fn configured_feed_requires_a_valid_https_endpoint() {
+    use phone_mirror_desktop::application_update::configured_endpoint;
+    let valid = "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json";
+    assert_eq!(
+        configured_endpoint(&serde_json::json!({"endpoints": [valid]})),
+        Some(valid.into())
+    );
+    for value in [
+        serde_json::json!({}),
+        serde_json::json!({"endpoints": []}),
+        serde_json::json!({"endpoints": [null]}),
+        serde_json::json!({"endpoints": ["http://invalid"]}),
+        serde_json::json!({"endpoints": ["https://user:secret@example.org/latest.json"]}),
+    ] {
+        assert_eq!(configured_endpoint(&value), None);
+    }
+}

@@ -1,0 +1,4202 @@
+{
+  "version": "0.2.1",
+  "packages": [
+    {
+      "ecosystem": "Rust",
+      "name": "adler2",
+      "version": "2.0.1",
+      "license": "0BSD OR MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/adler2/2.0.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/adler2/2.0.1/download",
+      "licenseTexts": [
+        "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+        "861399f8c21c042b110517e76dc6b63a2b334276c8cf17412fc3c8908ca8dc17",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "aead",
+      "version": "0.5.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/aead/0.5.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/aead/0.5.2/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "949ab7b3e7140fee216f06fe3a2bd67d68dd511f8ea73c1e01c98cb348e9c8ae"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "aes-gcm",
+      "version": "0.10.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/aes-gcm/0.10.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/aes-gcm/0.10.3/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "3c0dfa33fd2e6976038555b52095699452653b1fcabe113074f14e0848a6b11e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "aes",
+      "version": "0.8.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/aes/0.8.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/aes/0.8.4/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "f7e8ab639afef15573680c97f796166835cbeb3865175882fea41c60d106b733"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "aho-corasick",
+      "version": "1.1.5",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/crates/aho-corasick/1.1.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/aho-corasick/1.1.5/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "alloc-no-stdlib",
+      "version": "3.0.0",
+      "license": "BSD-3-Clause",
+      "source": "https://crates.io/crates/alloc-no-stdlib/3.0.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/alloc-no-stdlib/3.0.0/download",
+      "licenseTexts": [
+        "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "alloc-stdlib",
+      "version": "0.3.0",
+      "license": "BSD-3-Clause",
+      "source": "https://crates.io/crates/alloc-stdlib/0.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/alloc-stdlib/0.3.0/download",
+      "licenseTexts": [
+        "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "anyhow",
+      "version": "1.0.104",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/anyhow/1.0.104",
+      "sourceArchive": "https://crates.io/api/v1/crates/anyhow/1.0.104/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "arboard",
+      "version": "3.6.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/arboard/3.6.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/arboard/3.6.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "f35468024534e0f4f16bb94cd0e88c87fbd1314f919c2645a07d350fb77b40c0"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "async-trait",
+      "version": "0.1.92",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/async-trait/0.1.92",
+      "sourceArchive": "https://crates.io/api/v1/crates/async-trait/0.1.92/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "atomic-waker",
+      "version": "1.1.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/atomic-waker/1.1.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/atomic-waker/1.1.2/download",
+      "licenseTexts": [
+        "6226d0632e2e1a80c23597e964da9812ae193c535fe058154afb034e94167aa5",
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "base64",
+      "version": "0.21.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/base64/0.21.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/base64/0.21.7/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "base64",
+      "version": "0.22.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/base64/0.22.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/base64/0.22.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "0dd882e53de11566d50f8e8e2d5a651bcf3fabee4987d70f306233cf39094ba7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "base64",
+      "version": "0.23.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/base64/0.23.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/base64/0.23.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "ab499c75a0f0da8e0fe83bf9ba3a27e5c39705310f07107c6c66b69958d2401c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bit-set",
+      "version": "0.8.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/bit-set/0.8.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/bit-set/0.8.0/download",
+      "licenseTexts": [
+        "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+        "f51ac2c59a222f7476ce507ca879960e2b64ea64bb2786eefdbeb7b0b538d1b7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bit-vec",
+      "version": "0.8.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/bit-vec/0.8.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/bit-vec/0.8.0/download",
+      "licenseTexts": [
+        "8173d5c29b4f956d532781d2b86e4e30f83e6b7878dce18c919451d6ba707c90",
+        "f51ac2c59a222f7476ce507ca879960e2b64ea64bb2786eefdbeb7b0b538d1b7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bitflags",
+      "version": "1.3.2",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/bitflags/1.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/bitflags/1.3.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bitflags",
+      "version": "2.13.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/bitflags/2.13.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/bitflags/2.13.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "block-buffer",
+      "version": "0.10.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/block-buffer/0.10.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/block-buffer/0.10.4/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "d5c22aa3118d240e877ad41c5d9fa232f9c77d757d4aac0c2f943afc0a95e0ef"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "block2",
+      "version": "0.6.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/block2/0.6.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/block2/0.6.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "brotli-decompressor",
+      "version": "6.0.1",
+      "license": "BSD-3-Clause/MIT",
+      "source": "https://crates.io/crates/brotli-decompressor/6.0.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/brotli-decompressor/6.0.1/download",
+      "licenseTexts": [
+        "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "brotli",
+      "version": "9.0.0",
+      "license": "BSD-3-Clause AND MIT",
+      "source": "https://crates.io/crates/brotli/9.0.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/brotli/9.0.0/download",
+      "licenseTexts": [
+        "3d180008e36922a4e8daec11c34c7af264fed5962d07924aea928c38e8663c94",
+        "c0c56f26d9c051cac4d200c34c84e7ae9aaa853e01a982a1df08b09931e518ae"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bytemuck",
+      "version": "1.25.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/bytemuck/1.25.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/bytemuck/1.25.2/download",
+      "licenseTexts": [
+        "e3ba223bb1423f0aad8c3dfce0fe3148db48926d41e6fbc3afbbf5ff9e1c89cb",
+        "84b34dd7608f7fb9b17bd588a6bf392bf7de504e2716f024a77d89f1b145a151",
+        "9df9ba60a11af705f2e451b53762686e615d86f76b169cf075c3237730dbd7e2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "byteorder",
+      "version": "1.5.0",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/crates/byteorder/1.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/byteorder/1.5.0/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "bytes",
+      "version": "1.12.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/bytes/1.12.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/bytes/1.12.1/download",
+      "licenseTexts": [
+        "45f522cacecb1023856e46df79ca625dfc550c94910078bd8aec6e02880b3d42"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "camino",
+      "version": "1.2.6",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/camino/1.2.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/camino/1.2.6/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cargo-platform",
+      "version": "0.1.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/cargo-platform/0.1.9",
+      "sourceArchive": "https://crates.io/api/v1/crates/cargo-platform/0.1.9/download",
+      "licenseTexts": [
+        "8ada45cd9f843acf64e4722ae262c622a2b3b3007c7310ef36ac1061a30f6adb",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cargo_metadata",
+      "version": "0.19.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/cargo_metadata/0.19.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/cargo_metadata/0.19.2/download",
+      "licenseTexts": [
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cfb",
+      "version": "0.14.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/cfb/0.14.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/cfb/0.14.0/download",
+      "licenseTexts": [
+        "ebaac853b53fec0ed475796f533ce676912a4df9ad9d8a621fa76d5060591e10"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cfg-if",
+      "version": "1.0.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/cfg-if/1.0.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/cfg-if/1.0.5/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "chrono",
+      "version": "0.4.45",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/chrono/0.4.45",
+      "sourceArchive": "https://crates.io/api/v1/crates/chrono/0.4.45/download",
+      "licenseTexts": [
+        "2200505ceae34bd9ff69176a068316956062b8827fe6b5bdb2746362ef638122"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cipher",
+      "version": "0.4.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/cipher/0.4.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/cipher/0.4.4/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "5c7bd92d1f096f12203dc1b601e3cb17484fa1b023e30b6b8edcc80e416237ec"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "clipboard-win",
+      "version": "5.4.1",
+      "license": "BSL-1.0",
+      "source": "https://crates.io/crates/clipboard-win/5.4.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/clipboard-win/5.4.1/download",
+      "licenseTexts": [
+        "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cookie",
+      "version": "0.18.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/cookie/0.18.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/cookie/0.18.2/download",
+      "licenseTexts": [
+        "2773e20df8f4c52a026b5b578c7f2457341f5aa3fb6612fd87e1d2e1bd8f48ad",
+        "f28420c1906af38be726cd7842798f0194b27c41d6051c0d1e9ee348b8a4a0ea"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "core-foundation-sys",
+      "version": "0.8.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/core-foundation-sys/0.8.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/core-foundation-sys/0.8.7/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "core-foundation",
+      "version": "0.10.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/core-foundation/0.10.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/core-foundation/0.10.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "core-foundation",
+      "version": "0.9.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/core-foundation/0.9.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/core-foundation/0.9.4/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "core-graphics-types",
+      "version": "0.2.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/core-graphics-types/0.2.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/core-graphics-types/0.2.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "core-graphics",
+      "version": "0.25.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/core-graphics/0.25.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/core-graphics/0.25.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cpufeatures",
+      "version": "0.2.17",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/cpufeatures/0.2.17",
+      "sourceArchive": "https://crates.io/api/v1/crates/cpufeatures/0.2.17/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "ae9baa7beea910273c2f384c2a6b721fb7bd02bda3436074a1072e4ee689f985"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "crc32fast",
+      "version": "1.5.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/crc32fast/1.5.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/crc32fast/1.5.2/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "61d383b05b87d78f94d2937e2580cce47226d17823c0430fbcad09596537efcf"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "crossbeam-channel",
+      "version": "0.5.17",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/crossbeam-channel/0.5.17",
+      "sourceArchive": "https://crates.io/api/v1/crates/crossbeam-channel/0.5.17/download",
+      "licenseTexts": [
+        "b16db96b93b1d7cf7bea533f572091ec6bca3234fbe0a83038be772ff391a44c",
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "crossbeam-utils",
+      "version": "0.8.23",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/crossbeam-utils/0.8.23",
+      "sourceArchive": "https://crates.io/api/v1/crates/crossbeam-utils/0.8.23/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "5734ed989dfca1f625b40281ee9f4530f91b2411ec01cb748223e7eb87e201ab"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "crypto-common",
+      "version": "0.1.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/crypto-common/0.1.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/crypto-common/0.1.7/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "3521672491a3479422d5fe1aca6645dd2984090f85da6e5205abfb18fb7a6897"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cssparser-macros",
+      "version": "0.7.1",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/crates/cssparser-macros/0.7.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/cssparser-macros/0.7.1/download",
+      "licenseTexts": [
+        "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "cssparser",
+      "version": "0.37.0",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/crates/cssparser/0.37.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/cssparser/0.37.0/download",
+      "licenseTexts": [
+        "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ctor",
+      "version": "1.0.13",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/ctor/1.0.13",
+      "sourceArchive": "https://crates.io/api/v1/crates/ctor/1.0.13/download",
+      "licenseTexts": [
+        "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+        "fd80a26fbb3f644af1fa994134446702932968519797227e07a1368dea80f0bc"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ctr",
+      "version": "0.9.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/ctr/0.9.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/ctr/0.9.2/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "63af4bea227c94d021e99427f6ca3a4b8efddadcca93ab6130f708cf6138cf68"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "darling",
+      "version": "0.21.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/darling/0.21.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/darling/0.21.3/download",
+      "licenseTexts": [
+        "8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "darling_core",
+      "version": "0.21.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/darling_core/0.21.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/darling_core/0.21.3/download",
+      "licenseTexts": [
+        "8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "darling_macro",
+      "version": "0.21.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/darling_macro/0.21.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/darling_macro/0.21.3/download",
+      "licenseTexts": [
+        "8ea93490d74a5a1b1af3ff71d786271b3f1e5f0bea79ac16e02ec533cef040d6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "deranged",
+      "version": "0.5.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/deranged/0.5.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/deranged/0.5.8/download",
+      "licenseTexts": [
+        "edd65bdd88957a205c47d53fa499eed8865a70320f0f03f6391668cb304ea376",
+        "231c837c45eb53f108fb48929e488965bc4fcc14e9ea21d35f50e6b99d98685b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "derive_more-impl",
+      "version": "2.1.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/derive_more-impl/2.1.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/derive_more-impl/2.1.1/download",
+      "licenseTexts": [
+        "8a35369f3ca263b3c62fbb5032947e53b6bfebc6c8a4d1bb982de1c069f6fba5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "derive_more",
+      "version": "2.1.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/derive_more/2.1.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/derive_more/2.1.1/download",
+      "licenseTexts": [
+        "8a35369f3ca263b3c62fbb5032947e53b6bfebc6c8a4d1bb982de1c069f6fba5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "digest",
+      "version": "0.10.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/digest/0.10.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/digest/0.10.7/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dirs-sys",
+      "version": "0.5.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/dirs-sys/0.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/dirs-sys/0.5.0/download",
+      "licenseTexts": [
+        "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+        "6a2e0ade09a7d5f816f11566fee2b151b32235a7fad52b41d49cce96f833c1a9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dirs",
+      "version": "7.0.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/dirs/7.0.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/dirs/7.0.0/download",
+      "licenseTexts": [
+        "d3174ad63e721d4c9dccb8ad4320848992d314369bc46319720b5802c9153fe9",
+        "6a2e0ade09a7d5f816f11566fee2b151b32235a7fad52b41d49cce96f833c1a9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dispatch2",
+      "version": "0.3.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/dispatch2/0.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/dispatch2/0.3.1/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "displaydoc",
+      "version": "0.2.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/displaydoc/0.2.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/displaydoc/0.2.7/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dom_query",
+      "version": "0.28.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/dom_query/0.28.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/dom_query/0.28.0/download",
+      "licenseTexts": [
+        "ac481b3d81aa8fddeaba3625cf2d40a4425e02a1e60b743be3825d6a9923664f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dpi",
+      "version": "0.1.2",
+      "license": "Apache-2.0 AND MIT",
+      "source": "https://crates.io/crates/dpi/0.1.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/dpi/0.1.2/download",
+      "licenseTexts": [
+        "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+        "9eff396a99bafd208e7126602420d6864f6066c08b84485a5b032320a9c01997"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dtoa-short",
+      "version": "0.3.5",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/crates/dtoa-short/0.3.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/dtoa-short/0.3.5/download",
+      "licenseTexts": [
+        "1f256ecad192880510e84ad60474eab7589218784b9a50bc7ceee34c2b91f1d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dtoa",
+      "version": "1.0.11",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/dtoa/1.0.11",
+      "sourceArchive": "https://crates.io/api/v1/crates/dtoa/1.0.11/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dunce",
+      "version": "1.0.5",
+      "license": "CC0-1.0 OR MIT-0 OR Apache-2.0",
+      "source": "https://crates.io/crates/dunce/1.0.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/dunce/1.0.5/download",
+      "licenseTexts": [
+        "a2010f343487d3f7618affe54f789f5487602331c0a8d03f49e9a7c547cf0499"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "dyn-clone",
+      "version": "1.0.20",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/dyn-clone/1.0.20",
+      "sourceArchive": "https://crates.io/api/v1/crates/dyn-clone/1.0.20/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "embed_plist",
+      "version": "1.2.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/embed_plist/1.2.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/embed_plist/1.2.2/download",
+      "licenseTexts": [
+        "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "daacc37f680c7dd0a758ac99a109f2f57d9f21d3683df9e9245055922842a695"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "equivalent",
+      "version": "1.0.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/equivalent/1.0.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/equivalent/1.0.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7365cc8878a1d7ce155a58c4ca09c3d7a6be413efa5334a80ea842912b669349"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "erased-serde",
+      "version": "0.4.10",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/erased-serde/0.4.10",
+      "sourceArchive": "https://crates.io/api/v1/crates/erased-serde/0.4.10/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "errno",
+      "version": "0.3.14",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/errno/0.3.14",
+      "sourceArchive": "https://crates.io/api/v1/crates/errno/0.3.14/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8764a597675778ddfd4e25f81b08a05dbcf089ac05662df7613fe67f150e3aa2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "error-code",
+      "version": "3.4.0",
+      "license": "BSL-1.0",
+      "source": "https://crates.io/crates/error-code/3.4.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/error-code/3.4.0/download",
+      "licenseTexts": [
+        "c9bff75738922193e67fa726fa225535870d2aa1059f91452c411736284ad566"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "fastrand",
+      "version": "2.5.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/fastrand/2.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/fastrand/2.5.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "fdeflate",
+      "version": "0.3.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/fdeflate/0.3.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/fdeflate/0.3.7/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "c77a4cf9da729987d0fe7ccd811e3bd27393914ddf3d23467c18cc22954513b3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "filetime",
+      "version": "0.2.29",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/filetime/0.2.29",
+      "sourceArchive": "https://crates.io/api/v1/crates/filetime/0.2.29/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "flate2",
+      "version": "1.1.10",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/flate2/1.1.10",
+      "sourceArchive": "https://crates.io/api/v1/crates/flate2/1.1.10/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "025436edff4cfcdde17a5811fdea78892d8482efd1abdec5a17872d07a4f2112"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "fnv",
+      "version": "1.0.7",
+      "license": "Apache-2.0 / MIT",
+      "source": "https://crates.io/crates/fnv/1.0.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/fnv/1.0.7/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "65fdb6c76cd61612070c066eec9ecdb30ee74fb27859d0d9af58b9f499fd0c3e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "foldhash",
+      "version": "0.2.0",
+      "license": "Zlib",
+      "source": "https://crates.io/crates/foldhash/0.2.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/foldhash/0.2.0/download",
+      "licenseTexts": [
+        "1d4c38d56650edc2c673cadbec74bec14db1fe8f2f10f4e3477dcbb49563be40"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "foreign-types-macros",
+      "version": "0.2.4",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/foreign-types-macros/0.2.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/foreign-types-macros/0.2.4/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "333ea3aaa3cadb819f4acd9f9153f9feee060a995ca8710f32bc5bd9a4b91734"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "foreign-types-shared",
+      "version": "0.3.1",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/foreign-types-shared/0.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/foreign-types-shared/0.3.1/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "333ea3aaa3cadb819f4acd9f9153f9feee060a995ca8710f32bc5bd9a4b91734"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "foreign-types",
+      "version": "0.5.0",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/foreign-types/0.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/foreign-types/0.5.0/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "333ea3aaa3cadb819f4acd9f9153f9feee060a995ca8710f32bc5bd9a4b91734"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "form_urlencoded",
+      "version": "1.2.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/form_urlencoded/1.2.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/form_urlencoded/1.2.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "20c7855c364d57ea4c97889a5e8d98470a9952dade37bd9248b9a54431670e5e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-channel",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-channel/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-channel/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-core",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-core/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-core/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-io",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-io/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-io/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-macro",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-macro/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-macro/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-sink",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-sink/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-sink/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-task",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-task/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-task/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "futures-util",
+      "version": "0.3.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/futures-util/0.3.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/futures-util/0.3.34/download",
+      "licenseTexts": [
+        "275c491d6d1160553c32fd6127061d7f9606c3ea25abfad6ca3f6ed088785427",
+        "6652c868f35dfe5e8ef636810a4e576b9d663f3a17fb0f5613ad73583e1b88fd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "generic-array",
+      "version": "0.14.7",
+      "license": "MIT",
+      "source": "https://crates.io/crates/generic-array/0.14.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/generic-array/0.14.7/download",
+      "licenseTexts": [
+        "eb69613e00e596e13d2f58e820aee10e9d51754b91d7111bc997f1fc90791f66"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "getrandom",
+      "version": "0.2.17",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/getrandom/0.2.17",
+      "sourceArchive": "https://crates.io/api/v1/crates/getrandom/0.2.17/download",
+      "licenseTexts": [
+        "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+        "42fa16951ce7f24b5a467a40e5b449a1d41e662f97ca779864f053f39e097737"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "getrandom",
+      "version": "0.3.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/getrandom/0.3.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/getrandom/0.3.4/download",
+      "licenseTexts": [
+        "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+        "29e9fe5074bd27e0e5d5d110394fbbcd841baee2651a3c4b4560a632702cede4"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "getrandom",
+      "version": "0.4.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/getrandom/0.4.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/getrandom/0.4.3/download",
+      "licenseTexts": [
+        "aaff376532ea30a0cd5330b9502ad4a4c8bf769c539c87ffe78819d188a18ebf",
+        "523a42c25d245dde9c015f882cec7f4555aad883382a6cf19b4b7d9b2cd5419b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ghash",
+      "version": "0.5.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/ghash/0.5.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/ghash/0.5.1/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "c0fabcc308b450cb6fe62c9f56fae6abbeb9768eb80d992484c857d744846c2e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "glob",
+      "version": "0.3.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/glob/0.3.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/glob/0.3.4/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hashbrown",
+      "version": "0.12.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/hashbrown/0.12.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/hashbrown/0.12.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hashbrown",
+      "version": "0.17.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/hashbrown/0.17.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/hashbrown/0.17.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "ff8f68cb076caf8cefe7a6430d4ac086ce6af2ca8ce2c4e5a2004d4552ef52a2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "heck",
+      "version": "0.5.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/heck/0.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/heck/0.5.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hex",
+      "version": "0.4.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/hex/0.4.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/hex/0.4.3/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "f7bdb3426d045cd50efd4953026e3eb5a83d0199f458a075602611b9344da5b9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hkdf",
+      "version": "0.12.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/hkdf/0.12.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/hkdf/0.12.4/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "d288f9c9b4590446ec18c22ead8f8b5a12a3d4025b68f62dc9015063eb9cca69"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hmac",
+      "version": "0.12.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/hmac/0.12.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/hmac/0.12.1/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "9e0dfd2dd4173a530e238cb6adb37aa78c34c6bc7444e0e10c1ab5d8881f63ba"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "html5ever",
+      "version": "0.39.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/html5ever/0.39.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/html5ever/0.39.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "http-body-util",
+      "version": "0.1.5",
+      "license": "MIT",
+      "source": "https://crates.io/crates/http-body-util/0.1.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/http-body-util/0.1.5/download",
+      "licenseTexts": [
+        "248378d0a3383c173fb925f17141b88e71580b3ba17ddc6ac3d2a344683232ab"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "http-body",
+      "version": "1.1.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/http-body/1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/http-body/1.1.0/download",
+      "licenseTexts": [
+        "248378d0a3383c173fb925f17141b88e71580b3ba17ddc6ac3d2a344683232ab"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "http",
+      "version": "1.5.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/http/1.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/http/1.5.0/download",
+      "licenseTexts": [
+        "8bb1b50b0e5c9399ae33bd35fab2769010fa6c14e8860c729a52295d84896b7a",
+        "dc91f8200e4b2a1f9261035d4c18c33c246911a6c0f7b543d75347e61b249cff"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "httparse",
+      "version": "1.10.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/httparse/1.10.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/httparse/1.10.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "1626f2c950cee975b5809748e288468141d09aa420314c7c9b35e6e62b772b2d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hyper-rustls",
+      "version": "0.27.10",
+      "license": "Apache-2.0 OR ISC OR MIT",
+      "source": "https://crates.io/crates/hyper-rustls/0.27.10",
+      "sourceArchive": "https://crates.io/api/v1/crates/hyper-rustls/0.27.10/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4",
+        "709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hyper-util",
+      "version": "0.1.21",
+      "license": "MIT",
+      "source": "https://crates.io/crates/hyper-util/0.1.21",
+      "sourceArchive": "https://crates.io/api/v1/crates/hyper-util/0.1.21/download",
+      "licenseTexts": [
+        "9e0a97848ea543aef745c98e84fde696a9a3e0735538f6daefdd3cb1942effc1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "hyper",
+      "version": "1.12.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/hyper/1.12.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/hyper/1.12.0/download",
+      "licenseTexts": [
+        "2d01890414494742ba4a509fcec8efa40f6d8be22cbd72be7cff08d6fda4ec89"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "iana-time-zone",
+      "version": "0.1.65",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/iana-time-zone/0.1.65",
+      "sourceArchive": "https://crates.io/api/v1/crates/iana-time-zone/0.1.65/download",
+      "licenseTexts": [
+        "696759d65dfe558ff7d9f031c76db19ec5c0767470fb67c4e8d990820d1e99c9",
+        "da28ccc6b158fc2d8cccc74e99794b1cff1d29bd7bbeb019442fcf0c04c6cad9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ico",
+      "version": "0.5.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/ico/0.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/ico/0.5.0/download",
+      "licenseTexts": [
+        "41ca90213441b294e7517d5858f0cc85bc12e19ec044001b45bc213de461d33b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_collections",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_collections/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_collections/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_locale_core",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_locale_core/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_locale_core/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_normalizer",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_normalizer/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_normalizer/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_normalizer_data",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_normalizer_data/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_normalizer_data/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_properties",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_properties/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_properties/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_properties_data",
+      "version": "2.3.0",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_properties_data/2.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_properties_data/2.3.0/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "icu_provider",
+      "version": "2.3.1",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/icu_provider/2.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/icu_provider/2.3.1/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ident_case",
+      "version": "1.0.1",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/ident_case/1.0.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/ident_case/1.0.1/download",
+      "licenseTexts": [
+        "508a77d2e7b51d98adeed32648ad124b7b30241a8e70b2e72c99f92d8e5874d1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "idna",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/idna/1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/idna/1.1.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "idna_adapter",
+      "version": "1.2.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/idna_adapter/1.2.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/idna_adapter/1.2.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8b43ce8accd61e9d370b5ca9e9c4f953279b5c239926c62315b40e24df51b726"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "if-addrs",
+      "version": "0.15.0",
+      "license": "MIT OR BSD-3-Clause",
+      "source": "https://crates.io/crates/if-addrs/0.15.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/if-addrs/0.15.0/download",
+      "licenseTexts": [
+        "588713c78138d7d6985b87275724f7047949a71a007b16b352d7745499976f7f",
+        "3990ddb78a5a2cfd64a5ffe5cebc3306f3298f6880c644afdf15043ef7d702d9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "indexmap",
+      "version": "1.9.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/indexmap/1.9.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/indexmap/1.9.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "indexmap",
+      "version": "2.14.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/indexmap/2.14.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/indexmap/2.14.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "ecc269ef87fd38a1d98e30bfac9ba964a9dbd9315c3770fed98d4d7cb5882055"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "infer",
+      "version": "0.22.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/infer/0.22.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/infer/0.22.0/download",
+      "licenseTexts": [
+        "270b0d81891aa44c7e8726cf9432dade9556a01c848bacd2f3ef839c9c1a1859"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "inout",
+      "version": "0.1.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/inout/0.1.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/inout/0.1.4/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "304b898acad7f02e03d6d8832d682a3b43ee729ab5d3a069af5a36979083b6b4"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ipnet",
+      "version": "2.12.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/ipnet/2.12.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/ipnet/2.12.2/download",
+      "licenseTexts": [
+        "87d9feb9238c6bd8e0024fc4733b06cff036f89f36d93b7df1c8a0549bbb7a5b",
+        "47dc9ff29128ddfb4d6a0435383c9f89120bc374dbcc1dd00b933a0b28aa7865"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "itoa",
+      "version": "1.0.18",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/itoa/1.0.18",
+      "sourceArchive": "https://crates.io/api/v1/crates/itoa/1.0.18/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "json-patch",
+      "version": "4.2.0",
+      "license": "MIT/Apache-2.0",
+      "source": "https://crates.io/crates/json-patch/4.2.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/json-patch/4.2.0/download",
+      "licenseTexts": [
+        "b40930bbcf80744c86c46a12bc9da056641d722716c378f5659b9e555ef833e1",
+        "87f7527b1066337751f7f4d717089bf514ff8f7ee7d66c4c5b891b09e744ec11"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "jsonptr",
+      "version": "0.7.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/jsonptr/0.7.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/jsonptr/0.7.1/download",
+      "licenseTexts": [
+        "2cf31f2ae7f3feba667d50fc1d4d21ecf217703c04c3068b83c9a73b6dde723a",
+        "2bc107bdc18a74263d20bdefdb8073e17bc1a01b6b374dc5835683a33ee5ba7d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "keyboard-types",
+      "version": "0.8.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/keyboard-types/0.8.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/keyboard-types/0.8.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "dd57ede7eb6b56bc60b7c69f4b701b5550b9b5a1f4f47b98f26758ed74743f82"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "libc",
+      "version": "0.2.190",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/libc/0.2.190",
+      "sourceArchive": "https://crates.io/api/v1/crates/libc/0.2.190/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "123a331b5dbf04c30097fa43b8f858bc85df671fe776de498d01f3d6b7c1f69e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "litemap",
+      "version": "0.8.3",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/litemap/0.8.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/litemap/0.8.3/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "lock_api",
+      "version": "0.4.14",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/lock_api/0.4.14",
+      "sourceArchive": "https://crates.io/api/v1/crates/lock_api/0.4.14/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "log",
+      "version": "0.4.34",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/log/0.4.34",
+      "sourceArchive": "https://crates.io/api/v1/crates/log/0.4.34/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "markup5ever",
+      "version": "0.39.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/markup5ever/0.39.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/markup5ever/0.39.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "memchr",
+      "version": "2.8.3",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/crates/memchr/2.8.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/memchr/2.8.3/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "mime",
+      "version": "0.3.17",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/mime/0.3.17",
+      "sourceArchive": "https://crates.io/api/v1/crates/mime/0.3.17/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8b87502eddb2d7fa23d54ed2caf5681ab5fbbdc8eb553e8ade710240842f9097"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "minisign-verify",
+      "version": "0.3.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/minisign-verify/0.3.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/minisign-verify/0.3.0/download",
+      "licenseTexts": [
+        "42c8695fbc468866d9756be99af0ba4e37d733f8daa3c8827c8d80b8bec1b2f9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "miniz_oxide",
+      "version": "0.8.9",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "source": "https://crates.io/crates/miniz_oxide/0.8.9",
+      "sourceArchive": "https://crates.io/api/v1/crates/miniz_oxide/0.8.9/download",
+      "licenseTexts": [
+        "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d",
+        "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39",
+        "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b",
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "miniz_oxide",
+      "version": "0.9.1",
+      "license": "MIT OR Zlib OR Apache-2.0",
+      "source": "https://crates.io/crates/miniz_oxide/0.9.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/miniz_oxide/0.9.1/download",
+      "licenseTexts": [
+        "799e9ca9d179295ef372f25d3769cdda7d25bb2668add6a6a1e22d1e4c678b8d",
+        "0a54e647fe54104658b5e563c04c6f9edf251710e47bce692e0bd990a4ddaa39",
+        "4108245a1f2df9d4e94df8abed5b4ba0759bb2f9b40a6b939f1be141077ae50b",
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "mio",
+      "version": "1.2.4",
+      "license": "MIT",
+      "source": "https://crates.io/crates/mio/1.2.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/mio/1.2.4/download",
+      "licenseTexts": [
+        "07919255c7e04793d8ea760d6c2ce32d19f9ff02bdbdde3ce90b1e1880929a9b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "mp4",
+      "version": "0.14.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/mp4/0.14.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/mp4/0.14.0/download",
+      "licenseTexts": [
+        "7b6e414c192062fd716e27a0716c6cdb922e560515707d904620c45c266798f9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "muda",
+      "version": "0.20.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/muda/0.20.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/muda/0.20.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "135bd40d7e81207369801d42a130c337371322df59687bf986fb8216352d71b6",
+        "2ab5537b8c0cb1d475e2145b6a7994b04e7c71e6e5bd836f7f9c47c221a5ad9a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "new_debug_unreachable",
+      "version": "1.0.6",
+      "license": "MIT",
+      "source": "https://crates.io/crates/new_debug_unreachable/1.0.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/new_debug_unreachable/1.0.6/download",
+      "licenseTexts": [
+        "f7715d38a3fa1b4ac97c5729740752505a39cb92ee83ab5b102aeb5eaa7cdea4"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "num-bigint",
+      "version": "0.4.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/num-bigint/0.4.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/num-bigint/0.4.8/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "num-conv",
+      "version": "0.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/num-conv/0.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/num-conv/0.1.0/download",
+      "licenseTexts": [
+        "c0fd5f9df8d17e13587f8fe403d2326b835e60d532817d0b42ae4aea44209251",
+        "af85fff507d80e6c7ff242acfc4b0a7f5de9a72286bb3c883c782772ca4b4402"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "num-integer",
+      "version": "0.1.47",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/num-integer/0.1.47",
+      "sourceArchive": "https://crates.io/api/v1/crates/num-integer/0.1.47/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "num-rational",
+      "version": "0.4.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/num-rational/0.4.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/num-rational/0.4.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "num-traits",
+      "version": "0.2.19",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/num-traits/0.2.19",
+      "sourceArchive": "https://crates.io/api/v1/crates/num-traits/0.2.19/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-app-kit",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-app-kit/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-app-kit/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-core-foundation",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-core-foundation/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-core-foundation/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-core-graphics",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-core-graphics/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-core-graphics/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-encode",
+      "version": "4.1.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/objc2-encode/4.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-encode/4.1.0/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-exception-helper",
+      "version": "0.1.1",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-exception-helper/0.1.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-exception-helper/0.1.1/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-foundation",
+      "version": "0.3.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/objc2-foundation/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-foundation/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-io-surface",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-io-surface/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-io-surface/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-osa-kit",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-osa-kit/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-osa-kit/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-quartz-core",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-quartz-core/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-quartz-core/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2-web-kit",
+      "version": "0.3.2",
+      "license": "Zlib OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/objc2-web-kit/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2-web-kit/0.3.2/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "objc2",
+      "version": "0.6.5",
+      "license": "MIT",
+      "source": "https://crates.io/crates/objc2/0.6.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/objc2/0.6.5/download",
+      "licenseTexts": [
+        "7f976f7e9cb2d87df7230606feb932c3f21ac0e664045a775b600046ff850c54"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "once_cell",
+      "version": "1.21.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/once_cell/1.21.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/once_cell/1.21.4/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "opaque-debug",
+      "version": "0.3.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/opaque-debug/0.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/opaque-debug/0.3.1/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "f59f5a78193597e04fd932ee9af86254d14d08be5c9d0e003ab888feccce2161"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "option-ext",
+      "version": "0.2.0",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/crates/option-ext/0.2.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/option-ext/0.2.0/download",
+      "licenseTexts": [
+        "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "osakit",
+      "version": "0.3.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/osakit/0.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/osakit/0.3.1/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "5fb3573f6e7198ff6c203dbbd58d1da4bec9e8c5a828edefd9e98587d0443471"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "oxideav-aac",
+      "version": "0.1.7",
+      "license": "MIT",
+      "source": "https://crates.io/crates/oxideav-aac/0.1.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/oxideav-aac/0.1.7/download",
+      "licenseTexts": [
+        "4ecae6b086e0d2663c8629e7d3d7ab7d8b39958e8853f9e1371159499a0c3bf2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "oxideav-core",
+      "version": "0.1.39",
+      "license": "MIT",
+      "source": "https://crates.io/crates/oxideav-core/0.1.39",
+      "sourceArchive": "https://crates.io/api/v1/crates/oxideav-core/0.1.39/download",
+      "licenseTexts": [
+        "4ecae6b086e0d2663c8629e7d3d7ab7d8b39958e8853f9e1371159499a0c3bf2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "parking_lot",
+      "version": "0.12.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/parking_lot/0.12.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/parking_lot/0.12.5/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "parking_lot_core",
+      "version": "0.9.12",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/parking_lot_core/0.9.12",
+      "sourceArchive": "https://crates.io/api/v1/crates/parking_lot_core/0.9.12/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "c9a75f18b9ab2927829a208fc6aa2cf4e63b8420887ba29cdb265d6619ae82d5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "percent-encoding",
+      "version": "2.3.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/percent-encoding/2.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/percent-encoding/2.3.2/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "phf",
+      "version": "0.13.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/phf/0.13.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/phf/0.13.1/download",
+      "licenseTexts": [
+        "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "phf_generator",
+      "version": "0.13.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/phf_generator/0.13.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/phf_generator/0.13.1/download",
+      "licenseTexts": [
+        "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "phf_macros",
+      "version": "0.13.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/phf_macros/0.13.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/phf_macros/0.13.1/download",
+      "licenseTexts": [
+        "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "phf_shared",
+      "version": "0.13.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/phf_shared/0.13.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/phf_shared/0.13.1/download",
+      "licenseTexts": [
+        "0ab4d106b6faac07fb6a051815fd1b4d862d730895e2d7d7358c2f13565e7a38"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "pin-project-lite",
+      "version": "0.2.17",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/pin-project-lite/0.2.17",
+      "sourceArchive": "https://crates.io/api/v1/crates/pin-project-lite/0.2.17/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "plist",
+      "version": "1.7.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/plist/1.7.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/plist/1.7.0/download",
+      "licenseTexts": [
+        "b61cf1a75b378860940eb420fd0fd1d8e747fd5dae5f5a2f2c9cd4454e1db78a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "png",
+      "version": "0.17.16",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/png/0.17.16",
+      "sourceArchive": "https://crates.io/api/v1/crates/png/0.17.16/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "eaf40297c75da471f7cda1f3458e8d91b4b2ec866e609527a13acfa93b638652"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "png",
+      "version": "0.18.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/png/0.18.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/png/0.18.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "eaf40297c75da471f7cda1f3458e8d91b4b2ec866e609527a13acfa93b638652"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "polyval",
+      "version": "0.6.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/polyval/0.6.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/polyval/0.6.2/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "a291b6910744d262a9e953c3b5868d74510e20161359f649a11e1791fde84fcd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "potential_utf",
+      "version": "0.1.6",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/potential_utf/0.1.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/potential_utf/0.1.6/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "powerfmt",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/powerfmt/0.2.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/powerfmt/0.2.1/download",
+      "licenseTexts": [
+        "155420c6403d4e0fca34105e3c03fdd6939b64c393c7ec6f95f5b72c5474eab0",
+        "070dbc7dda03a29296f2d58bdb9b7331af90f2abc9f31df22875d1eabaf29852"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "precomputed-hash",
+      "version": "0.1.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/precomputed-hash/0.1.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/precomputed-hash/0.1.1/download",
+      "licenseTexts": [
+        "7ca6700600dfa9c9497bf5556365067daa802c871ea78239f129309c7a2048f7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "proc-macro2",
+      "version": "1.0.107",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/proc-macro2/1.0.107",
+      "sourceArchive": "https://crates.io/api/v1/crates/proc-macro2/1.0.107/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "quick-xml",
+      "version": "0.32.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/quick-xml/0.32.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/quick-xml/0.32.0/download",
+      "licenseTexts": [
+        "f0cf9b1c62bbe3bd3a69f5f79c7158f513f612b4940a0a812d1db39d605318bc"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "quote",
+      "version": "1.0.47",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/quote/1.0.47",
+      "sourceArchive": "https://crates.io/api/v1/crates/quote/1.0.47/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rand_core",
+      "version": "0.6.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/rand_core/0.6.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/rand_core/0.6.4/download",
+      "licenseTexts": [
+        "6df43f6f4b5d4587f3d8d71e45532c688fd168afa5fe89d571cb32fa09c4ef51",
+        "209fbbe0ad52d9235e37badf9cadfe4dbdc87203179c0899e738b39ade42177b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "raw-window-handle",
+      "version": "0.6.2",
+      "license": "MIT OR Apache-2.0 OR Zlib",
+      "source": "https://crates.io/crates/raw-window-handle/0.6.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/raw-window-handle/0.6.2/download",
+      "licenseTexts": [
+        "9c5a80639a57c1c945570e7ebbca0706305849ce3c098021325cca9db2f7acc4",
+        "ae895c8576e682f310fb70d93d9f99b1dd82872094c54a8f6cdfe2ca5c2d6ecb",
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ref-cast-impl",
+      "version": "1.0.27",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/ref-cast-impl/1.0.27",
+      "sourceArchive": "https://crates.io/api/v1/crates/ref-cast-impl/1.0.27/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ref-cast",
+      "version": "1.0.27",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/ref-cast/1.0.27",
+      "sourceArchive": "https://crates.io/api/v1/crates/ref-cast/1.0.27/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "regex-automata",
+      "version": "0.4.18",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/regex-automata/0.4.18",
+      "sourceArchive": "https://crates.io/api/v1/crates/regex-automata/0.4.18/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "regex-syntax",
+      "version": "0.8.11",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/regex-syntax/0.8.11",
+      "sourceArchive": "https://crates.io/api/v1/crates/regex-syntax/0.8.11/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "regex",
+      "version": "1.13.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/regex/1.13.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/regex/1.13.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "6485b8ed310d3f0340bf1ad1f47645069ce4069dcc6bb46c7d5c6faf41de1fdb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "reqwest",
+      "version": "0.13.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/reqwest/0.13.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/reqwest/0.13.5/download",
+      "licenseTexts": [
+        "751963a8b88c0e3a9f27e98933079fbcf09b9998b2c13ac49c2e4d58444520d6",
+        "917c0fe02296eec634820b2758519e39278716bb0104f055cfee771bd7a4c534"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rfd",
+      "version": "0.16.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/rfd/0.16.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/rfd/0.16.0/download",
+      "licenseTexts": [
+        "65fc947f4bac882a2cd104ef73c246b1b037059df9f2b3a58b7f77f0b9e56071"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "ring",
+      "version": "0.17.14",
+      "license": "Apache-2.0 AND ISC",
+      "source": "https://crates.io/crates/ring/0.17.14",
+      "sourceArchive": "https://crates.io/api/v1/crates/ring/0.17.14/download",
+      "licenseTexts": [
+        "b3d734001a94efff3579978d953391aa7115f877657d25eb54037a43875d078a",
+        "f025ccfb7dfb6bdfedc75ca0f67acc69e6fb4998143d834f7c2f38a29989680f",
+        "005fc765ddc5115da796cca915baa9557abae13ff35e0a47c47affc56f6c414d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustc-hash",
+      "version": "2.1.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/rustc-hash/2.1.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustc-hash/2.1.3/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustix",
+      "version": "1.1.5",
+      "license": "Apache-2.0 WITH LLVM-exception OR Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/rustix/1.1.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustix/1.1.5/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "a6c48161a09acc75a0e25503bab66a731eb5fba5392ed4bb4743e4ba5085327a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustls-pki-types",
+      "version": "1.15.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/rustls-pki-types/1.15.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustls-pki-types/1.15.1/download",
+      "licenseTexts": [
+        "45fd05c4865e7c350b98ad7ac50e1b15462d49af4a91e9b0c9dd933dc9a69742",
+        "9117d922e667125508dde62b02c1f57ed22f5ad21eb536aa2e2d99e1c796e639"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustls-platform-verifier",
+      "version": "0.7.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/rustls-platform-verifier/0.7.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustls-platform-verifier/0.7.1/download",
+      "licenseTexts": [
+        "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "1c7cf76689c837a68ed8d704994e52a0f2940c087958f860d17f3186afbdcc0c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustls-webpki",
+      "version": "0.103.15",
+      "license": "ISC",
+      "source": "https://crates.io/crates/rustls-webpki/0.103.15",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustls-webpki/0.103.15/download",
+      "licenseTexts": [
+        "5b698ca13897be3afdb7174256fa1574f8c6892b8bea1a66dd6469d3fe27885a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "rustls",
+      "version": "0.23.45",
+      "license": "Apache-2.0 OR ISC OR MIT",
+      "source": "https://crates.io/crates/rustls/0.23.45",
+      "sourceArchive": "https://crates.io/api/v1/crates/rustls/0.23.45/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7cfafc877eccc46c0e346ccbaa5c51bb6b894d2b818e617d970211e232785ad4",
+        "709e3175b4212f7b13aa93971c9f62ff8c69ec45ad8c6532a7e0c41d7a7d6f8c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "same-file",
+      "version": "1.0.6",
+      "license": "Unlicense/MIT",
+      "source": "https://crates.io/crates/same-file/1.0.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/same-file/1.0.6/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "schemars",
+      "version": "0.8.22",
+      "license": "MIT",
+      "source": "https://crates.io/crates/schemars/0.8.22",
+      "sourceArchive": "https://crates.io/api/v1/crates/schemars/0.8.22/download",
+      "licenseTexts": [
+        "1954992a2b32e8a2af24a4c11b726902e344c1934b947a77f04d404908f8db30"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "schemars",
+      "version": "0.9.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/schemars/0.9.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/schemars/0.9.0/download",
+      "licenseTexts": [
+        "1954992a2b32e8a2af24a4c11b726902e344c1934b947a77f04d404908f8db30"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "schemars",
+      "version": "1.2.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/schemars/1.2.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/schemars/1.2.2/download",
+      "licenseTexts": [
+        "1954992a2b32e8a2af24a4c11b726902e344c1934b947a77f04d404908f8db30"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "schemars_derive",
+      "version": "0.8.22",
+      "license": "MIT",
+      "source": "https://crates.io/crates/schemars_derive/0.8.22",
+      "sourceArchive": "https://crates.io/api/v1/crates/schemars_derive/0.8.22/download",
+      "licenseTexts": [
+        "1954992a2b32e8a2af24a4c11b726902e344c1934b947a77f04d404908f8db30"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "scopeguard",
+      "version": "1.2.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/scopeguard/1.2.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/scopeguard/1.2.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "fb77f0a9c53e473abe5103c8632ef9f0f2874d4fb3f17cb2d8c661aab9cee9d7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "security-framework-sys",
+      "version": "2.17.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/security-framework-sys/2.17.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/security-framework-sys/2.17.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "91e934255ba3b2f21103d68c5581c23ef34aa95c4628e4405b8c901935e11c69"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "security-framework",
+      "version": "3.7.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/security-framework/3.7.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/security-framework/3.7.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "91e934255ba3b2f21103d68c5581c23ef34aa95c4628e4405b8c901935e11c69"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "selectors",
+      "version": "0.38.0",
+      "license": "MPL-2.0",
+      "source": "https://crates.io/crates/selectors/0.38.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/selectors/0.38.0/download",
+      "licenseTexts": [
+        "3f3d9e0024b1921b067d6f7f88deb4a60cbe7a78e76c64e3f1d7fc3b779b9d04"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "semver",
+      "version": "1.0.28",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/semver/1.0.28",
+      "sourceArchive": "https://crates.io/api/v1/crates/semver/1.0.28/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde-untagged",
+      "version": "0.1.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde-untagged/0.1.9",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde-untagged/0.1.9/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde/1.0.229",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde/1.0.229/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_core",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_core/1.0.229",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_core/1.0.229/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_derive",
+      "version": "1.0.229",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_derive/1.0.229",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_derive/1.0.229/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_derive_internals",
+      "version": "0.29.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_derive_internals/0.29.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_derive_internals/0.29.1/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_json",
+      "version": "1.0.151",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_json/1.0.151",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_json/1.0.151/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_repr",
+      "version": "0.1.21",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_repr/0.1.21",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_repr/0.1.21/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_spanned",
+      "version": "1.1.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_spanned/1.1.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_spanned/1.1.2/download",
+      "licenseTexts": [
+        "05c58f1374a0ba16711c4f60552df215d72078d374bbd245ad438388c87c3573",
+        "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_with",
+      "version": "3.17.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_with/3.17.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_with/3.17.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serde_with_macros",
+      "version": "3.17.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serde_with_macros/3.17.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/serde_with_macros/3.17.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7576269ea71f767b99297934c0b2367532690f8c4badc695edf8e04ab6a1e545"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serialize-to-javascript-impl",
+      "version": "0.1.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serialize-to-javascript-impl/0.1.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/serialize-to-javascript-impl/0.1.2/download",
+      "licenseTexts": [
+        "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "e53a7165e8bc3ced5e5628404b3d2d28ecc14ad720f1c09ba28385d5151ecf93"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "serialize-to-javascript",
+      "version": "0.1.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/serialize-to-javascript/0.1.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/serialize-to-javascript/0.1.2/download",
+      "licenseTexts": [
+        "c71d239df91726fc519c6eb72d318ec65820627232b2f796219e87dcf35d0ab4",
+        "e53a7165e8bc3ced5e5628404b3d2d28ecc14ad720f1c09ba28385d5151ecf93"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "servo_arc",
+      "version": "0.4.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/servo_arc/0.4.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/servo_arc/0.4.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "sha2",
+      "version": "0.10.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/sha2/0.10.9",
+      "sourceArchive": "https://crates.io/api/v1/crates/sha2/0.10.9/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "b4eb00df6e2a4d22518fcaa6a2b4646f249b3a3c9814509b22bd2091f1392ff1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "signal-hook-registry",
+      "version": "1.4.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/signal-hook-registry/1.4.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/signal-hook-registry/1.4.8/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "503558bfefe66ca15e4e3f7955b3cb0ec87fd52f29bf24b336af7bd00e946d5c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "simd-adler32",
+      "version": "0.3.10",
+      "license": "MIT",
+      "source": "https://crates.io/crates/simd-adler32/0.3.10",
+      "sourceArchive": "https://crates.io/api/v1/crates/simd-adler32/0.3.10/download",
+      "licenseTexts": [
+        "42a35170233e83e18856792e748de4c1ce4a63b2afce9a370c89ef3fe23f9f2d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "siphasher",
+      "version": "1.0.4",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/siphasher/1.0.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/siphasher/1.0.4/download",
+      "licenseTexts": [
+        "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "c962ee4d1d05ddc138b202b2540219ebc57893fcf97b364852094a9a94ce1365",
+        "f9c4c77baa3828004ee54b8a4f2db2e88ed44a6237a493965bf551fac0fcb62d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "slab",
+      "version": "0.4.12",
+      "license": "MIT",
+      "source": "https://crates.io/crates/slab/0.4.12",
+      "sourceArchive": "https://crates.io/api/v1/crates/slab/0.4.12/download",
+      "licenseTexts": [
+        "8ce0830173fdac609dfb4ea603fdc002c2f4af0dc9b1a005653f5da9cf534b18"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "smallvec",
+      "version": "1.16.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/smallvec/1.16.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/smallvec/1.16.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "0b28172679e0009b655da42797c03fd163a3379d5cfa67ba1f1655e974a2a1a9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "socket2",
+      "version": "0.6.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/socket2/0.6.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/socket2/0.6.5/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "378f5840b258e2779c39418f3f2d7b2ba96f1c7917dd6be0713f88305dbda397"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "softbuffer",
+      "version": "0.4.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/softbuffer/0.4.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/softbuffer/0.4.8/download",
+      "licenseTexts": [
+        "a4445427440043e8ce6fadf7a43fb906cb0d7f6c573a560a9f142cf9f9bf8ff4",
+        "74f180f4d19f51aede780e1884b37d02c19cbbad872f8ca3b6450288db66e5cd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "stable_deref_trait",
+      "version": "1.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/stable_deref_trait/1.2.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/stable_deref_trait/1.2.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "3c125f249fc6fb19f2415d027a0d9a170860583960ea53d08ea1d2b3f269d153"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "string_cache",
+      "version": "0.9.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/string_cache/0.9.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/string_cache/0.9.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "62065228e42caebca7e7d7db1204cbb867033de5982ca4009928915e4095f3a3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "strsim",
+      "version": "0.11.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/strsim/0.11.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/strsim/0.11.1/download",
+      "licenseTexts": [
+        "1e697ce8d21401fbf1bddd9b5c3fd4c4c79ae1e3bdf51f81761c85e11d5a89cd"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "subtle",
+      "version": "2.6.1",
+      "license": "BSD-3-Clause",
+      "source": "https://crates.io/crates/subtle/2.6.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/subtle/2.6.1/download",
+      "licenseTexts": [
+        "cc0332a88c2ea21d5f3c1298f966120f4c95196871c3f6bb4fcf615508b93fa1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "swift-rs",
+      "version": "1.0.9",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/swift-rs/1.0.9",
+      "sourceArchive": "https://crates.io/api/v1/crates/swift-rs/1.0.9/download",
+      "licenseTexts": [
+        "ccaab19135434ffad2316174e87f6e0910bcef46b9ebfa18c38c5aca3a4726ed",
+        "f3c3e9f4febe81ff14ccc233c344e6e60051290d1c1e5a2c670d63cc3608a5bb"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "syn",
+      "version": "2.0.119",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/syn/2.0.119",
+      "sourceArchive": "https://crates.io/api/v1/crates/syn/2.0.119/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "syn",
+      "version": "3.0.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/syn/3.0.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/syn/3.0.7/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "sync_wrapper",
+      "version": "1.0.2",
+      "license": "Apache-2.0",
+      "source": "https://crates.io/crates/sync_wrapper/1.0.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/sync_wrapper/1.0.2/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "synstructure",
+      "version": "0.14.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/synstructure/0.14.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/synstructure/0.14.0/download",
+      "licenseTexts": [
+        "219920e865eee70b7dcfc948a86b099e7f4fe2de01bcca2ca9a20c0a033f2b59"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "system-configuration-sys",
+      "version": "0.6.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/system-configuration-sys/0.6.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/system-configuration-sys/0.6.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "000cbb5bea6f21829c8f0d9e1fe87410bd5ef0453412ffc017845982a3e19824"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "system-configuration",
+      "version": "0.7.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/system-configuration/0.7.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/system-configuration/0.7.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "000cbb5bea6f21829c8f0d9e1fe87410bd5ef0453412ffc017845982a3e19824"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tao",
+      "version": "0.37.1",
+      "license": "Apache-2.0",
+      "source": "https://crates.io/crates/tao/0.37.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tao/0.37.1/download",
+      "licenseTexts": [
+        "a8ad31b1c3f40dca5a84119351b8fa8ddc868edd77fad8a8ebf6d8f2d16fa4ae",
+        "02b6448337b757772d90e5f31caaa0f9e6afaad2221c01771d0a3deaa4d4196c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tar",
+      "version": "0.4.46",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/tar/0.4.46",
+      "sourceArchive": "https://crates.io/api/v1/crates/tar/0.4.46/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8ca6b96cea9e67c6c5c63f452c31bd396db8bd2406231fdea5d48ef462b48077"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-codegen",
+      "version": "2.7.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-codegen/2.7.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-codegen/2.7.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-macros",
+      "version": "2.7.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-macros/2.7.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-macros/2.7.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-plugin-dialog",
+      "version": "2.8.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-plugin-dialog/2.8.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-plugin-dialog/2.8.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9c1db6b7e7eb83e1cb2af973b5df2bdc63651ede0f38506ab98dfa0940487759",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-plugin-fs",
+      "version": "2.6.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-plugin-fs/2.6.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-plugin-fs/2.6.0/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9c1db6b7e7eb83e1cb2af973b5df2bdc63651ede0f38506ab98dfa0940487759",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-plugin-updater",
+      "version": "2.13.3",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-plugin-updater/2.13.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-plugin-updater/2.13.3/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9c1db6b7e7eb83e1cb2af973b5df2bdc63651ede0f38506ab98dfa0940487759",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-runtime-wry",
+      "version": "2.12.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-runtime-wry/2.12.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-runtime-wry/2.12.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-runtime",
+      "version": "2.12.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-runtime/2.12.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-runtime/2.12.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri-utils",
+      "version": "2.10.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri-utils/2.10.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri-utils/2.10.1/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tauri",
+      "version": "2.12.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/tauri/2.12.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/tauri/2.12.2/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tempfile",
+      "version": "3.27.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/tempfile/3.27.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/tempfile/3.27.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tendril",
+      "version": "0.5.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/tendril/0.5.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tendril/0.5.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "60a7062291b01ba068f300612cdbdc20382ac1d4934f07bcdd7167c15299f309"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "thiserror-impl",
+      "version": "1.0.69",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/thiserror-impl/1.0.69",
+      "sourceArchive": "https://crates.io/api/v1/crates/thiserror-impl/1.0.69/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "thiserror-impl",
+      "version": "2.0.21",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/thiserror-impl/2.0.21",
+      "sourceArchive": "https://crates.io/api/v1/crates/thiserror-impl/2.0.21/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "thiserror",
+      "version": "1.0.69",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/thiserror/1.0.69",
+      "sourceArchive": "https://crates.io/api/v1/crates/thiserror/1.0.69/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "thiserror",
+      "version": "2.0.21",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/thiserror/2.0.21",
+      "sourceArchive": "https://crates.io/api/v1/crates/thiserror/2.0.21/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "time-core",
+      "version": "0.1.6",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/time-core/0.1.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/time-core/0.1.6/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "2537228d9a1b44a5dc595241349cae7090b326c8de165aaf89bfddef4a00d0fc"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "time-macros",
+      "version": "0.2.24",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/time-macros/0.2.24",
+      "sourceArchive": "https://crates.io/api/v1/crates/time-macros/0.2.24/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "2537228d9a1b44a5dc595241349cae7090b326c8de165aaf89bfddef4a00d0fc"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "time",
+      "version": "0.3.44",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/time/0.3.44",
+      "sourceArchive": "https://crates.io/api/v1/crates/time/0.3.44/download",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "2537228d9a1b44a5dc595241349cae7090b326c8de165aaf89bfddef4a00d0fc"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tinystr",
+      "version": "0.8.4",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/tinystr/0.8.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/tinystr/0.8.4/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tokio-macros",
+      "version": "2.7.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tokio-macros/2.7.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/tokio-macros/2.7.2/download",
+      "licenseTexts": [
+        "0b83dc40cba89b9922bb84b0a9c7d2768ce37c1d7e138b7424fd4549915778c9"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tokio-rustls",
+      "version": "0.26.6",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/tokio-rustls/0.26.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/tokio-rustls/0.26.6/download",
+      "licenseTexts": [
+        "cc117d90b498b32b11a886f279b359da16a73c3b01efbb2f5cc004b20262334e",
+        "e20fa2b8e0a2565f24a792b94b4bf4b6c2b9d36f781d8a9516e218a036e6677a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tokio-util",
+      "version": "0.7.20",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tokio-util/0.7.20",
+      "sourceArchive": "https://crates.io/api/v1/crates/tokio-util/0.7.20/download",
+      "licenseTexts": [
+        "253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tokio",
+      "version": "1.53.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tokio/1.53.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/tokio/1.53.2/download",
+      "licenseTexts": [
+        "253cd04c6714889df2d32f3f64d669179a1c95c76ac43c40882c52eb06bc3552"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "toml",
+      "version": "1.1.8+spec-1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/toml/1.1.8+spec-1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/toml/1.1.8+spec-1.1.0/download",
+      "licenseTexts": [
+        "05c58f1374a0ba16711c4f60552df215d72078d374bbd245ad438388c87c3573",
+        "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "toml_datetime",
+      "version": "1.1.2+spec-1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/toml_datetime/1.1.2+spec-1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/toml_datetime/1.1.2+spec-1.1.0/download",
+      "licenseTexts": [
+        "05c58f1374a0ba16711c4f60552df215d72078d374bbd245ad438388c87c3573",
+        "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "toml_parser",
+      "version": "1.1.5+spec-1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/toml_parser/1.1.5+spec-1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/toml_parser/1.1.5+spec-1.1.0/download",
+      "licenseTexts": [
+        "05c58f1374a0ba16711c4f60552df215d72078d374bbd245ad438388c87c3573",
+        "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "toml_writer",
+      "version": "1.1.3+spec-1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/toml_writer/1.1.3+spec-1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/toml_writer/1.1.3+spec-1.1.0/download",
+      "licenseTexts": [
+        "05c58f1374a0ba16711c4f60552df215d72078d374bbd245ad438388c87c3573",
+        "6efb0476a1cc085077ed49357026d8c173bf33017278ef440f222fb9cbcb66e6"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tower-http",
+      "version": "0.6.11",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tower-http/0.6.11",
+      "sourceArchive": "https://crates.io/api/v1/crates/tower-http/0.6.11/download",
+      "licenseTexts": [
+        "5049cf464977eff4b4fcfa7988d84e74116956a3eb9d5f1d451b3f828f945233"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tower-layer",
+      "version": "0.3.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tower-layer/0.3.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/tower-layer/0.3.3/download",
+      "licenseTexts": [
+        "4249c8e6c5ebb85f97c77e6457c6fafc1066406eb8f1ef61e796fbdc5ff18482"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tower-service",
+      "version": "0.3.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tower-service/0.3.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/tower-service/0.3.3/download",
+      "licenseTexts": [
+        "4249c8e6c5ebb85f97c77e6457c6fafc1066406eb8f1ef61e796fbdc5ff18482"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tower",
+      "version": "0.5.3",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tower/0.5.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/tower/0.5.3/download",
+      "licenseTexts": [
+        "4249c8e6c5ebb85f97c77e6457c6fafc1066406eb8f1ef61e796fbdc5ff18482"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tracing-core",
+      "version": "0.1.36",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tracing-core/0.1.36",
+      "sourceArchive": "https://crates.io/api/v1/crates/tracing-core/0.1.36/download",
+      "licenseTexts": [
+        "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tracing",
+      "version": "0.1.44",
+      "license": "MIT",
+      "source": "https://crates.io/crates/tracing/0.1.44",
+      "sourceArchive": "https://crates.io/api/v1/crates/tracing/0.1.44/download",
+      "licenseTexts": [
+        "898b1ae9821e98daf8964c8d6c7f61641f5f5aa78ad500020771c0939ee0dea1"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "tray-icon",
+      "version": "0.25.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/tray-icon/0.25.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/tray-icon/0.25.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "44181d1db740d9841dbe6d7fa1963a23067f335567127fc15a9d050476af71a6",
+        "2ab5537b8c0cb1d475e2145b6a7994b04e7c71e6e5bd836f7f9c47c221a5ad9a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "try-lock",
+      "version": "0.2.5",
+      "license": "MIT",
+      "source": "https://crates.io/crates/try-lock/0.2.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/try-lock/0.2.5/download",
+      "licenseTexts": [
+        "8b62775bacdfa5ae8390519b7cdf7ab7d6c53f008981f1b9abd6135ef745b67e"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "typeid",
+      "version": "1.0.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/typeid/1.0.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/typeid/1.0.3/download",
+      "licenseTexts": [
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "typenum",
+      "version": "1.20.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/typenum/1.20.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/typenum/1.20.1/download",
+      "licenseTexts": [
+        "3c97f5b6ad4e73ad22dc0d1e0c7120579a350df57095120017ddfe5a8669604e",
+        "36bb253818ac13761081556ff5c457d626da9df1eb4f56194d9ad3926c418a68",
+        "a825bd853ab71619a4923d7b4311221427848070ff44d990da39b0b274c1683f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "unicode-ident",
+      "version": "1.0.26",
+      "license": "(MIT OR Apache-2.0) AND Unicode-3.0",
+      "source": "https://crates.io/crates/unicode-ident/1.0.26",
+      "sourceArchive": "https://crates.io/api/v1/crates/unicode-ident/1.0.26/download",
+      "licenseTexts": [
+        "f7db81051789b729fea528a63ec4c938fdcb93d9d61d97dc8cc2e9df6d47f2a1",
+        "62c7a1e35f56406896d7aa7ca52d0cc0d272ac022b5d2796e7d6905db8a3636a",
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "unicode-segmentation",
+      "version": "1.13.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/unicode-segmentation/1.13.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/unicode-segmentation/1.13.3/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7b63ecd5f1902af1b63729947373683c32745c16a10e8e6292e2e2dcd7e90ae0"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "universal-hash",
+      "version": "0.5.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/universal-hash/0.5.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/universal-hash/0.5.1/download",
+      "licenseTexts": [
+        "a9040321c3712d8fd0b09cf52b17445de04a23a10165049ae187cd39e5c86be5",
+        "6b50510a0400c72172355cc5d2ba0f2c5c2eb33149b8f96539dc345fdc484920"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "untrusted",
+      "version": "0.9.0",
+      "license": "ISC",
+      "source": "https://crates.io/crates/untrusted/0.9.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/untrusted/0.9.0/download",
+      "licenseTexts": [
+        "7abd9b6960dcf7d4d0a48606a5b71bfe37d472db68d70637f3a58a56785f1621"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "url",
+      "version": "2.5.8",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/url/2.5.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/url/2.5.8/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "b38f11f6096706e6de553dabe2a7ed142d59b6fa8c97e290c67496154745cdd5"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "urlpattern",
+      "version": "0.6.0",
+      "license": "MIT",
+      "source": "https://crates.io/crates/urlpattern/0.6.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/urlpattern/0.6.0/download",
+      "licenseTexts": [
+        "5cf1c9dc617e4cad7fa03181ff893601ad5243aa3be527ef39034e1cd6377676"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "utf8_iter",
+      "version": "1.0.4",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/utf8_iter/1.0.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/utf8_iter/1.0.4/download",
+      "licenseTexts": [
+        "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "3fa4ca83dcc9237839b1bdeb2e6d16bdfb5ec0c5ce42b24694d8bbf0dcbef72c"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "uuid",
+      "version": "1.28.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/uuid/1.28.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/uuid/1.28.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "436bc5a105d8e57dcd8778730f3754f7bf39c14d2f530e4cde4bd2d17a83ec3d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "walkdir",
+      "version": "2.5.0",
+      "license": "Unlicense/MIT",
+      "source": "https://crates.io/crates/walkdir/2.5.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/walkdir/2.5.0/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "0f96a83840e146e43c0ec96a22ec1f392e0680e6c1226e6f3ba87e0740af850f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "want",
+      "version": "0.3.2",
+      "license": "MIT",
+      "source": "https://crates.io/crates/want/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/want/0.3.2/download",
+      "licenseTexts": [
+        "96d741569b18c61043e5ad2b8505b5e4891a27994b732b1da9f86f46be67f59a"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "web-time",
+      "version": "1.1.0",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/web-time/1.1.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/web-time/1.1.0/download",
+      "licenseTexts": [
+        "54a744942eb3fa63a74d8d359989ed6962c04f3f10ff20cfa08ff8aa7efbe4e6",
+        "f428305bbf2e70fbd807af0f3c7ac1b7acfb95311640f451e9d2e48db6d7e96b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "web_atoms",
+      "version": "0.2.6",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/web_atoms/0.2.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/web_atoms/0.2.6/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "86dd7f026f916daf7511e39951ad8ea8cf55a8db67ae64060dacf829761c18f3"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "webview2-com-macros",
+      "version": "0.8.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/webview2-com-macros/0.8.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/webview2-com-macros/0.8.1/download",
+      "licenseTexts": [
+        "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "webview2-com-sys",
+      "version": "0.39.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/webview2-com-sys/0.39.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/webview2-com-sys/0.39.1/download",
+      "licenseTexts": [
+        "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "webview2-com",
+      "version": "0.39.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/webview2-com/0.39.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/webview2-com/0.39.1/download",
+      "licenseTexts": [
+        "0dcf41516e608bbcb6cdc5229feb7b86fe4a643b85e7df251133c93408fdac73"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "winapi-util",
+      "version": "0.1.11",
+      "license": "Unlicense OR MIT",
+      "source": "https://crates.io/crates/winapi-util/0.1.11",
+      "sourceArchive": "https://crates.io/api/v1/crates/winapi-util/0.1.11/download",
+      "licenseTexts": [
+        "01c266bced4a434da0051174d6bee16a4c82cf634e2679b6155d40d75012390f",
+        "cb3c929a05e6cbc9de9ab06a4c57eeb60ca8c724bef6c138c87d3a577e27aa14"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "window-vibrancy",
+      "version": "0.8.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/window-vibrancy/0.8.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/window-vibrancy/0.8.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "7ccef0d35e8507fa02d7e904a5277d62723f9ec576d52f6a865cab7b4dbf12ad",
+        "617b85f62a4f1b6a62d3d9f28f6d7003b7f68a70b7675a8174bbcc68401ac62d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-collections",
+      "version": "0.3.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-collections/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-collections/0.3.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-core",
+      "version": "0.62.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-core/0.62.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-core/0.62.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-future",
+      "version": "0.3.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-future/0.3.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-future/0.3.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-implement",
+      "version": "0.60.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-implement/0.60.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-implement/0.60.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-interface",
+      "version": "0.59.3",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-interface/0.59.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-interface/0.59.3/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-link",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-link/0.2.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-link/0.2.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-numerics",
+      "version": "0.3.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-numerics/0.3.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-numerics/0.3.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-registry",
+      "version": "0.6.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-registry/0.6.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-registry/0.6.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-result",
+      "version": "0.4.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-result/0.4.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-result/0.4.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-strings",
+      "version": "0.5.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-strings/0.5.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-strings/0.5.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-sys",
+      "version": "0.60.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-sys/0.60.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-sys/0.60.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-sys",
+      "version": "0.61.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-sys/0.61.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-sys/0.61.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-targets",
+      "version": "0.53.5",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-targets/0.53.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-targets/0.53.5/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-threading",
+      "version": "0.2.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-threading/0.2.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-threading/0.2.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows-version",
+      "version": "0.1.7",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows-version/0.1.7",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows-version/0.1.7/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows",
+      "version": "0.62.2",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows/0.62.2",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows/0.62.2/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "windows_x86_64_msvc",
+      "version": "0.53.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/windows_x86_64_msvc/0.53.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/windows_x86_64_msvc/0.53.1/download",
+      "licenseTexts": [
+        "c16f8dcf1a368b83be78d826ea23de4079fe1b4469a0ab9ee20563f37ff3d44b",
+        "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "winnow",
+      "version": "1.0.4",
+      "license": "MIT",
+      "source": "https://crates.io/crates/winnow/1.0.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/winnow/1.0.4/download",
+      "licenseTexts": [
+        "cb5aedb296c5246d1f22e9099f925a65146f9f0d6b4eebba97fd27a6cdbbab2d"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "writeable",
+      "version": "0.6.4",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/writeable/0.6.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/writeable/0.6.4/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "wry",
+      "version": "0.57.0",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/wry/0.57.0",
+      "sourceArchive": "https://crates.io/api/v1/crates/wry/0.57.0/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "f73041468536d0b5fd1a6610fa3f317e3dc6cf9a0c0591a5529d6556a0d8a2c3",
+        "ef88893533af22ffbb68ceef0724ba1389518df26165a34f3c99ad30b884df4f"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "xattr",
+      "version": "1.6.1",
+      "license": "MIT OR Apache-2.0",
+      "source": "https://crates.io/crates/xattr/1.6.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/xattr/1.6.1/download",
+      "licenseTexts": [
+        "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+        "8b427f5bc501764575e52ba4f9d95673cf8f6d80a86d0d06599852e1a9a20a36"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "yoke-derive",
+      "version": "0.8.4",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/yoke-derive/0.8.4",
+      "sourceArchive": "https://crates.io/api/v1/crates/yoke-derive/0.8.4/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "yoke",
+      "version": "0.8.3",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/yoke/0.8.3",
+      "sourceArchive": "https://crates.io/api/v1/crates/yoke/0.8.3/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zerofrom-derive",
+      "version": "0.1.8",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/zerofrom-derive/0.1.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/zerofrom-derive/0.1.8/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zerofrom",
+      "version": "0.1.8",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/zerofrom/0.1.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/zerofrom/0.1.8/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zeroize",
+      "version": "1.9.1",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://crates.io/crates/zeroize/1.9.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/zeroize/1.9.1/download",
+      "licenseTexts": [
+        "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+        "8c7516d4b27b1e495be5e38b612298b63de48d05f49cdac94f70f3cd70f8864b"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zerotrie",
+      "version": "0.2.5",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/zerotrie/0.2.5",
+      "sourceArchive": "https://crates.io/api/v1/crates/zerotrie/0.2.5/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zerovec-derive",
+      "version": "0.11.6",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/zerovec-derive/0.11.6",
+      "sourceArchive": "https://crates.io/api/v1/crates/zerovec-derive/0.11.6/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zerovec",
+      "version": "0.11.8",
+      "license": "Unicode-3.0",
+      "source": "https://crates.io/crates/zerovec/0.11.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/zerovec/0.11.8/download",
+      "licenseTexts": [
+        "f367c1b8e1aa262435251e442901da4607b4650e0e63a026f5044473ecfb90f2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zip",
+      "version": "4.6.1",
+      "license": "MIT",
+      "source": "https://crates.io/crates/zip/4.6.1",
+      "sourceArchive": "https://crates.io/api/v1/crates/zip/4.6.1/download",
+      "licenseTexts": [
+        "13f16f8435b4242f494f038d761bd99c5af70395aa39274bd287d22c4d35c3b7"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zlib-rs",
+      "version": "0.6.8",
+      "license": "Zlib",
+      "source": "https://crates.io/crates/zlib-rs/0.6.8",
+      "sourceArchive": "https://crates.io/api/v1/crates/zlib-rs/0.6.8/download",
+      "licenseTexts": [
+        "ae078f5c300de75464ac3feafe98111bd27ce41d226d95d30adc280479517ac2"
+      ]
+    },
+    {
+      "ecosystem": "Rust",
+      "name": "zmij",
+      "version": "1.0.23",
+      "license": "MIT",
+      "source": "https://crates.io/crates/zmij/1.0.23",
+      "sourceArchive": "https://crates.io/api/v1/crates/zmij/1.0.23/download",
+      "licenseTexts": [
+        "23f18e03dc49df91622fe2a76176497404e46ced8a715d9d2b67a7446571cca3"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "@tauri-apps/api",
+      "version": "2.12.2",
+      "license": "Apache-2.0 OR MIT",
+      "source": "https://www.npmjs.com/package/@tauri-apps/api/v/2.12.2",
+      "licenseTexts": [
+        "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+        "5e834fe9788c524210deda859c46a550ffa5aa0cba9ea0572f0d81120e97c008",
+        "9dd42ea92cff2ede5cd477cbfcce051b2d0115c0ac7f368ee88cb545055dff1d"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "ansi-regex",
+      "version": "5.0.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/ansi-regex/v/5.0.1",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "camelcase",
+      "version": "5.3.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/camelcase/v/5.3.1",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "cliui",
+      "version": "6.0.0",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/cliui/v/6.0.0",
+      "licenseTexts": [
+        "2dc0465729366c3a7890dfa9e972a1ba7048a26c02116fb8b419a6a1ac110149"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "color-convert",
+      "version": "2.0.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/color-convert/v/2.0.1",
+      "licenseTexts": [
+        "119fee4adef95a6af980129b12bbc02ef32a0a75737cbdd31b6922c0db0050bc"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "color-name",
+      "version": "1.1.4",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/color-name/v/1.1.4",
+      "licenseTexts": [
+        "9060d3e477a57e94563100d089ee07a1bf3342f149fd7366913abf2b4b54f04b"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "decamelize",
+      "version": "1.2.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/decamelize/v/1.2.0",
+      "licenseTexts": [
+        "6fb9754611c20f6649f68805e8c990e83261f29316e29de9e6cedae607b8634c"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "dijkstrajs",
+      "version": "1.0.3",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/dijkstrajs/v/1.0.3",
+      "licenseTexts": [
+        "c46324e45a005413535a6fb7a97e9eacd3cc6bf30335b7d5c10b8ee3af9e60c2"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "emoji-regex",
+      "version": "8.0.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/emoji-regex/v/8.0.0",
+      "licenseTexts": [
+        "483acb265f182907d1caf6cff9c16c96f31325ed23792832cc5d8b12d5f88c8a"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "find-up",
+      "version": "4.1.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/find-up/v/4.1.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "get-caller-file",
+      "version": "2.0.5",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/get-caller-file/v/2.0.5",
+      "licenseTexts": [
+        "902dbb4154679fb2b8d7c33878183f45b268d01eae5e5033dddaa8852d45f213"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "is-fullwidth-code-point",
+      "version": "3.0.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/is-fullwidth-code-point/v/3.0.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "locate-path",
+      "version": "5.0.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/locate-path/v/5.0.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "p-limit",
+      "version": "2.3.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/p-limit/v/2.3.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "p-locate",
+      "version": "4.1.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/p-locate/v/4.1.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "p-try",
+      "version": "2.2.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/p-try/v/2.2.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "path-exists",
+      "version": "4.0.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/path-exists/v/4.0.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "pngjs",
+      "version": "5.0.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/pngjs/v/5.0.0",
+      "licenseTexts": [
+        "176b07a18c0bb3836aaeb61088fd0bf11a38f66e6f15e3fbda85faa225250d6e"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "qrcode",
+      "version": "1.5.4",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/qrcode/v/1.5.4",
+      "licenseTexts": [
+        "a060a98ea20666c5ce36c08c58fcffd9bbf0562f7de525449bbe1b7cdf4911a8"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "react",
+      "version": "19.3.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/react/v/19.3.0",
+      "licenseTexts": [
+        "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "react-dom",
+      "version": "19.3.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/react-dom/v/19.3.0",
+      "licenseTexts": [
+        "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "require-directory",
+      "version": "2.1.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/require-directory/v/2.1.1",
+      "licenseTexts": [
+        "a92e52eb1fa7cd746e3827bf01d3a3589bbc8e1e51348b1da042aad165525ad1"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "require-main-filename",
+      "version": "2.0.0",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/require-main-filename/v/2.0.0",
+      "licenseTexts": [
+        "365496ca1f56da40b23c9815fc40fa9005847b2f8f8fd1c1a4929ef25ec8cd1d"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "scheduler",
+      "version": "0.28.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/scheduler/v/0.28.0",
+      "licenseTexts": [
+        "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "set-blocking",
+      "version": "2.0.0",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/set-blocking/v/2.0.0",
+      "licenseTexts": [
+        "365496ca1f56da40b23c9815fc40fa9005847b2f8f8fd1c1a4929ef25ec8cd1d"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "string-width",
+      "version": "4.2.3",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/string-width/v/4.2.3",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "strip-ansi",
+      "version": "6.0.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/strip-ansi/v/6.0.1",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "which-module",
+      "version": "2.0.1",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/which-module/v/2.0.1",
+      "licenseTexts": [
+        "852bf81203aa93aa89afc9f881ebb035322dc7334aaceff435c557634c94a815"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "wrap-ansi",
+      "version": "6.2.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/wrap-ansi/v/6.2.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "ansi-styles",
+      "version": "4.3.0",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/ansi-styles/v/4.3.0",
+      "licenseTexts": [
+        "48da2f39e100d4085767e94966b43f4fa95ff6a0698fba57ed460914e35f94a0"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "y18n",
+      "version": "4.0.3",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/y18n/v/4.0.3",
+      "licenseTexts": [
+        "2034cce3b6fafcddd642c4175e01d3ddfc332a53b9f20fdc46b1466dc89ac469"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "yargs",
+      "version": "15.4.1",
+      "license": "MIT",
+      "source": "https://www.npmjs.com/package/yargs/v/15.4.1",
+      "licenseTexts": [
+        "2f1a503bfab84b3ba7393627308b3274501e459e3b5185bbb56bbf16cb1602d4"
+      ]
+    },
+    {
+      "ecosystem": "npm",
+      "name": "yargs-parser",
+      "version": "18.1.3",
+      "license": "ISC",
+      "source": "https://www.npmjs.com/package/yargs-parser/v/18.1.3",
+      "licenseTexts": [
+        "365496ca1f56da40b23c9815fc40fa9005847b2f8f8fd1c1a4929ef25ec8cd1d"
+      ]
+    }
+  ]
+}

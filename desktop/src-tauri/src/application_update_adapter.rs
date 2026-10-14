@@ -26,17 +26,27 @@ impl ApplicationUpdateState {
 pub(crate) struct Configuration {
     version: String,
     configured: bool,
+    endpoint: Option<String>,
 }
 #[derive(Serialize)]
 pub(crate) struct Candidate {
     version: String,
     notes: String,
 }
+fn default_endpoint(app: &AppHandle) -> Option<String> {
+    app.config()
+        .plugins
+        .0
+        .get("updater")
+        .and_then(crate::application_update::configured_endpoint)
+}
 #[tauri::command]
 pub(crate) fn application_update_configuration(app: AppHandle) -> Configuration {
+    let endpoint = default_endpoint(&app);
     Configuration {
         version: app.package_info().version.to_string(),
-        configured: false,
+        configured: endpoint.is_some(),
+        endpoint,
     }
 }
 #[tauri::command]
@@ -51,7 +61,10 @@ pub(crate) async fn check_application_update(
         .try_lock()
         .map_err(|_| "업데이트 작업이 진행 중입니다.")?;
     *pending = None;
-    let endpoint = validate_endpoint(endpoint.as_deref().unwrap_or(""))?;
+    let endpoint = endpoint
+        .or_else(|| default_endpoint(&app))
+        .unwrap_or_default();
+    let endpoint = validate_endpoint(&endpoint)?;
     let updater = app
         .updater_builder()
         .endpoints(vec![endpoint])

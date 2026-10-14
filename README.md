@@ -40,7 +40,7 @@ The primary desktop app targets **macOS 14+ and Windows**. Implemented support a
 
 See the [full support matrix](docs/SUPPORT.md) for differences between hosts and connection methods. iPhone mouse/touch control is not implemented; text input requires the Phone Mirror keyboard, Full Access, a local network connection, and a compatible field. Audio availability depends on OS, application, and protected-content policies.
 
-**Release status:** public installers and the official update feed are still in preparation. The app supports signed updates, but the official feed has not been connected yet. Use the source build below to try the app.
+**Release status:** installers and signed updates are distributed through [GitHub Releases](https://github.com/JungSeunghun/phone/releases). Version 0.2.1 connects the official feed by default; on 0.2.0, register the address in the [distribution guide](desktop/RELEASING.md). Current development installers use macOS ad-hoc signing without notarization and have no Windows publisher signature; update artifact signature verification remains enabled.
 
 ## Quick start
 
