@@ -96,7 +96,7 @@ fn release_configuration_connects_the_official_update_feed() {
     assert_eq!(
         configuration["plugins"]["updater"]["endpoints"],
         serde_json::json!([
-            "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json"
+            "https://github.com/JungSeunghun/phone-mirror/releases/latest/download/latest.json"
         ])
     );
 }
@@ -104,7 +104,7 @@ fn release_configuration_connects_the_official_update_feed() {
 #[test]
 fn configured_feed_requires_a_valid_https_endpoint() {
     use phone_mirror_desktop::application_update::configured_endpoint;
-    let valid = "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json";
+    let valid = "https://github.com/JungSeunghun/phone-mirror/releases/latest/download/latest.json";
     assert_eq!(
         configured_endpoint(&serde_json::json!({"endpoints": [valid]})),
         Some(valid.into())

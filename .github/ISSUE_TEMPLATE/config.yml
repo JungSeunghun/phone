@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security reporting instructions
-    url: https://github.com/JungSeunghun/phone/blob/main/SECURITY.md
+    url: https://github.com/JungSeunghun/phone-mirror/blob/main/SECURITY.md
     about: Read the private-reporting instructions before discussing vulnerabilities.

@@ -73,7 +73,7 @@
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEQyQkY5MThBRjA2RUQwQTQKUldTazBHN3dpcEcvMHFxWm9IV2RlVnV0V1lmS0RzZnA1Q1B4K29oczMycSt1RTZVMk1JdnpUM1IK",
       "endpoints": [
-        "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json"
+        "https://github.com/JungSeunghun/phone-mirror/releases/latest/download/latest.json"
       ],
       "windows": {
         "installMode": "passive"

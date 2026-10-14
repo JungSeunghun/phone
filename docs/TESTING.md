@@ -138,3 +138,11 @@ SM-S901N, 886×1920 실제 영상으로 최종 수정본의 녹화·일시정지
 [공개 릴리스 desktop-v0.2.2](https://github.com/JungSeunghun/phone/releases/tag/desktop-v0.2.2)를 만들기 전에 12개 첨부 파일을 내려받아 GitHub 업로드 digest와 대조했다. 세 설치 파일 SHA-256, 세 업데이트 파일의 기존 고정 공개 키 서명 및 trusted comment의 버전 0.2.2, manifest의 태그 소스 커밋을 검증했다. Mac 앱 Info.plist 버전·bundle identifier와 Mach-O ARM64/x86_64 아키텍처, 동봉한 runtime 라이선스 공지도 확인했다. `.build/update-release-verification.log`에 오프라인 검증 결과를 보관했다.
 
 공개 후 공식 주소 `https://github.com/JungSeunghun/phone/releases/latest/download/latest.json`이 HTTP 200과 버전 0.2.2를 반환했다. 공개 URL에서 세 업데이트 파일을 실제 내려받아 검증한 초안 파일과 SHA-256이 같은지 확인했다 (`.build/update-public-feed-verification.log`). 업데이트 설치·재시작 자체는 실행하지 않았다. Windows 폰 연결, iPhone 실기기 및 Intel Mac 실행 증거는 이 배포 작업에서 추가하지 않았다. Android USB 녹화 증거는 위의 실제 SM-S901N 검증과 구분하여 유지한다.
+
+### 저장소 이름 변경 검증 (2026-10-14)
+
+GitHub 저장소를 `JungSeunghun/phone-mirror`로 변경하고 origin, README 배지·링크, 보안 신고 링크, Cargo repository metadata와 기본 updater endpoint를 갱신했다. 위 0.2.2 배포 기록의 이전 URL은 당시 검증 증거로 유지한다. 저장소 ID, 최신 릴리스 ID, 12개 릴리스 asset ID·크기·digest, 앱 버전·identifier·고정 공개 키가 변경 전과 같음을 확인했다. 공개 릴리스 본문의 안내 링크도 새 이름으로 갱신했다. 기존 배포 파일과 manifest는 수정하지 않았다.
+
+새 기본 endpoint를 기대하는 Rust 테스트가 먼저 실패한 것을 `.build/repository-rename-red.log`에 기록한 뒤 설정을 수정했다. Rust updater 테스트 6개, frontend updater 테스트 10개(저장된 이전 주소·사용자 지정 주소 보존 포함), release policy 23개, Rust/Prettier formatting과 frontend 빌드가 통과했다. macOS 호스트에서 Rust 테스트를 실행했고 Windows GNU 대상 `cargo check --no-default-features --locked`도 통과했다. Windows 네이티브 실행이나 새 실기기 검사는 이 URL 변경의 검증에 포함하지 않았다.
+
+이전 `phone` 및 새 `phone-mirror`의 `releases/latest/download/latest.json` 주소가 모두 HTTP 200으로 동일한 버전 0.2.2를 반환했다. 세 플랫폼 업데이트 파일을 이전·새 경로에서 내려받아 GitHub digest와 대조하고 기존 공개 키 및 서명 버전을 검증했다 (`.build/repository-rename-verification.log`). 업데이트 설치·재시작은 실행하지 않았다. 이전 저장소 이름을 재사용하지 않아야 기존 배포 앱의 리다이렉트가 유지된다. 다음 빌드부터 새 주소를 기본 사용한다.

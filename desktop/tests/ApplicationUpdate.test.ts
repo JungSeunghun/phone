@@ -158,9 +158,12 @@ it("retains installation failure when cancellation arrives after install began",
   expect(f.controller.getSnapshot().message).toContain("install failed");
 });
 
-it("uses the official feed by default and preserves a saved override", async () => {
+it.each([
+  "https://updates.example.org/latest.json",
+  "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json",
+])("uses the official feed and preserves saved override %s", async (custom) => {
   const endpoint =
-    "https://github.com/JungSeunghun/phone/releases/latest/download/latest.json";
+    "https://github.com/JungSeunghun/phone-mirror/releases/latest/download/latest.json";
   const f = fixture();
   f.backend.configuration.mockResolvedValue({
     version: "0.2.1",
@@ -171,7 +174,6 @@ it("uses the official feed by default and preserves a saved override", async () 
   expect(f.controller.getSnapshot().endpoint).toBe(endpoint);
   expect(f.backend.check).toHaveBeenCalledWith(endpoint);
   const g = fixture();
-  const custom = "https://updates.example.org/latest.json";
   g.storage.getItem.mockImplementation((key?: string) =>
     key === "phone-mirror-update-endpoint" ? custom : null,
   );
