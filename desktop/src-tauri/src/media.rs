@@ -1,8 +1,4 @@
-use std::{
-    fs::{self, OpenOptions},
-    io::Write,
-    path::Path,
-};
+use std::{fs, io::Write, path::Path};
 #[derive(Clone, Copy)]
 pub enum MediaFormat {
     Png,
@@ -50,10 +46,7 @@ pub fn save_media(path: &Path, format: MediaFormat, bytes: &[u8]) -> Result<(), 
     }
     let temp = path.with_file_name(format!(".phone-mirror-{}.tmp", uuid::Uuid::new_v4()));
     let result = (|| -> std::io::Result<()> {
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&temp)?;
+        let mut file = crate::infrastructure::private_file::create_private_file(&temp)?;
         file.write_all(bytes)?;
         file.sync_all()?;
         drop(file);

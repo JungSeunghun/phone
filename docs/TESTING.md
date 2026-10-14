@@ -78,8 +78,28 @@ GUI 앱을 종료한 상태에서 Android USB 실기기로 검증한다. 첫 프
 
 ## 보안 회귀 검증 (2026-10-14)
 
-키보드 연결과 연결 코드 저장 개선은 변경 전 테스트 실패를 확인한 뒤 수정했다.
+세 보안 개선점은 변경 전 테스트 실패를 확인한 뒤 수정했다.
 
 - `unauthenticated_idle_client_does_not_block_legitimate_keyboard`: 기존 구현에서 정상 키보드 인증이 1초 안에 진행되지 않아 실패했다. 수정 후 인증 전 연결을 최대 4개 병렬 처리하며, IP당 8초에 8회와 추적 주소 64개 제한을 적용한다. 전체 인증의 읽기·쓰기에는 8초 제한을 적용하며, 종료 시 대기 작업과 소켓을 취소한다. 연결 수 한계, 반복 잘못된 인증, 정확한 시도 제한 시간 경계, 연결 세대, ACK 시간 초과와 취소를 검사한다. 이는 자원 제한과 단일 미인증 연결의 지연을 줄이는 조치이며, 네트워크 전체의 서비스 거부 공격을 막는다는 보장은 아니다.
 - `testConnectionSecretsAreNotSavedInDefaults`: 기존 송출 설정과 키보드 코드가 UserDefaults에 남아 두 assertion이 실패했다. 수정 후 App Group Keychain에 저장하고 저장 성공 후 기존 값을 제거한다. 주입한 저장소로 누락·손상·읽기/쓰기 실패·반복 이관을 검사한다.
 - 추가 이관 회귀 테스트 `testLegacyValuesCannotReplaceExistingSecureCodesOrBypassReadFailure`에서 오래된 값이 이미 저장된 Keychain 코드를 덮어쓰고 읽기 실패를 우회하는 네 assertion의 실패를 확인했다. 수정 후 Keychain을 먼저 읽고, 기존 보안 항목이 없는 경우에만 검증된 값을 이관한다. 보안 저장값이 있으면 오래된 UserDefaults 값은 제거한다.
+- `saved_capture_has_owner_only_permissions_in_shared_directory`: 기존 PNG가 `0644`로 생성되어 `0600` 기대값에 실패했다. 수정 후 내용을 쓰기 전에 Unix `0600`과 실제 모드 확인, Windows 현재 사용자 SID의 보호된 DACL을 적용한다. Windows는 ACL을 지속적으로 지원하지 않는 저장 장치를 거부한다. 원자적 저장, 기존 파일 보존, 임시 파일 정리도 기존 회귀 검사로 확인한다. macOS 공유 폴더 ACL의 상속 여부도 검사한다.
+
+검증 명령:
+
+```sh
+cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked
+cargo clippy --manifest-path desktop/src-tauri/Cargo.toml --all-targets --locked -- -D warnings
+cargo check --manifest-path desktop/src-tauri/Cargo.toml --no-default-features --locked --tests --target x86_64-pc-windows-gnu
+swift test
+swift test --package-path ios
+# desktop에서 실행
+npm test
+npm run build
+```
+
+macOS에서 기존 Swift 앱 53개, iOS 코어 26개, 데스크톱 프런트엔드 199개 자동 테스트가 통과했다. Rust 전체 143개가 통과한 뒤 인증 대기 중 종료 테스트를 추가했고 최종 관련 검사(키보드 9개, 미디어 5개)가 통과했다. Clippy의 경고 금지 검사, Rust/Swift 형식 검사와 데스크톱 빌드도 통과했다. iOS 앱과 방송·키보드 확장은 `iphonesimulator`와 `iphoneos` SDK로 `CODE_SIGNING_ALLOWED=NO` 빌드했다. Windows 결과는 테스트 소스까지 포함한 크로스 컴파일이며 Windows 네이티브 실행 결과가 아니다. 기존 Windows CI는 이 ACL 테스트를 네이티브 `cargo test`에 포함한다.
+
+Android USB 실기기(SM-S901N)에서 기존 녹화·캡처 통합 예제를 두 번 실행했다. 두 실행 모두 녹화 완료 시 “녹화할 기준 프레임을 받지 못했습니다.” 오류로 종료했으므로 전체 통합 성공으로 보고하지 않는다. 그 전에 생성된 녹화 중/일시정지 중 PNG 총 네 파일은 실제 화면의 PNG 시그니처와 `0600` 권한을 확인했다. 이 검증은 캡처 저장에 한정하며 물리적 케이블 분리 시험은 아니다. 실제 화면 미디어는 외부로 공유하지 않고 무시된 `desktop/src-tauri/target/verification/recording-screenshot`에만 보관한다.
+
+실제 iPhone이 연결되어 있지 않아 서명된 앱과 확장 간 Keychain 공유, ReplayKit·실제 iPhone 키보드 검증은 수행하지 않았다. Windows 네이티브 ACL 적용·읽기 검증도 이 macOS 환경에서는 수행하지 않았다. 로컬 검사 로그는 무시된 `.build/security-*.log`에 보관한다.

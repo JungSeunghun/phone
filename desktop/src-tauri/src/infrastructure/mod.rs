@@ -9,3 +9,5 @@ pub use stream::*;
 
 mod diagnostics;
 pub use diagnostics::*;
+
+pub(crate) mod private_file;
