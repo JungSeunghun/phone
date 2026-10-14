@@ -187,3 +187,127 @@ fn validates_unicode_size_and_supported_editing_without_touch_control() {
     })
     .is_ok());
 }
+
+#[tokio::test]
+async fn unauthenticated_idle_client_does_not_block_legitimate_keyboard() {
+    let service = IosKeyboardInputService::default();
+    let info = service.start("iphone".into()).await.unwrap();
+    let port = info.codes[0]
+        .split('|')
+        .nth(1)
+        .unwrap()
+        .rsplit(':')
+        .next()
+        .unwrap();
+    let mut idle = TcpStream::connect(format!("127.0.0.1:{port}"))
+        .await
+        .unwrap();
+    let mut greeting = [0; 20];
+    idle.read_exact(&mut greeting).await.unwrap();
+    let result = tokio::time::timeout(Duration::from_secs(1), connect(&info.codes[0])).await;
+    service.stop(&info.receiver_id).await.unwrap();
+    assert!(
+        result.is_ok(),
+        "an unauthenticated client blocked legitimate authentication"
+    );
+    assert_eq!(
+        idle.read_u8().await.unwrap_err().kind(),
+        std::io::ErrorKind::UnexpectedEof
+    );
+}
+
+#[tokio::test]
+async fn pending_handshakes_are_bounded_expire_at_deadline_and_cancel_cleanly() {
+    let service = IosKeyboardInputService::default();
+    let info = service.start("iphone".into()).await.unwrap();
+    let port = info.codes[0]
+        .split('|')
+        .nth(1)
+        .unwrap()
+        .rsplit(':')
+        .next()
+        .unwrap();
+    let address = format!("127.0.0.1:{port}");
+    let mut idle = Vec::new();
+    for _ in 0..4 {
+        let mut socket = TcpStream::connect(&address).await.unwrap();
+        let mut greeting = [0; 20];
+        socket.read_exact(&mut greeting).await.unwrap();
+        idle.push(socket);
+    }
+    let mut excess = TcpStream::connect(&address).await.unwrap();
+    assert!(
+        tokio::time::timeout(Duration::from_secs(1), excess.read_u8())
+            .await
+            .unwrap()
+            .is_err()
+    );
+    let mut first = idle.remove(0);
+    let waiting = tokio::spawn(async move { first.read_u8().await });
+    // Real sockets establish admission; injected time exercises the exact deadline.
+    tokio::time::pause();
+    tokio::time::advance(Duration::from_millis(7999)).await;
+    assert!(!waiting.is_finished());
+    tokio::time::advance(Duration::from_millis(1)).await;
+    assert!(waiting.await.unwrap().is_err());
+    tokio::time::resume();
+    for mut socket in idle {
+        assert!(socket.read_u8().await.is_err());
+    }
+    let (_authenticated, _, _) = connect(&info.codes[0]).await;
+    service.stop(&info.receiver_id).await.unwrap();
+    // A fresh service starts without retaining old admission state.
+    let next = service.start("iphone".into()).await.unwrap();
+    let (_socket, _, _) = connect(&next.codes[0]).await;
+    service.stop(&next.receiver_id).await.unwrap();
+}
+
+#[tokio::test]
+async fn repeated_invalid_authentication_is_rate_limited() {
+    let service = IosKeyboardInputService::default();
+    let info = service.start("iphone".into()).await.unwrap();
+    let port = info.codes[0]
+        .split('|')
+        .nth(1)
+        .unwrap()
+        .rsplit(':')
+        .next()
+        .unwrap();
+    let address = format!("127.0.0.1:{port}");
+    for _ in 0..8 {
+        let mut socket = TcpStream::connect(&address).await.unwrap();
+        let mut greeting = [0; 20];
+        socket.read_exact(&mut greeting).await.unwrap();
+        // An invalid length is rejected before allocation or authentication.
+        socket.write_u32(0).await.unwrap();
+        assert!(socket.read_u8().await.is_err());
+    }
+    let mut rejected = TcpStream::connect(&address).await.unwrap();
+    assert!(rejected.read_u8().await.is_err());
+    service.stop(&info.receiver_id).await.unwrap();
+}
+
+#[tokio::test]
+async fn stop_cancels_pending_authentication_without_late_connection_status() {
+    let service = IosKeyboardInputService::default();
+    let info = service.start("iphone".into()).await.unwrap();
+    let port = info.codes[0]
+        .split('|')
+        .nth(1)
+        .unwrap()
+        .rsplit(':')
+        .next()
+        .unwrap();
+    let mut socket = TcpStream::connect(format!("127.0.0.1:{port}"))
+        .await
+        .unwrap();
+    let mut greeting = [0; 20];
+    socket.read_exact(&mut greeting).await.unwrap();
+    tokio::time::timeout(Duration::from_secs(1), service.stop(&info.receiver_id))
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(socket.read_u8().await.is_err());
+    assert!(service.status(&info.receiver_id).await.is_err());
+    service.stop(&info.receiver_id).await.unwrap();
+}

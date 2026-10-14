@@ -13,7 +13,8 @@ use tokio::{
     io::{AsyncReadExt, AsyncWriteExt},
     net::{TcpListener, TcpStream},
     sync::{mpsc, oneshot, Mutex},
-    time::{timeout, Duration},
+    task::JoinSet,
+    time::{timeout, Duration, Instant},
 };
 use tokio_util::sync::CancellationToken;
 
@@ -186,30 +187,33 @@ impl IosKeyboardInputService {
         let status = connected.clone();
         let cancel = cancellation.clone();
         let task = tokio::spawn(async move {
+            // Only authenticated sockets enter the command loop. Idle peers cannot serialize admission.
+            let mut handshakes = JoinSet::new();
+            let mut attempts = std::collections::HashMap::<std::net::IpAddr, (Instant, u8)>::new();
             loop {
-                let accepted = tokio::select! { biased; _=cancel.cancelled()=>break,result=listener.accept()=>result };
-                let Ok((mut socket, _)) = accepted else { break };
-                let run = async {
-                    let challenge = *uuid::Uuid::new_v4().as_bytes();
-                    socket
-                        .write_all(&[b"PMK1".as_slice(), &challenge].concat())
-                        .await
-                        .map_err(|_| "연결 종료")?;
-                    let mut incoming = KeyboardPacketCipher::new(&secret, &challenge, "keyboard")?;
-                    let mut outgoing = KeyboardPacketCipher::new(&secret, &challenge, "desktop")?;
-                    let hello = timeout(
-                        Duration::from_secs(8),
-                        read_packet(&mut socket, &mut incoming),
-                    )
-                    .await
-                    .map_err(|_| "키보드 인증 시간 초과")??;
-                    if hello != b"{\"kind\":\"hello\"}" {
-                        return Err("키보드 인증 실패".into());
+                let authenticated = tokio::select! {
+                    biased;
+                    _ = cancel.cancelled() => break,
+                    result = handshakes.join_next(), if !handshakes.is_empty() => {
+                        match result {
+                            Some(Ok(Ok(connection))) => connection,
+                            _ => continue,
+                        }
                     }
-                    socket
-                        .write_all(&outgoing.seal(b"{\"kind\":\"ready\"}")?)
-                        .await
-                        .map_err(|_| "연결 종료")?;
+                    result = listener.accept() => {
+                        let Ok((socket, address)) = result else { break };
+                        if !admit_keyboard_handshake(&mut attempts, address.ip(), handshakes.len(), Instant::now()) {
+                            continue;
+                        }
+                        handshakes.spawn(authenticate_keyboard(socket, secret));
+                        continue;
+                    }
+                };
+                let (mut socket, mut incoming, mut outgoing) = authenticated;
+                // Discard other pending handshakes once one peer owns the input session.
+                handshakes.abort_all();
+                while handshakes.join_next().await.is_some() {}
+                let run = async {
                     let token = connection_generation.fetch_add(1, Ordering::SeqCst) + 1;
                     status.store(true, Ordering::SeqCst);
                     loop {
@@ -260,6 +264,8 @@ impl IosKeyboardInputService {
                     break;
                 }
             }
+            handshakes.abort_all();
+            while handshakes.join_next().await.is_some() {}
             status.store(false, Ordering::SeqCst);
         });
         *active = Some(KeyboardReceiver {
@@ -368,4 +374,104 @@ async fn read_packet(
         .await
         .map_err(|_| "키보드 연결 종료")?;
     cipher.open(&frame)
+}
+
+async fn authenticate_keyboard(
+    mut socket: TcpStream,
+    secret: [u8; 32],
+) -> Result<(TcpStream, KeyboardPacketCipher, KeyboardPacketCipher), String> {
+    // Bound the complete handshake, including writes and fragmented reads.
+    timeout(Duration::from_secs(8), async move {
+        let challenge = *uuid::Uuid::new_v4().as_bytes();
+        socket
+            .write_all(&[b"PMK1".as_slice(), &challenge].concat())
+            .await
+            .map_err(|_| "연결 종료")?;
+        let mut incoming = KeyboardPacketCipher::new(&secret, &challenge, "keyboard")?;
+        let mut outgoing = KeyboardPacketCipher::new(&secret, &challenge, "desktop")?;
+        let hello = read_packet(&mut socket, &mut incoming).await?;
+        if hello != b"{\"kind\":\"hello\"}" {
+            return Err("키보드 인증 실패".into());
+        }
+        socket
+            .write_all(&outgoing.seal(b"{\"kind\":\"ready\"}")?)
+            .await
+            .map_err(|_| "연결 종료")?;
+        Ok((socket, incoming, outgoing))
+    })
+    .await
+    .map_err(|_| "키보드 인증 시간 초과")?
+}
+
+fn admit_keyboard_handshake(
+    attempts: &mut std::collections::HashMap<std::net::IpAddr, (Instant, u8)>,
+    address: std::net::IpAddr,
+    pending: usize,
+    now: Instant,
+) -> bool {
+    attempts.retain(|_, (started, _)| now.duration_since(*started) < Duration::from_secs(8));
+    if pending >= 4 || (!attempts.contains_key(&address) && attempts.len() >= 64) {
+        return false;
+    }
+    let entry = attempts.entry(address).or_insert((now, 0));
+    if entry.1 >= 8 {
+        return false;
+    }
+    entry.1 += 1;
+    true
+}
+
+#[cfg(test)]
+mod admission_tests {
+    use super::*;
+    #[test]
+    fn attempts_recover_exactly_at_window_boundary_without_sliding_on_rejection() {
+        let mut attempts = std::collections::HashMap::new();
+        let address = "127.0.0.1".parse().unwrap();
+        let start = Instant::now();
+        for _ in 0..8 {
+            assert!(admit_keyboard_handshake(&mut attempts, address, 0, start));
+        }
+        assert!(!admit_keyboard_handshake(&mut attempts, address, 0, start));
+        assert!(!admit_keyboard_handshake(
+            &mut attempts,
+            address,
+            0,
+            start + Duration::from_millis(7999)
+        ));
+        assert!(admit_keyboard_handshake(
+            &mut attempts,
+            address,
+            0,
+            start + Duration::from_secs(8)
+        ));
+        assert_eq!(attempts[&address].1, 1);
+    }
+    #[test]
+    fn pending_connections_and_tracked_addresses_are_bounded() {
+        let mut attempts = std::collections::HashMap::new();
+        let start = Instant::now();
+        let address = "127.0.0.1".parse().unwrap();
+        assert!(!admit_keyboard_handshake(&mut attempts, address, 4, start));
+        assert!(!admit_keyboard_handshake(
+            &mut attempts,
+            address,
+            usize::MAX,
+            start
+        ));
+        assert!(attempts.is_empty());
+        for last in 1..=64 {
+            let address = std::net::IpAddr::V4(std::net::Ipv4Addr::new(10, 0, 0, last));
+            assert!(admit_keyboard_handshake(&mut attempts, address, 3, start));
+        }
+        assert!(!admit_keyboard_handshake(&mut attempts, address, 0, start));
+        assert_eq!(attempts.len(), 64);
+        assert!(admit_keyboard_handshake(
+            &mut attempts,
+            address,
+            0,
+            start + Duration::from_secs(8)
+        ));
+        assert_eq!(attempts.len(), 1);
+    }
 }
