@@ -128,3 +128,7 @@ SM-S901N, 886×1920 실제 영상으로 최종 수정본의 녹화·일시정지
 실제 미디어는 무시된 `desktop/src-tauri/target/verification/recording-screenshot` 아래에만 보관하고 외부로 공유하지 않았다. 이 결과는 Android USB 녹화 검증이며, 물리적 케이블 분리·Android Wi-Fi·실제 iPhone·Windows 네이티브 검증을 의미하지 않는다. 최종 로그는 `.build/recording-physical-final.log`, `.build/recording-all-tests.log`, `.build/recording-clippy.log`, `.build/recording-windows-check.log`에 보관한다.
 
 최종 커밋 전 재검토에서는 `cargo test --manifest-path desktop/src-tauri/Cargo.toml --locked` 151개, `swift test --build-system native` 92개, `swift test --package-path ios` 26개를 다시 실행해 모두 통과했다. 이 재검토 결과는 무시된 `.build/final-review-*-tests.log`에 보관한다.
+
+### 공식 업데이트 피드 배포 (2026-10-14)
+
+0.2.1 소스의 Rust 153개, frontend 200개, browser 57개, release policy 22개 테스트와 CI Mac/Windows 검사 및 iOS SDK 빌드가 통과했다. 배포 run 38557162331에서 세 설치 파일 생성은 통과했으나 Mac의 `--bundles dmg`가 updater archive를 생성하지 않아 초안 생성이 실패했고 공개 배포는 하지 않았다. `installerBundles` 회귀 테스트 실패를 `.build/update-bundle-red.log`에 기록한 뒤, 업데이트 서명을 사용하는 Mac 빌드에 `app,dmg`를 요청하도록 수정했다. 수정 후 release policy 23개와 formatting/version validation이 통과했다. 기존 태그를 보존하고 수정본 버전을 0.2.2로 올렸다. 공개 피드 기본값과 저장된 사용자 주소 우선 적용도 TDD로 검증했다 (`.build/update-feed-red.log`, `.build/update-feed-frontend-red.log`). OS 코드 서명은 Mac ad-hoc/미공증, Windows 게시자 서명 없음이며 업데이트 암호학적 서명과 구분한다.

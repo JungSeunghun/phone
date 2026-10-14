@@ -178,3 +178,10 @@ export function buildEnvironment(targetIdentifier, mode, environment) {
   }
   return result;
 }
+
+export function installerBundles(targetIdentifier, createUpdaterArtifacts) {
+  const target = releaseTarget(targetIdentifier);
+  return target.bundle === "dmg" && createUpdaterArtifacts
+    ? ["app", "dmg"]
+    : [target.bundle];
+}

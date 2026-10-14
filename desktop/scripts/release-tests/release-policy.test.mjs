@@ -4,6 +4,7 @@ import { readFile, mkdtemp, writeFile, mkdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  installerBundles,
   releaseVersion,
   validateVersions,
   signingConfiguration,
@@ -385,4 +386,14 @@ test("unsigned builds remove signing credentials, and signed builds expose only 
   const windows = buildEnvironment("windows-x64", "signed", environment);
   assert.equal(windows.AZURE_CLIENT_SECRET, "private-azure");
   assert.equal(windows.APPLE_CERTIFICATE, undefined);
+});
+
+test("Mac packaging requests an app archive alongside the DMG for signed updates", () => {
+  for (const target of ["macos-arm64", "macos-x64"]) {
+    assert.deepEqual(installerBundles(target, true), ["app", "dmg"]);
+    assert.deepEqual(installerBundles(target, false), ["dmg"]);
+  }
+  assert.deepEqual(installerBundles("windows-x64", true), ["nsis"]);
+  assert.deepEqual(installerBundles("windows-x64", false), ["nsis"]);
+  assert.throws(() => installerBundles("unknown", true));
 });

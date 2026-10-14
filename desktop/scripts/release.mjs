@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 import { parseArgs } from "node:util";
 import { createPrivateKey, randomUUID } from "node:crypto";
 import {
+  installerBundles,
   releaseVersion,
   validateVersions,
   releaseTarget,
@@ -128,7 +129,10 @@ async function main() {
         "--target",
         target.target,
         "--bundles",
-        target.bundle,
+        installerBundles(
+          target.id,
+          Boolean(process.env.TAURI_SIGNING_PRIVATE_KEY),
+        ).join(","),
         "--config",
         configurationPath,
         "--ci",

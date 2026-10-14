@@ -117,7 +117,7 @@ CI는 .NET 8과 `artifact-signing-cli` 0.11.0을 준비하고 Tauri의 signComma
 
 앱 설정의 **앱 업데이트**에서 현재 버전, 자동 확인 설정, 수동 확인, 다운로드 취소, **업데이트하고 다시 시작**을 제공한다. 자동 확인은 실행 시와 실행 중 24시간 간격이며 연결 중 정기 확인은 대기한다. 설치는 사용자의 버튼 동작으로 시작하고, 활성 미러링·녹화·파일 저장·아직 끝나지 않은 기기 작업이 있으면 네이티브 계층에서도 거부한다. 다운로드는 512 MiB로 제한하고 HTTPS·공개 키 서명·서명에 포함된 버전을 확인한다. 앱 종료 시 기존 녹화 저장 흐름은 유지한다.
 
-0.2.1부터 공식 업데이트 주소는 `https://github.com/JungSeunghun/phone/releases/latest/download/latest.json`이다. 새 앱은 이 주소를 기본값으로 사용하며 기존 사용자 지정 주소는 유지한다. 0.2.0에서는 **업데이트 배포 주소**에 이 주소를 직접 저장한다. 정식 릴리스와 `latest.json`이 공개되어 있어야 작동하며, 기존 공개 키로 서명된 파일만 설치할 수 있다. 초안의 모든 파일을 검증한 뒤 릴리스를 공개하고 최신 릴리스로 지정한다.
+0.2.2부터 공식 업데이트 주소는 `https://github.com/JungSeunghun/phone/releases/latest/download/latest.json`이다. 새 앱은 이 주소를 기본값으로 사용하며 기존 사용자 지정 주소는 유지한다. 0.2.0에서는 **업데이트 배포 주소**에 이 주소를 직접 저장한다. 정식 릴리스와 `latest.json`이 공개되어 있어야 작동하며, 기존 공개 키로 서명된 파일만 설치할 수 있다. 초안의 모든 파일을 검증한 뒤 릴리스를 공개하고 최신 릴리스로 지정한다.
 
 업데이트 서명 개인 키는 이 Mac의 `~/.config/phone-mirror/updater-signing.key`에 권한 600으로 생성했고, 공개 키는 `desktop/src-tauri/tauri.conf.json`에 포함했다. 개인 키는 저장소 밖에 유지하고 별도로 안전하게 백업한다. 키가 바뀌면 기존 설치 앱은 새 키의 업데이트를 받을 수 없으므로 기존 키를 유지하거나 기존 키로 키 교체 버전을 배포해야 한다. OS 코드 서명·Apple 공증과 업데이트 서명은 서로 별개다.
 
@@ -137,6 +137,6 @@ node scripts/release.mjs stage --target macos-arm64
 
 GitHub의 `releases/latest/download/latest.json` 주소를 사용할 때는 검토한 공개 정식 릴리스가 해당 주소에 연결되도록 최신 릴리스 설정도 확인한다. 버전별 다운로드 주소는 매니페스트 내부 파일 URL에 사용하고, 앱에는 새 매니페스트를 따라갈 수 있는 고정 주소를 등록한다.
 
-## 0.2.1 배포 범위
+## 0.2.2 배포 범위
 
 업데이트 서명은 기존 Phone Mirror 키를 유지한다. 현재 OS 코드 서명 모드는 `unsigned`이므로 Mac은 ad-hoc 서명·미공증, Windows는 게시자 코드 서명이 없는 개발용 설치 파일이다. 업데이트 서명 검증과 Apple 공증·Windows Authenticode는 별개다. 이 상태를 릴리스 설명과 manifest에 표시한다. 일반 사용자용 OS 신뢰 배포에는 위 Developer ID·Azure 서명 설정을 별도로 완료해야 한다. 라이선스 고지와 고정 의존성 소스 링크는 앱의 `licenses/runtime` 리소스에 포함한다.
