@@ -10,6 +10,63 @@ Thank you for helping improve Phone Mirror. Contributions to project-authored co
 
 The desktop application is in `desktop/`; the original Swift app is in `Sources/`; the iPhone sender and keyboard extension are in `ios/`. Preserve these boundaries and follow [AGENTS.md](AGENTS.md).
 
+## Branch management
+
+Use `main` as the integration branch and short-lived work branches. This convention applies to contributors and AI agents alike; `codex/` is not the default prefix.
+
+| Prefix | Purpose | Example |
+| --- | --- | --- |
+| `feature/` | New functionality | `feature/wireless-pairing` |
+| `fix/` | Ordinary bug fixes | `fix/android-recording` |
+| `hotfix/` | Urgent fixes to a released version | `hotfix/recording-crash` |
+| `release/` | Version updates and release preparation | `release/0.2.3` |
+| `chore/` | Tooling, configuration, and repository maintenance | `chore/rename-repository` |
+| `docs/` | Documentation changes | `docs/update-guide` |
+
+Use lowercase, descriptive, hyphen-separated work descriptions. Release branch suffixes use the intended version. Branch prefixes and commit types are separate: `feature/` branches normally contain `feat:` commits; a `chore/` branch may contain focused `build:`, `ci:`, `test:`, or `refactor:` commits as appropriate.
+
+1. Branch from current `main` for ordinary work.
+2. Keep one logical task per PR, use TDD for behavior changes, and include the applicable validation evidence.
+3. Merge through a PR after applicable CI passes and review is complete. Do not commit or push directly to `main`, or force-push it. Keep merged commit messages consistent with the conventions below.
+4. Delete merged work branches when no longer needed. A merge does not automatically publish a release.
+
+Do not introduce a permanent `develop` branch or separate platform development branches by default. Use directories and focused PRs to maintain platform boundaries. Release branches are temporary preparation branches; introduce a maintenance branch only when an older release line actually needs concurrent support.
+
+If an urgent fix must ship while `main` contains unrelated unreleased changes, create a temporary `release/<version>` branch from the affected release tag and branch `hotfix/<description>` from that base. Add regression tests and merge the hotfix and version preparation through a PR into that release branch before tagging a new PATCH version. Apply the fix and tests to `main` through a separate PR, without copying older release version changes. The hotfix release must not ship unrelated changes from `main`.
+
+## Versioning policy
+
+Use [Semantic Versioning](https://semver.org/) with the following explicit policy for the initial `0.x` development phase:
+
+| Change | Version increment | Example |
+| --- | --- | --- |
+| Compatible bug, security, or packaging fix | PATCH | `0.2.2` to `0.2.3` |
+| New functionality | MINOR; reset PATCH | `0.2.3` to `0.3.0` |
+| Incompatible public contract change during `0.x` | MINOR; reset PATCH and document migration | `0.3.2` to `0.4.0` |
+| First release with a defined stable public contract | `1.0.0` | `0.x` to `1.0.0` |
+
+From `1.0.0`, use PATCH for compatible fixes, MINOR for compatible new functionality, and MAJOR for incompatible public contract changes. Public contracts include connection protocols, persisted settings formats, and supported integration behavior. Incompatible changes require a `BREAKING CHANGE:` explanation and migration guidance, including during `0.x`. Compatible releases must preserve app identifiers, persisted settings compatibility, and the updater trust relationship; a necessary change to these requires a designed migration.
+
+Increase versions when preparing a release, not for every commit. Documentation-only changes or a repository rename do not require a release by themselves. If those changes are included in a newly distributed application artifact, give that artifact a new version. Choose the release increment from its actual behavior and compatibility changes, not automatically from a single commit type.
+
+Keep independently distributed applications independently versioned. Desktop uses `desktop-v<version>`, for example `desktop-v0.2.3`. Introduce `ios-v<version>` or `swift-v<version>` only when a separate distribution process is established; the existing Desktop workflow does not release those applications. Record compatible Desktop/iOS versions when a connection protocol changes.
+
+### Desktop release preparation
+
+1. Create `release/<version>` from `main` and update these six values together:
+   - `desktop/package.json`: `version`.
+   - `desktop/package-lock.json`: top-level `version` and `packages[""].version`.
+   - `desktop/src-tauri/tauri.conf.json`: `version`.
+   - `desktop/src-tauri/Cargo.toml`: `package.version`.
+   - `desktop/src-tauri/Cargo.lock`: the `phone-mirror-desktop` package version.
+2. Run the applicable development and release checks, including `npm run release:validate` from `desktop`, and document compatibility, migrations, and verification limitations in the release preparation PR.
+3. Merge the PR into `main` and create an annotated `desktop-v<version>` tag at the exact verified commit. For a hotfix, merge and tag on the temporary release branch based on the affected release tag, as described above.
+4. Push the tag to trigger the existing packaging and draft-release workflow. Verify the draft's source commit, platform artifacts, checksums, and update signatures before publishing.
+
+For preview releases, use `alpha.N`, `beta.N`, or `rc.N`, such as `desktop-v0.3.0-rc.1`. Mark previews as GitHub prereleases and do not promote them to the stable update feed. The current Desktop validator accepts version components from 0 to 65535 and preview numbers from 1 to 9999; it rejects leading zeros and build metadata. See [RELEASING.md](desktop/RELEASING.md) for packaging and publication details.
+
+Do not move or reuse release tags or replace published binaries or update manifests. Publish changed artifacts under a new version and tag. Existing published artifacts remain the evidence for their tagged source; explanatory release notes may be corrected without replacing artifacts.
+
 ## Commit messages
 
 Use Conventional Commits with an English imperative summary:
